@@ -1,36 +1,166 @@
-import logo from './logo.svg'
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { FileSpreadsheet, Upload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {  z } from "zod";
+import { useRef, useState } from "react";
+
+const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
+
 
 function App() {
-  return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
-  )
+	const jsonData = JSON.stringify(
+		{
+			dates: [
+				{
+					date: "2025-01-01",
+					events: [
+						{
+							name: "Event 1",
+							description: "Description 1",
+						},
+					],
+				},
+			],
+		},
+		null,
+		2,
+	);
+
+
+
+
+    const schema = z
+    .array(
+      z
+        .instanceof(File, { message: "Must be a file" })
+        .refine((file) => file.size <= MAX_UPLOAD_SIZE, {
+          message: "File size must be less than 3MB",
+        })
+    )
+    .nonempty({ message: "Please select at least one file" }) //
+
+
+
+    interface StatementFile {
+      id: string | null;
+      file: File;
+      uploaded: boolean;
+    }
+
+
+  const [statementFiles, setStatementFiles] = useState<StatementFile[]>([]);
+
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  function formatFileSize(file: File) {
+    const mbSize = file.size / (1024 * 1024)
+    if (mbSize < 1) {
+      return(mbSize * 1024).toFixed(2) + " KB"
+    } else {
+      return(mbSize).toFixed(2) + " MB"
+    }
+  }
+
+	const handleUploadClick = () => {
+		fileInputRef.current?.click();
+	};
+
+  function handleUpload(file: File) {
+    const statementFile: StatementFile = {
+      id: null,
+      file: file,
+      uploaded: false,
+    }
+    setStatementFiles(prevFiles => [...prevFiles, statementFile]);
+
+     // make an api call to upload the file
+    // if successful set new id
+    // else delete the file from the state
+
+  }
+
+	function onChange(fileList: FileList | null) {
+		console.log(fileList);
+
+		if (fileList) {
+      const files = Array.from(fileList)
+      const result = schema.safeParse(files)
+
+      if (result.success) {
+        console.log("File is valid");
+        //handle file upload. we only ever need to upload one file at at time.
+        handleUpload(files[0])
+      } else {
+        console.log("File is invalid", result.error);
+        // alert the user we could not upload file
+        // make an api call to log error TODO: log-error-backend
+      }
+
+		}
+	}
+
+
+
+	return (
+		<div className="flex flex-row gap-10 p-10 bg-gray-100 h-screen">
+			<div className="basis-2/3">
+				<pre id="json">{jsonData}</pre>
+			</div>
+			<div className="flex flex-col basis-1/3">
+				<Card className="w-3/6 ">
+					<CardHeader>
+						<CardTitle>Upload File</CardTitle>
+					</CardHeader>
+					<CardContent className="flex flex-col gap-4">
+           {/* Files upload section */}
+								<Input
+									ref={fileInputRef}
+									type="file"
+									id="file-upload"
+									className="hidden"
+									accept=".xlsx"
+									onChange={(e) => {
+										onChange(e.target.files);
+									}}
+								/>
+								<div
+									onClick={handleUploadClick}
+									className="gap-2  cursor-pointer bg-gray-200 flex flex-col justify-center items-center text-center  p-8 rounded-lg border-2 border-dashed border-gray-400 hover:border-blue-500 transition-colors"
+								>
+									<Upload />
+									<p className="font-semibold">Drop or Select Statement to Upload</p>
+									<p className="text-xs text-gray-500 font-medium">
+										Drop Statement here or click to browse through your machine
+									</p>
+								</div>
+
+                {/* Files uploaded */}
+                <div className="flex flex-col gap-2">
+                  {statementFiles.map(({id, file}) => (
+                    <div className="flex flex-row justify-between items-center rounded-lg border-2 border-dashed border-gray-200 p-2 cursor-pointer gap-2 hover:bg-gray-50" key={id}>
+                      <FileSpreadsheet className="w-10 h-10" />
+                      <div className="truncate">
+                      <p className="text-sm font-semibold truncate w-3/4">{file.name}</p>
+                      <p className="text-sm font-semibold text-gray-500">{formatFileSize(file)}</p>
+                      </div>
+
+
+
+                    </div>
+                  ))}
+                </div>
+
+					</CardContent>
+				</Card>
+			</div>
+		</div>
+	);
 }
 
-export default App
+export default App;
