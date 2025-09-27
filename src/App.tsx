@@ -8,6 +8,7 @@ import { FileSpreadsheet, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {  z } from "zod";
 import { useRef, useState } from "react";
+import { formatFileSize } from "@/utils/formatFileSize";
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
 
@@ -58,14 +59,6 @@ function App() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-  function formatFileSize(file: File) {
-    const mbSize = file.size / (1024 * 1024)
-    if (mbSize < 1) {
-      return(mbSize * 1024).toFixed(2) + " KB"
-    } else {
-      return(mbSize).toFixed(2) + " MB"
-    }
-  }
 
 	const handleUploadClick = () => {
 		fileInputRef.current?.click();
@@ -77,7 +70,7 @@ function App() {
       file: file,
       uploaded: false,
     }
-    setStatementFiles(prevFiles => [...prevFiles, statementFile]);
+    setStatementFiles([statementFile]); // clear all previous files because we only support one document.
 
      // make an api call to upload the file
     // if successful set new id
@@ -86,8 +79,6 @@ function App() {
   }
 
 	function onChange(fileList: FileList | null) {
-		console.log(fileList);
-
 		if (fileList) {
       const files = Array.from(fileList)
       const result = schema.safeParse(files)
