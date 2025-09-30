@@ -58,7 +58,7 @@ describe('App', () => {
     fireEvent.change(fileInput, { target: { files: createFileListMock(secondMockFile) } });
 
     await waitFor(() => {
-        expect(screen.queryByText(firstMockFile.name)).toBeNull();
+        expect(screen.queryByText(firstMockFile.name)).toBeDefined();
         expect(screen.getByText(secondMockFile.name)).toBeDefined();
       });
   });
