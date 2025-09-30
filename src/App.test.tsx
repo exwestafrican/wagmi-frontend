@@ -51,15 +51,19 @@ describe('App', () => {
     fireEvent.change(fileInput, { target: { files: createFileListMock(firstMockFile) } });
 
     await waitFor(() => {
+        // First file should exist
         expect(screen.getByText(firstMockFile.name)).toBeDefined();
+        // Second file should NOT exist
         expect(screen.queryByText(secondMockFile.name)).toBeNull();
       });
 
     fireEvent.change(fileInput, { target: { files: createFileListMock(secondMockFile) } });
 
     await waitFor(() => {
-        expect(screen.queryByText(firstMockFile.name)).toBeDefined();
-        expect(screen.getByText(secondMockFile.name)).toBeDefined();
+        // First file should NOT exist anymore
+        expect(screen.queryByText(firstMockFile.name)).toBeNull();
+        // Second file should exist now
+        expect(screen.getByText(secondMockFile.name)).toBeNull();
       });
   });
 
