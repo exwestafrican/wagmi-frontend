@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileSpreadsheet, Upload } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { z } from "zod";
-import { useRef, useState } from "react";
-import { formatFileSize } from "@/utils/formatFileSize";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileSpreadsheet, Upload } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { z } from "zod"
+import { useRef, useState } from "react"
+import { formatFileSize } from "@/utils/formatFileSize"
 
-const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
+const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
 
 function App() {
 	const jsonData = JSON.stringify(
@@ -24,7 +24,7 @@ function App() {
 		},
 		null,
 		2,
-	);
+	)
 
 	const schema = z
 		.array(
@@ -34,29 +34,29 @@ function App() {
 					message: "File size must be less than 3MB",
 				}),
 		)
-		.nonempty({ message: "Please select at least one file" }); //
+		.nonempty({ message: "Please select at least one file" }) //
 
 	interface StatementFile {
-		id: string | null;
-		file: File;
-		uploaded: boolean;
+		id: string | null
+		file: File
+		uploaded: boolean
 	}
 
-	const [statementFiles, setStatementFiles] = useState<StatementFile[]>([]);
+	const [statementFiles, setStatementFiles] = useState<StatementFile[]>([])
 
-	const fileInputRef = useRef<HTMLInputElement>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const handleUploadClick = () => {
-		fileInputRef.current?.click();
-	};
+		fileInputRef.current?.click()
+	}
 
 	function handleUpload(file: File) {
 		const statementFile: StatementFile = {
 			id: null,
 			file: file,
 			uploaded: false,
-		};
-		setStatementFiles([statementFile]); // clear all previous files because we only support one document.
+		}
+		setStatementFiles([statementFile]) // clear all previous files because we only support one document.
 
 		// make an api call to upload the file
 		// if successful set new id
@@ -65,15 +65,15 @@ function App() {
 
 	function onChange(fileList: FileList | null) {
 		if (fileList) {
-			const files = Array.from(fileList);
-			const result = schema.safeParse(files);
+			const files = Array.from(fileList)
+			const result = schema.safeParse(files)
 
 			if (result.success) {
-				console.log("File is valid");
+				console.log("File is valid")
 				//handle file upload. we only ever need to upload one file at at time.
-				handleUpload(files[0]);
+				handleUpload(files[0])
 			} else {
-				console.log("File is invalid", result.error);
+				console.log("File is invalid", result.error)
 				// alert the user we could not upload file
 				// make an api call to log error TODO: log-error-backend
 			}
@@ -99,12 +99,13 @@ function App() {
 							className="hidden"
 							accept=".xlsx"
 							onChange={(e) => {
-								onChange(e.target.files);
+								onChange(e.target.files)
 							}}
 						/>
-						<div
+						<button
+							type="button"
 							onClick={handleUploadClick}
-							className="gap-2  cursor-pointer bg-gray-200 flex flex-col justify-center items-center text-center  p-8 rounded-lg border-2 border-dashed border-gray-400 hover:border-blue-500 transition-colors"
+							className="gap-2 cursor-pointer bg-gray-200 flex flex-col justify-center items-center text-center p-8 rounded-lg border-2 border-dashed border-gray-400 hover:border-blue-500 transition-colors"
 						>
 							<Upload />
 							<p className="font-semibold">
@@ -113,7 +114,7 @@ function App() {
 							<p className="text-xs text-gray-500 font-medium">
 								Drop Statement here or click to browse through your machine
 							</p>
-						</div>
+						</button>
 
 						{/* Files uploaded */}
 						<div className="flex flex-col gap-2">
@@ -139,7 +140,7 @@ function App() {
 				</Card>
 			</div>
 		</div>
-	);
+	)
 }
 
-export default App;
+export default App
