@@ -40,7 +40,7 @@ describe("formatFileSize", () => {
 			{ size: 512, expected: "0.50 KB" }, // 0.50 KB
 		]
 
-		testCases.forEach(({ size, expected }) => {
+		for (const { size, expected } of testCases) {
 			const mockFile = {
 				size,
 				name: "test.txt",
@@ -49,6 +49,6 @@ describe("formatFileSize", () => {
 
 			const result = formatFileSize(mockFile)
 			expect(result).toBe(expected)
-		})
+		}
 	})
 })

@@ -102,9 +102,10 @@ function App() {
 								onChange(e.target.files)
 							}}
 						/>
-						<div
+						<button
+							type="button"
 							onClick={handleUploadClick}
-							className="gap-2  cursor-pointer bg-gray-200 flex flex-col justify-center items-center text-center  p-8 rounded-lg border-2 border-dashed border-gray-400 hover:border-blue-500 transition-colors"
+							className="gap-2 cursor-pointer bg-gray-200 flex flex-col justify-center items-center text-center p-8 rounded-lg border-2 border-dashed border-gray-400 hover:border-blue-500 transition-colors"
 						>
 							<Upload />
 							<p className="font-semibold">
@@ -113,7 +114,7 @@ function App() {
 							<p className="text-xs text-gray-500 font-medium">
 								Drop Statement here or click to browse through your machine
 							</p>
-						</div>
+						</button>
 
 						{/* Files uploaded */}
 						<div className="flex flex-col gap-2">
