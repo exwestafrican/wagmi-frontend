@@ -5,7 +5,7 @@ import type { StatementFile } from "@/features/file-upload/types/statementFile"
 describe("formatFileSize", () => {
 	test("should format large file sizes correctly", () => {
 		// Create a mock file with 10.75MB
-		const mockFile : StatementFile = {
+		const mockFile: StatementFile = {
 			size: 10.75 * 1024 * 1024, // 10.75MB in bytes
 			name: "large-file.xlsx",
 			id: "06f74755-155b-4cd7-99c2-9a42f5cc8195", //create a random uuid
@@ -17,7 +17,7 @@ describe("formatFileSize", () => {
 
 	test("should format file size with zero bytes", () => {
 		// Create a mock file with 0 bytes
-		const mockFile : StatementFile = {
+		const mockFile: StatementFile = {
 			size: 0,
 			name: "large-file.xlsx",
 			id: "06f74755-155b-4cd7-99c2-9a42f5cc8195", //create a random uuid
@@ -42,13 +42,11 @@ describe("formatFileSize", () => {
 		]
 
 		for (const { size, expected } of testCases) {
-
-			const mockFile : StatementFile = {
+			const mockFile: StatementFile = {
 				size: size,
 				name: "large-file.xlsx",
 				id: "06f74755-155b-4cd7-99c2-9a42f5cc8195", //create a random uuid
 			}
-
 
 			const result = formatFileSize(mockFile)
 			expect(result).toBe(expected)
