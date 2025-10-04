@@ -1,9 +1,7 @@
-import UploadPage from "@/features/file-upload/upload-page";
-
-
+import UploadPage from "@/features/file-upload/upload-page"
 
 function App() {
-  return <UploadPage />
+	return <UploadPage />
 }
 
 export default App
