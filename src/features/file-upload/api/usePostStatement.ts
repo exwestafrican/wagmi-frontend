@@ -20,8 +20,17 @@ export function usePostStatement() {
 				},
 			})
 		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["uploads"] })
+		onSuccess: (response) => {
+			// Update the query cache with the new data
+			queryClient.setQueryData(["uploads"], () => {
+				const newFile = {
+					id: response.data.id,
+					name: response.data.name,
+					size: response.data.size,
+				}
+				// Replace the entire array with the new file (overwrite behavior)
+				return [newFile]
+			})
 		},
 	})
 }
