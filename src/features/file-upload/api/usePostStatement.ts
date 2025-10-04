@@ -16,7 +16,7 @@ export function usePostStatement() {
 				onUploadProgress: (progressEvent) => {
 					const total = progressEvent.total || 0
 					const percent = Math.round((progressEvent.loaded * 100) / total)
-					console.log(percent)
+					console.info(percent)
 				},
 			})
 		},

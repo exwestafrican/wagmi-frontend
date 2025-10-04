@@ -67,11 +67,10 @@ function UploadPage() {
 			const result = schema.safeParse(files)
 
 			if (result.success) {
-				console.log("File is valid")
-				// Start upload - onSuccess will update with real ID from backend
+				console.info("File is valid")
 				uploadMutation(files[0])
 			} else {
-				console.log("File is invalid", result.error)
+				console.error("File is invalid", result.error)
 				// alert the user we could not upload file
 				// make an api call to log error TODO: log-error-backend
 			}
