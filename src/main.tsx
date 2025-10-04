@@ -12,7 +12,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
-import App from "./App.tsx"
+import UploadPage from "@/features/file-upload/upload-page"
 
 const rootRoute = createRootRoute({
 	component: () => (
@@ -26,7 +26,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: App,
+	component: UploadPage,
 })
 
 const routeTree = rootRoute.addChildren([indexRoute])
