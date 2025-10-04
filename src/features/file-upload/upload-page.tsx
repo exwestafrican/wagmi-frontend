@@ -2,25 +2,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileSpreadsheet, Upload } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { z } from "zod"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { formatFileSize } from "@/utils/formatFileSize"
+import { usePostStatement } from "./api/usePostStatement"
+import type { StatementFile } from "@/features/file-upload/types/statementFile"
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
 
 function UploadPage() {
 	const jsonData = JSON.stringify(
 		{
-			dates: [
-				{
-					date: "2025-01-01",
-					events: [
-						{
-							name: "Event 1",
-							description: "Description 1",
-						},
-					],
-				},
-			],
+			app: {
+				name: "Wagmi",
+				version: "1.0.0",
+				description: "🧘🏾‍♂️ Lets figure out what your bank statements say about you 💰",
+            },
+			userMeta: {
+				generatedAt: new Date().toISOString(),
+				timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+				viewport: {
+					width: window.innerWidth,
+					height: window.innerHeight
+				}
+			},
+			author: {
+				name: "WaggzzCorp",
+				message: "Built with ❤️ for finance",
+				year: new Date().getFullYear()
+			}
 		},
 		null,
 		2,
@@ -28,21 +37,33 @@ function UploadPage() {
 
 	const schema = z
 		.array(
-			z
-				.instanceof(File, { message: "Must be a file" })
-				.refine((file) => file.size <= MAX_UPLOAD_SIZE, {
-					message: "File size must be less than 3MB",
-				}),
+			z.instanceof(File, { message: "Must be a file" })
+            .refine((file) => file.size <= MAX_UPLOAD_SIZE, {
+                message: "File size must be less than 3MB",
+            }),
 		)
 		.nonempty({ message: "Please select at least one file" }) //
 
-	interface StatementFile {
-		id: string | null
-		file: File
-		uploaded: boolean
-	}
 
-	const [statementFiles, setStatementFiles] = useState<StatementFile[]>([])
+    const [statementFiles, setStatementFiles] = useState<StatementFile[]>([])
+
+
+
+	const { mutate: uploadMutation, data: responseData, isSuccess, isError, error } = usePostStatement()
+
+
+	useEffect(() => {
+		if (isSuccess && responseData) {
+			console.log('Upload successful:', responseData)
+			const data = responseData.data
+			setStatementFiles([{ id: data.id, name: data.name, size: data.size }])
+		}
+		if (isError) {
+			console.error('Upload failed:', error)
+		}
+	}, [isSuccess, isError, responseData, error])
+
+
 
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -50,18 +71,6 @@ function UploadPage() {
 		fileInputRef.current?.click()
 	}
 
-	function handleUpload(file: File) {
-		const statementFile: StatementFile = {
-			id: null,
-			file: file,
-			uploaded: false,
-		}
-		setStatementFiles([statementFile]) // clear all previous files because we only support one document.
-
-		// make an api call to upload the file
-		// if successful set new id
-		// else delete the file from the state
-	}
 
 	function onChange(fileList: FileList | null) {
 		if (fileList) {
@@ -71,7 +80,7 @@ function UploadPage() {
 			if (result.success) {
 				console.log("File is valid")
 				//handle file upload. we only ever need to upload one file at at time.
-				handleUpload(files[0])
+				uploadMutation(files[0])
 			} else {
 				console.log("File is invalid", result.error)
 				// alert the user we could not upload file
@@ -81,12 +90,12 @@ function UploadPage() {
 	}
 
 	return (
-		<div className="flex flex-row gap-10 p-10 bg-gray-100 h-screen">
+		<div className="flex flex-row gap-10 p-10 bg-gray-100 h-screen justify-between ">
 			<div className="basis-2/3">
 				<pre id="json">{jsonData}</pre>
 			</div>
 			<div className="flex flex-col basis-1/3">
-				<Card className="w-3/6 ">
+				<Card className="w-full max-w-96">
 					<CardHeader>
 						<CardTitle>Upload File</CardTitle>
 					</CardHeader>
@@ -118,10 +127,10 @@ function UploadPage() {
 
 						{/* Files uploaded */}
 						<div className="flex flex-col gap-2">
-							{statementFiles.map(({ id, file }) => (
+							{statementFiles.map((file) => (
 								<div
 									className="flex flex-row justify-between items-center rounded-lg border-2 border-dashed border-gray-200 p-2 cursor-pointer gap-2 hover:bg-gray-50"
-									key={id}
+									key={file.id}
 								>
 									<FileSpreadsheet className="w-6 h-6" />
 
