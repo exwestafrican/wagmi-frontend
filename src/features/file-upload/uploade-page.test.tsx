@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import App from "@/App"
+import UploadPage from "@/features/file-upload/upload-page"
 
-describe("App", () => {
+describe("UploadPage", () => {
 	function createFileListMock(mockFile: File) {
 		return {
 			0: mockFile,
@@ -21,7 +21,7 @@ describe("App", () => {
 	}
 
 	test("user can upload one file", async () => {
-		render(<App />)
+		render(<UploadPage />)
 
 		// Create a mock Excel file
 		const mockFile = createMockFile("test.xlsx", "test content")
@@ -39,7 +39,7 @@ describe("App", () => {
 	})
 
 	test("uploading an extra file overwrites previous upload", async () => {
-		render(<App />)
+		render(<UploadPage />)
 
 		const firstMockFile = createMockFile("first-test.xlsx", "test content")
 		const secondMockFile = createMockFile("second-test.xlsx", "test content")
@@ -66,7 +66,7 @@ describe("App", () => {
 	})
 
 	test("user cannot upload file exceeding size limit", async () => {
-		render(<App />)
+		render(<UploadPage />)
 
 		// Create a mock file that's larger than MAX_UPLOAD_SIZE (3MB)
 		const largeMockFile = createMockFile("large-file.xlsx", "test content")

@@ -8,11 +8,24 @@ import {
 	createRouter,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
-import App from "./App.tsx"
+import UploadPage from "@/features/file-upload/upload-page"
+
+// Create a client
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // 5 minutes
+			gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+			retry: 1,
+			refetchOnWindowFocus: false,
+		},
+	},
+})
 
 const rootRoute = createRootRoute({
 	component: () => (
@@ -26,7 +39,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: App,
+	component: UploadPage,
 })
 
 const routeTree = rootRoute.addChildren([indexRoute])
@@ -51,7 +64,9 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement)
 	root.render(
 		<StrictMode>
-			<RouterProvider router={router} />
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
 		</StrictMode>,
 	)
 }
