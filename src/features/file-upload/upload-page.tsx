@@ -2,9 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileSpreadsheet, Upload } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { z } from "zod"
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import { formatFileSize } from "@/utils/formatFileSize"
-import { usePostStatement } from "./api/usePostStatement"
+import { usePostStatement } from "@/features/file-upload/api/usePostStatement"
+import { useQuery } from "@tanstack/react-query"
 import type { StatementFile } from "@/features/file-upload/types/statementFile"
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 3 // 3MB
@@ -15,21 +16,22 @@ function UploadPage() {
 			app: {
 				name: "Wagmi",
 				version: "1.0.0",
-				description: "🧘🏾‍♂️ Lets figure out what your bank statements say about you 💰",
-            },
+				description:
+					"🧘🏾‍♂️ Lets figure out what your bank statements say about you 💰",
+			},
 			userMeta: {
 				generatedAt: new Date().toISOString(),
 				timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 				viewport: {
 					width: window.innerWidth,
-					height: window.innerHeight
-				}
+					height: window.innerHeight,
+				},
 			},
 			author: {
 				name: "WaggzzCorp",
 				message: "Built with ❤️ for finance",
-				year: new Date().getFullYear()
-			}
+				year: new Date().getFullYear(),
+			},
 		},
 		null,
 		2,
@@ -37,40 +39,27 @@ function UploadPage() {
 
 	const schema = z
 		.array(
-			z.instanceof(File, { message: "Must be a file" })
-            .refine((file) => file.size <= MAX_UPLOAD_SIZE, {
-                message: "File size must be less than 3MB",
-            }),
+			z
+				.instanceof(File, { message: "Must be a file" })
+				.refine((file) => file.size <= MAX_UPLOAD_SIZE, {
+					message: "File size must be less than 3MB",
+				}),
 		)
 		.nonempty({ message: "Please select at least one file" }) //
 
+	const { data: uploadedFiles = [] } = useQuery<StatementFile[]>({
+		queryKey: ["uploads"] as const,
+		queryFn: () => [], // This will be populated by setQueryData in onSuccess
+		initialData: [],
+	})
 
-    const [statementFiles, setStatementFiles] = useState<StatementFile[]>([])
-
-
-
-	const { mutate: uploadMutation, data: responseData, isSuccess, isError, error } = usePostStatement()
-
-
-	useEffect(() => {
-		if (isSuccess && responseData) {
-			console.log('Upload successful:', responseData)
-			const data = responseData.data
-			setStatementFiles([{ id: data.id, name: data.name, size: data.size }])
-		}
-		if (isError) {
-			console.error('Upload failed:', error)
-		}
-	}, [isSuccess, isError, responseData, error])
-
-
+	const { mutate: uploadMutation } = usePostStatement()
 
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const handleUploadClick = () => {
 		fileInputRef.current?.click()
 	}
-
 
 	function onChange(fileList: FileList | null) {
 		if (fileList) {
@@ -79,7 +68,7 @@ function UploadPage() {
 
 			if (result.success) {
 				console.log("File is valid")
-				//handle file upload. we only ever need to upload one file at at time.
+				// Start upload - onSuccess will update with real ID from backend
 				uploadMutation(files[0])
 			} else {
 				console.log("File is invalid", result.error)
@@ -127,7 +116,7 @@ function UploadPage() {
 
 						{/* Files uploaded */}
 						<div className="flex flex-col gap-2">
-							{statementFiles.map((file) => (
+							{uploadedFiles.map((file) => (
 								<div
 									className="flex flex-row justify-between items-center rounded-lg border-2 border-dashed border-gray-200 p-2 cursor-pointer gap-2 hover:bg-gray-50"
 									key={file.id}
