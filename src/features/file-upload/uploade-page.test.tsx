@@ -1,8 +1,28 @@
 import { describe, expect, test } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import UploadPage from "@/features/file-upload/upload-page"
 
 describe("UploadPage", () => {
+	// Create a test wrapper with QueryClient
+	function renderWithQueryClient(component: React.ReactElement) {
+		const queryClient = new QueryClient({
+			defaultOptions: {
+				queries: {
+					retry: false,
+				},
+				mutations: {
+					retry: false,
+				},
+			},
+		})
+		return render(
+			<QueryClientProvider client={queryClient}>
+				{component}
+			</QueryClientProvider>
+		)
+	}
+
 	function createFileListMock(mockFile: File) {
 		return {
 			0: mockFile,
@@ -21,7 +41,7 @@ describe("UploadPage", () => {
 	}
 
 	test("user can upload one file", async () => {
-		render(<UploadPage />)
+		renderWithQueryClient(<UploadPage />)
 
 		// Create a mock Excel file
 		const mockFile = createMockFile("test.xlsx", "test content")
@@ -39,7 +59,7 @@ describe("UploadPage", () => {
 	})
 
 	test("uploading an extra file overwrites previous upload", async () => {
-		render(<UploadPage />)
+		renderWithQueryClient(<UploadPage />)
 
 		const firstMockFile = createMockFile("first-test.xlsx", "test content")
 		const secondMockFile = createMockFile("second-test.xlsx", "test content")
@@ -66,7 +86,7 @@ describe("UploadPage", () => {
 	})
 
 	test("user cannot upload file exceeding size limit", async () => {
-		render(<UploadPage />)
+		renderWithQueryClient(<UploadPage />)
 
 		// Create a mock file that's larger than MAX_UPLOAD_SIZE (3MB)
 		const largeMockFile = createMockFile("large-file.xlsx", "test content")
