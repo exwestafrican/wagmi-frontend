@@ -15,6 +15,8 @@ import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
 import WaitListPage from "@/features/waitlist/waitlist-page"
+import LoginPage from "@/features/auth/login-page.tsx"
+import SignupPage from "@/features/auth/signup-page.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -34,7 +36,28 @@ const indexRoute = createRoute({
 	component: WaitListPage,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
+const authRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "auth",
+	component: () => <Outlet />,
+})
+
+const signupRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/signup",
+	component: SignupPage,
+})
+
+const loginRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/login",
+	component: LoginPage,
+})
+
+const routeTree = rootRoute.addChildren([
+	indexRoute,
+	authRoute.addChildren([signupRoute, loginRoute]),
+])
 
 const router = createRouter({
 	routeTree,
