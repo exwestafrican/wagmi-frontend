@@ -18,6 +18,7 @@ import WaitListPage from "@/features/waitlist/waitlist-page"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { Toaster } from "sonner"
 
+
 // Create a client
 const queryClient = new QueryClient({})
 
