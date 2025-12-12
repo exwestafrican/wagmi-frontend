@@ -1,7 +1,7 @@
-import UploadPage from "@/features/file-upload/upload-page"
+import ChatPage from "@/features/chat/chat-page"
 
 function App() {
-	return <UploadPage />
+	return <ChatPage />
 }
 
 export default App
