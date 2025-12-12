@@ -1,8 +1,7 @@
-import React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { loginSchema, type LoginData } from "./schema/authSchema"
+import { loginSchema, type LoginData } from "@/features/auth/schema/authSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
