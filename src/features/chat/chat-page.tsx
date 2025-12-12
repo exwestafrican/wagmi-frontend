@@ -56,9 +56,8 @@ export default function ChatPage() {
 				{messages.map((message) => {
 					if (message.direction === MessageDirection.INBOUND) {
 						return <InboundMessage key={message.id} message={message} />
-					} else {
-						return <OutboundMessage key={message.id} message={message} />
 					}
+					return <OutboundMessage key={message.id} message={message} />
 				})}
 			</div>
 
