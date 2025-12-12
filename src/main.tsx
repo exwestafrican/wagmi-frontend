@@ -14,9 +14,8 @@ import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
 import UploadPage from "@/features/file-upload/upload-page"
-import App from "@/App.tsx"
-import LoginPage from "./features/auth/login-page.tsx"
-import SignupPage from "./features/auth/signup-page.tsx"
+import LoginPage from "@/features/auth/login-page.tsx"
+import SignupPage from "@/features/auth/signup-page.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})

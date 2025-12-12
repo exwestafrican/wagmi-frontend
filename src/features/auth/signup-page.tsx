@@ -1,15 +1,13 @@
-import React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { signupSchema, type SignupData } from "./schema/authSchema"
+import { signupSchema, type SignupData } from "@/features/auth/schema/authSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
 const SignupPage = () => {
 	const {
 		register,
-		control,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<SignupData>({
