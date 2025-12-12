@@ -4,20 +4,19 @@ import { MessageDirection } from "@/features/chat/types/message"
 import { Input } from "@/components/ui/input"
 
 export default function ChatPage() {
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter" && messageContent.trim() !== "") {
-            const newMessage: Message = {
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter" && messageContent.trim() !== "") {
+			const newMessage: Message = {
 				id: messages.length + 1,
 				content: messageContent.trim(),
 				direction: MessageDirection.OUTBOUND,
 				createdAt: new Date(),
 			}
 
-            setMessages((prev) => [...prev, newMessage])
+			setMessages((prev) => [...prev, newMessage])
 			setMessageContent("")
-        }
-    }
+		}
+	}
 	const [messageContent, setMessageContent] = useState("")
 
 	const [messages, setMessages] = useState<Message[]>([
@@ -62,15 +61,14 @@ export default function ChatPage() {
 					}
 				})}
 			</div>
-			<div className="">
-				<Input
-					value={messageContent}
-					onChange={(e) => setMessageContent(e.target.value)}
-					type="text"
-					placeholder="Message"
-					onKeyDown={handleKeyDown}
-				/>
-			</div>
+
+			<Input
+				value={messageContent}
+				onChange={(e) => setMessageContent(e.target.value)}
+				type="text"
+				placeholder="Message"
+				onKeyDown={handleKeyDown}
+			/>
 		</div>
 	)
 }
