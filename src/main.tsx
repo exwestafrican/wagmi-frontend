@@ -14,6 +14,7 @@ import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
 import UploadPage from "@/features/file-upload/upload-page"
+import ChatPage from "@/features/chat/chat-page"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -33,7 +34,13 @@ const indexRoute = createRoute({
 	component: UploadPage,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
+const chatRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/chat",
+	component: ChatPage,
+})
+
+const routeTree = rootRoute.addChildren([indexRoute, chatRoute])
 
 const router = createRouter({
 	routeTree,
