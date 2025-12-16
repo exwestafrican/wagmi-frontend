@@ -1,22 +1,37 @@
 import { Button } from "@/components/ui/button"
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { signupSchema, type SignupData } from "@/features/auth/schema/authSchema"
+import {
+	type SignupData,
+	signupSchema,
+} from "@/features/auth/schema/signupSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { Link } from "@tanstack/react-router"
 
 const SignupPage = () => {
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<SignupData>({
+	const form = useForm<SignupData>({
 		resolver: zodResolver(signupSchema),
 		mode: "onSubmit",
+		defaultValues: {
+			firstName: "",
+			lastName: "",
+			workEmail: "",
+			companyName: "",
+			phoneNumber: "",
+		},
 	})
 
-	const submitData = (data: SignupData) => {
-		console.log(data)
+	const onSubmit = (data: SignupData) => {
+		console.log(`Signup Data: ${data}`)
 	}
 
 	return (
@@ -27,115 +42,93 @@ const SignupPage = () => {
 					<p>Create an account</p>
 				</div>
 			</div>
-			<form
-				action=""
-				className="w-full md:max-w-125 lg:max-w-175 flex flex-col gap-6"
-				onSubmit={handleSubmit(submitData)}
-			>
-				{/* ------ first name ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="firstName" className="font-bold">
-						First Name
-					</Label>
-					<div>
-						<Input
-							id="firstName"
-							type="text"
-							className={`${errors.firstName ? "border-red-600" : ""}`}
-							placeholder="John"
-							{...register("firstName")}
-						/>
-						{errors.firstName && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.firstName.message}
-							</p>
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="space-y-4 w-full max-w-175 flex flex-col gap-6"
+				>
+					<FormField
+						control={form.control}
+						name="firstName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>First Name</FormLabel>
+								<FormControl>
+									<Input placeholder="John" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				{/* ------ last name name ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="lastName" className="font-bold">
-						Last Name
-					</Label>
-					<div>
-						<Input
-							id="lastName"
-							type="text"
-							className={`${errors.lastName ? "border-red-600" : ""}`}
-							placeholder="Doe"
-							{...register("lastName")}
-						/>
-						{errors.lastName && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.lastName.message}
-							</p>
+					/>
+
+					<FormField
+						control={form.control}
+						name="lastName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Last Name</FormLabel>
+								<FormControl>
+									<Input placeholder="Doe" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				{/* ------ company name ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="companyName" className="font-bold">
-						Company Name
-					</Label>
-					<div>
-						<Input
-							id="companyName"
-							type="text"
-							className={`${errors.companyName ? "border-red-600" : ""}`}
-							placeholder="John Doe Enterprises"
-							{...register("companyName")}
-						/>
-						{errors.companyName && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.companyName.message}
-							</p>
+					/>
+
+					<FormField
+						control={form.control}
+						name="workEmail"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Work Email</FormLabel>
+								<FormControl>
+									<Input placeholder="jd@xxx.com" {...field} />
+								</FormControl>
+								<FormDescription className="text-xs">
+									In the absence of work email, please provide personal email
+									address
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				{/* ------ work email ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="workEmail" className="font-bold">
-						Work Email
-					</Label>
-					<div>
-						<Input
-							id="workEmail"
-							type="email"
-							className={`${errors.workEmail ? "border-red-600" : ""}`}
-							placeholder="jd@xxx.com"
-							{...register("workEmail")}
-						/>
-						{errors.workEmail && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.workEmail.message}
-							</p>
+					/>
+
+					<FormField
+						control={form.control}
+						name="companyName"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Company Name</FormLabel>
+								<FormControl>
+									<Input placeholder="Doe.inc" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				{/* ------ phone number ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="phoneNumber" className="font-bold">
-						Phone Number
-					</Label>
-					<div>
-						<Input
-							id="phoneNumber"
-							type="text"
-							className={`${errors.phoneNumber ? "border-red-600" : ""}`}
-							placeholder="080xxxxxxxx"
-							{...register("phoneNumber")}
-						/>
-						{errors.phoneNumber && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.phoneNumber.message}
-							</p>
+					/>
+
+					<FormField
+						control={form.control}
+						name="phoneNumber"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Phone Number</FormLabel>
+								<FormControl>
+									<Input placeholder="091xxxxxxx" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				<Button className="" type="submit">
-					Signup
-				</Button>
-			</form>
+					/>
+
+					<Button type="submit" className="w-full">
+						Sign Up
+					</Button>
+				</form>
+			</Form>
+			<p className="mt-2 text-sm">
+				Already have an account? <Link to="/auth/login" className="font-bold cursor-pointer">Login</Link>
+			</p>
 		</div>
 	)
 }

@@ -1,22 +1,30 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { loginSchema, type LoginData } from "@/features/auth/schema/authSchema"
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form"
+import { type LoginData, loginSchema } from "@/features/auth/schema/loginSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { Link } from "@tanstack/react-router"
 
 const LoginPage = () => {
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<LoginData>({
+	const form = useForm<LoginData>({
 		resolver: zodResolver(loginSchema),
 		mode: "onSubmit",
+		defaultValues: {
+			workEmail: "",
+		},
 	})
 
-	const onSumbit = (data: LoginData) => {
-		console.log(data)
+	const onSubmit = (data: LoginData) => {
+		console.log(`Login Data: ${data}`)
 	}
 
 	return (
@@ -27,35 +35,36 @@ const LoginPage = () => {
 					<p>Login to your account</p>
 				</div>
 			</div>
-			<form
-				action=""
-				className="w-full md:max-w-125 lg:max-w-175 flex flex-col gap-6"
-				onSubmit={handleSubmit(onSumbit)}
-			>
-				{/* ------ work email ------ */}
-				<div className="flex flex-col gap-2">
-					<Label htmlFor="workemail" className="font-bold">
-						Work Email
-					</Label>
-					<div>
-						<Input
-							id="workemail"
-							type="email"
-							className={`${errors.workEmail ? "border-red-600" : ""}`}
-							placeholder="jd@xxx.com"
-							{...register("workEmail")}
-						/>
-						{errors.workEmail && (
-							<p className="mt-2 text-sm text-red-600">
-								{errors.workEmail.message}
-							</p>
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="w-full md:max-w-125 lg:max-w-175 flex flex-col gap-6"
+				>
+					<FormField
+						control={form.control}
+						name="workEmail"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Work Email</FormLabel>
+								<FormControl>
+									<Input placeholder="jd@xxx.com" {...field} />
+								</FormControl>
+								<FormDescription className="text-xs">
+									Please enter your registered email address
+								</FormDescription>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
-				</div>
-				<Button className="" type="submit">
-					Login
-				</Button>
-			</form>
+					/>
+
+					<Button className="" type="submit">
+						Login
+					</Button>
+				</form>
+			</Form>
+			<p className="mt-2 text-sm">
+				Don't have an account? <Link to="/auth/signup" className="font-bold cursor-pointer">Sign up</Link>
+			</p>
 		</div>
 	)
 }
