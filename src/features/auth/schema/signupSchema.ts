@@ -14,11 +14,3 @@ export const signupSchema = z.object({
 })
 
 export type SignupData = z.infer<typeof signupSchema>
-
-export const loginSchema = z.object({
-	workEmail: z
-		.email({ message: "Invalid email address, please try again" })
-		.nonempty({ message: "Work email is required" }),
-})
-
-export type LoginData = z.infer<typeof loginSchema>
