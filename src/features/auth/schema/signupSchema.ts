@@ -1,7 +1,11 @@
 import z from "zod"
 
 export const signupSchema = z.object({
-	firstName: z.string().nonempty({ message: "First name is required" }),
+	firstName: z
+		.string()
+		.trim()
+		.nonempty({ message: "First name is required" })
+		.min(2, { message: "First name must contain at least 2 characters" }),
 	lastName: z.string().nonempty({ message: "Last name is required" }),
 	companyName: z.string().nonempty({ message: "Company name is required" }),
 	workEmail: z
