@@ -63,7 +63,10 @@ const LoginPage = () => {
 				</form>
 			</Form>
 			<p className="mt-2 text-sm">
-				Don't have an account? <Link to="/auth/signup" className="font-bold cursor-pointer">Sign up</Link>
+				Don't have an account?{" "}
+				<Link to="/auth/signup" className="font-bold cursor-pointer">
+					Sign up
+				</Link>
 			</p>
 		</div>
 	)

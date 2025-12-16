@@ -54,7 +54,11 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
-									<Input placeholder="John" {...field} />
+									<Input
+										placeholder="John"
+										{...field}
+										data-testid="first-name"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -68,7 +72,7 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
-									<Input placeholder="Doe" {...field} />
+									<Input placeholder="Doe" {...field} data-testid="last-name" />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -82,7 +86,11 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Work Email</FormLabel>
 								<FormControl>
-									<Input placeholder="jd@xxx.com" {...field} />
+									<Input
+										placeholder="jd@xxx.com"
+										{...field}
+										data-testid="work-email"
+									/>
 								</FormControl>
 								<FormDescription className="text-xs">
 									In the absence of work email, please provide personal email
@@ -100,7 +108,11 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Company Name</FormLabel>
 								<FormControl>
-									<Input placeholder="Doe.inc" {...field} />
+									<Input
+										placeholder="Doe.inc"
+										{...field}
+										data-testid="company-name"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -114,20 +126,27 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Phone Number</FormLabel>
 								<FormControl>
-									<Input placeholder="091xxxxxxx" {...field} />
+									<Input
+										placeholder="091xxxxxxx"
+										{...field}
+										data-testid="phone-number"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 
-					<Button type="submit" className="w-full">
+					<Button type="submit" className="w-full" data-testid="signup-button">
 						Sign Up
 					</Button>
 				</form>
 			</Form>
 			<p className="mt-2 text-sm">
-				Already have an account? <Link to="/auth/login" className="font-bold cursor-pointer">Login</Link>
+				Already have an account?{" "}
+				<Link to="/auth/login" className="font-bold cursor-pointer">
+					Login
+				</Link>
 			</p>
 		</div>
 	)
