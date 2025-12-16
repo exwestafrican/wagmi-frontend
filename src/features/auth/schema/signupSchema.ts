@@ -4,6 +4,7 @@ export const signupSchema = z.object({
 	firstName: z
 		.string()
 		.trim()
+		.toLowerCase()
 		.nonempty({ message: "First name is required" })
 		.min(2, { message: "First name must contain at least 2 characters" }),
 	lastName: z.string().nonempty({ message: "Last name is required" }),
