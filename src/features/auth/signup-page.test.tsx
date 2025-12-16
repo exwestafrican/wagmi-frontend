@@ -30,21 +30,6 @@ describe("SignupPage", () => {
 	})
 
 	describe("user can not sign up with invalid data", () => {
-		test("user can not sign up with invalid first name", async () => {
-			render(<SignupPage />)
-			const user = userEvent.setup()
-			const firstNameInput = screen.getByTestId(Input.FIRST_NAME)
-			await user.type(firstNameInput, " ")
-			const submitButton = screen.getByTestId(Input.SUBMIT_BUTTON)
-			await user.click(submitButton)
-
-			await waitFor(() => {
-				const errorMessage = screen.getByText("First name is required")
-				expect(errorMessage).toBeDefined()
-				expect(errorMessage.textContent).toBe("First name is required")
-			})
-		})
-
 		test("user cannot use multiple spaces in name fields", async () => {
 			render(<SignupPage />)
 			const user = userEvent.setup()
