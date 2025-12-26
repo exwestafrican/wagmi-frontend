@@ -13,6 +13,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
+import LoginPage from "@/features/auth/login-page.tsx"
+import SignupPage from "@/features/auth/signup-page.tsx"
 import WaitListPage from "@/features/waitlist/waitlist-page"
 
 // Create a client
@@ -33,7 +35,28 @@ const indexRoute = createRoute({
 	component: WaitListPage,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
+const authRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "auth",
+	component: () => <Outlet />,
+})
+
+const signupRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/signup",
+	component: SignupPage,
+})
+
+const loginRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/login",
+	component: LoginPage,
+})
+
+const routeTree = rootRoute.addChildren([
+	indexRoute,
+	authRoute.addChildren([signupRoute, loginRoute]),
+])
 
 const router = createRouter({
 	routeTree,
