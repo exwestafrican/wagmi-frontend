@@ -13,7 +13,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
-import UploadPage from "@/features/file-upload/upload-page"
 import LoginPage from "@/features/auth/login-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import WaitListPage from "@/features/waitlist/waitlist-page"
