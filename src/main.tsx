@@ -16,6 +16,7 @@ import reportWebVitals from "./reportWebVitals.ts"
 import UploadPage from "@/features/file-upload/upload-page"
 import LoginPage from "@/features/auth/login-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
+import WaitListPage from "@/features/waitlist/waitlist-page"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -32,7 +33,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: UploadPage,
+	component: WaitListPage,
 })
 
 const authRoute = createRoute({
