@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useJoinWaitList } from "@/features/waitlist/api/useJoinWaitlist"
+import { toast } from "sonner"
 
 const formSchema = z.object({
 	email: z
@@ -32,6 +33,7 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
+                toast.success("You are on the wait list! 🍾🍾")
 			},
 		})
 	}
