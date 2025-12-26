@@ -13,7 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
-import UploadPage from "@/features/file-upload/upload-page"
+import WaitListPage from "@/features/waitlist/waitlist-page"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -30,7 +30,7 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: UploadPage,
+	component: WaitListPage,
 })
 
 const routeTree = rootRoute.addChildren([indexRoute])
