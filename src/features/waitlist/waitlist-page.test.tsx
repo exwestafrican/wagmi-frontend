@@ -36,5 +36,9 @@ describe("WaitListPage", () => {
 		})
 
 		expect(mockMutate).toHaveBeenCalledTimes(1)
+
+        await waitFor(() => {
+            expect(screen.getByText("You are on the wait list! 🍾🍾")).toBeInTheDocument()
+        })
 	})
 })
