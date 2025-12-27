@@ -49,11 +49,13 @@ const JoinWaitListForm = () => {
 							<FormControl>
 								<div className="flex items-center gap-3 border-b border-border pb-3">
 									<Input
+                                        data-testid="waitlist-email-input"
 										className="bg-transparent border-0 shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0  placeholder:text-foreground/40"
 										placeholder="Enter your email..."
 										{...field}
 									/>
 									<Button
+                                        data-testid="join-button"
 										className="cursor-pointer bg-black text-white hover:bg-black/90"
 										type="submit"
 										disabled={isPending}
