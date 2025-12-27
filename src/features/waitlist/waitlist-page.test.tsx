@@ -25,11 +25,11 @@ describe("WaitListPage", () => {
 		const user = userEvent.setup()
 		renderWithQueryClient(<WaitListPage />)
 
-		const emailInput = screen.getByPlaceholderText("Enter your email...")
+		const emailInput = screen.getByTestId("waitlist-email-input")
 		await user.type(emailInput, "test@example.com")
 		expect((emailInput as HTMLInputElement).value).toBe("test@example.com")
 
-		await user.click(screen.getByText("Get Notified"))
+		await user.click(screen.getByTestId("join-button"))
 
 		await waitFor(() => {
 			expect((emailInput as HTMLInputElement).value).toBe("")
