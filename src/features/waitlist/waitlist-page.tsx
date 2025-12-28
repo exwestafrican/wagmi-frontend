@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
 
 function WaitListPage() {
+    console.info("API_URL", import.meta.env.VITE_API_URL);
 	return (
 
 		<div
