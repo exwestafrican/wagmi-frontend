@@ -5,7 +5,7 @@ function WaitListPage() {
 	return (
 
 		<div
-			className="min-h-screen  flex items-center"
+			className="min-h-screen px-8 flex items-center"
 			style={{
 				background:
 					"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 120, 120, 0.15), transparent 50%), #ffffff",
