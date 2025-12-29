@@ -13,6 +13,7 @@ import { z } from "zod"
 import { useJoinWaitList } from "@/features/waitlist/api/useJoinWaitlist"
 import { toast } from "sonner"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
+import type { AxiosError } from "axios"
 
 const formSchema = z.object({
 	email: z
@@ -22,6 +23,12 @@ const formSchema = z.object({
 		.trim()
 		.toLowerCase(),
 })
+
+interface ErrorResponse {
+	message: string
+	error: string
+	statusCode: number
+}
 
 const JoinWaitListForm = () => {
 	const { mutate: joinWaitList, isPending } = useJoinWaitList()
@@ -40,11 +47,22 @@ const JoinWaitListForm = () => {
 				toast.success("Congratulations!!! You are on the wait list! 🍾🍾")
 			},
 			onError: (error: unknown) => {
-				const errorMessage =
-					error instanceof Error ? error.message : "Failed to join wait list"
-				toast.error("Uh oh! Something went wrong.", {
-					description: errorMessage,
-				})
+				const apiError = error as AxiosError<ErrorResponse>
+				const errorResponse: ErrorResponse | undefined = apiError.response
+					?.data as ErrorResponse | undefined
+				if (errorResponse) {
+					const errorMessage = errorResponse.message
+						? errorResponse.message
+						: "Failed to join wait list"
+					toast.error("Uh oh! Something went wrong.", {
+						description: errorMessage,
+					})
+				} else {
+					toast.error("Uh oh! Something went wrong.", {
+						description:
+							"We could not add you to the wait list at this time. Please try again later.",
+					})
+				}
 			},
 		})
 	}
