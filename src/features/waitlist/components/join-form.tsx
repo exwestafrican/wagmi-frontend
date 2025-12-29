@@ -33,7 +33,7 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
-                toast.success("You are on the wait list! 🍾🍾")
+				toast.success("You are on the wait list! 🍾🍾")
 			},
 		})
 	}
