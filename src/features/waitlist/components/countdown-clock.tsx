@@ -44,7 +44,7 @@ export default function CountdownClock() {
 		const timer = setInterval(calculateTimeLeft, ONE_SECOND) // call this every one second
 
 		return () => clearInterval(timer)
-	}, [])
+	}, [launchDate])
 
 	const getLabelValue = (key: string) => {
 		//TODO: Translate the label to the user's language

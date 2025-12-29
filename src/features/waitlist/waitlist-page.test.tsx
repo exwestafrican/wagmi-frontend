@@ -21,7 +21,11 @@ const mockJoin = vi.fn()
 const mockHasJoined = vi.fn(() => false)
 
 vi.mock("@/features/waitlist/store/useWaitlistStatus", () => ({
-	useWaitlistStore: (selector: (state: any) => any) => {
+	useWaitlistStore: (
+		selector: (state: { hasJoined: boolean; join: () => void }) =>
+			| boolean
+			| (() => void),
+	) => {
 		const state = {
 			hasJoined: mockHasJoined(),
 			join: mockJoin,
