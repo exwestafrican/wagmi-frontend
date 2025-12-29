@@ -1,8 +1,10 @@
 import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
+import CountdownClock from "@/features/waitlist/components/countdown-clock.tsx"
+import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 
 function WaitListPage() {
-	console.info("API_URL", import.meta.env.VITE_API_URL)
+	const hasJoined = useWaitlistStore((state) => state.hasJoined)
 	return (
 		<div
 			className="min-h-screen px-8 flex items-center"
@@ -11,7 +13,7 @@ function WaitListPage() {
 					"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 120, 120, 0.15), transparent 50%), #ffffff",
 			}}
 		>
-			<Toaster test-id="toaster" position="top-right" />
+			<Toaster richColors test-id="toaster" position="top-right" />
 			<main className="mx-auto max-w-6xl  w-full">
 				<div className="flex-1 gap-8  flex flex-col justify-center">
 					<div>
@@ -23,8 +25,16 @@ function WaitListPage() {
 							Unify all your customer communications in one powerful inbox.{" "}
 						</p>
 					</div>
-
-					<JoinWaitListForm />
+					{hasJoined ? (
+						<div>
+							<p className=" text-sm  text-foreground/40 tracking-tight mb-2">
+								Launching in
+							</p>
+							<CountdownClock />
+						</div>
+					) : (
+						<JoinWaitListForm />
+					)}
 				</div>
 			</main>
 		</div>

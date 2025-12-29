@@ -1,4 +1,4 @@
-Welcome to your new TanStack app! 
+Welcome to your new TanStack app!
 
 # Getting Started
 
@@ -162,7 +162,7 @@ import viteReact from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 
-  
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -489,3 +489,8 @@ Files prefixed with `demo` can be safely deleted. They are there to provide a st
 # Learn More
 
 You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+
+
+## Docs
+
+1. [toast](https://sonner.emilkowal.ski/)
