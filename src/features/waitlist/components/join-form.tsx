@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useJoinWaitList } from "@/features/waitlist/api/useJoinWaitlist"
 import { toast } from "sonner"
+import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 
 const formSchema = z.object({
 	email: z
@@ -24,6 +25,8 @@ const formSchema = z.object({
 
 const JoinWaitListForm = () => {
 	const { mutate: joinWaitList, isPending } = useJoinWaitList()
+	const join = useWaitlistStore((state) => state.join)
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: { email: "" },
@@ -33,7 +36,15 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
-				toast.success("You are on the wait list! 🍾🍾")
+				join() // update the store
+				toast.success("Congratulations!!! You are on the wait list! 🍾🍾")
+			},
+			onError: (error: unknown) => {
+				const errorMessage =
+					error instanceof Error ? error.message : "Failed to join wait list"
+				toast.error("Uh oh! Something went wrong.", {
+					description: errorMessage,
+				})
 			},
 		})
 	}
@@ -49,11 +60,13 @@ const JoinWaitListForm = () => {
 							<FormControl>
 								<div className="flex items-center gap-3 border-b border-border pb-3">
 									<Input
+										data-testid="waitlist-email-input"
 										className="bg-transparent border-0 shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0  placeholder:text-foreground/40"
 										placeholder="Enter your email..."
 										{...field}
 									/>
 									<Button
+										data-testid="join-button"
 										className="cursor-pointer bg-black text-white hover:bg-black/90"
 										type="submit"
 										disabled={isPending}
