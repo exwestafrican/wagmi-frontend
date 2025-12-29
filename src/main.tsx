@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import LanguageProvider from "./i18n/LanguageProvider.tsx"
 
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
@@ -55,9 +56,11 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement)
 	root.render(
 		<StrictMode>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-			</QueryClientProvider>
+			<LanguageProvider>
+				<QueryClientProvider client={queryClient}>
+					<RouterProvider router={router} />
+				</QueryClientProvider>
+			</LanguageProvider>
 		</StrictMode>,
 	)
 }
