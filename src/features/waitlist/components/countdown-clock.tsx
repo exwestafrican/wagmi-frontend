@@ -10,11 +10,11 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 		</div>
 	)
 }
+const MARCH = 2
+const LAUNCH_DATE = new Date(2026, MARCH, 14) // Move outside component
 
 export default function CountdownClock() {
-	const MARCH = 2
 	const ONE_SECOND = 1000 // 1,000ms -> 1sec
-	const launchDate = new Date(2026, MARCH, 14) //TODO: make this utc
 	const SECONDS_IN_A_DAY = 86400
 	const SECONDS_IN_AN_HOUR = 3600
 	const SECONDS_IN_A_MINUTE = 60
@@ -30,7 +30,7 @@ export default function CountdownClock() {
 			const currentLocalDateTime = Date.now()
 			const totalSeconds = Math.max(
 				0,
-				Math.floor((launchDate.getTime() - currentLocalDateTime) / 1000),
+				Math.floor((LAUNCH_DATE.getTime() - currentLocalDateTime) / 1000),
 			)
 
 			setTimeLeft({
@@ -44,7 +44,7 @@ export default function CountdownClock() {
 		const timer = setInterval(calculateTimeLeft, ONE_SECOND) // call this every one second
 
 		return () => clearInterval(timer)
-	}, [launchDate])
+	}, [])
 
 	const getLabelValue = (key: string) => {
 		//TODO: Translate the label to the user's language
