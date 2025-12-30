@@ -1,5 +1,12 @@
-import { vi } from "vitest"
+import { afterEach, vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
+
+vi.mock("axios")
+
+afterEach(() => {
+	vi.clearAllMocks()
+})
+
 // Mock window.matchMedia: window.matchMedia isn't available in the test environment. Sonner uses it for theme detection. Checking the test file and adding a mock:
 Object.defineProperty(window, "matchMedia", {
 	writable: true,
