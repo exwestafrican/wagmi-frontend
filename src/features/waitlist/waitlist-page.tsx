@@ -30,7 +30,7 @@ function upcomingProgress(features: RoadmapFeature[]) {
 }
 function WaitListPage() {
 	const hasJoined = useWaitlistStore((state) => state.hasJoined)
-	const emptyUpcomingFeatures = new Array(3).fill(0)
+	const emptyUpcomingFeatures = new Array(3).fill(0).map((_, idx) =>({id: idx}))
 	const { data: response, isLoading } = useGetRoadmapFeatures()
 
 	return (
@@ -90,8 +90,8 @@ function WaitListPage() {
 							<h2 className="tracking-wide text-sm"> Upcoming features</h2>
 						</div>
 						{isLoading
-							? emptyUpcomingFeatures.map((_, idx) => (
-									<UpcomingFeatureSkeleton key={idx} />
+							? emptyUpcomingFeatures.map((emptyFeature) => (
+									<UpcomingFeatureSkeleton key={emptyFeature.id} />
 								))
 							: upcomingProgress(response?.data ?? [])
 									.sort((a, b) => b.votes - a.votes)
