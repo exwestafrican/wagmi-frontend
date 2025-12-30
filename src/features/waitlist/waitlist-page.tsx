@@ -88,7 +88,7 @@ function WaitListPage() {
 
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
-							<h2 className="tracking-wide text-sm"> Upcoming features</h2>
+							<h2 className="tracking-wide text-sm"> upcoming features</h2>
 						</div>
 						{isLoading
 							? emptyUpcomingFeatures.map((emptyFeature) => (
