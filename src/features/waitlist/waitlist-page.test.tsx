@@ -1,8 +1,12 @@
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import WaitListPage from "./waitlist-page"
-import renderWithQueryClient from "@/common/renderWithQueryClient"
+import WaitListPage from "@/features/waitlist/waitlist-page"
+import renderWithQueryClient, {
+	createTestQueryClient,
+} from "@/common/renderWithQueryClient"
 import { screen, waitFor } from "@testing-library/react"
+import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
+import { ROADMAP_FEATURES } from "./api/useRoadmapFeatures"
 
 const mockMutate = vi.fn((_, options) => {
 	options?.onSuccess()
@@ -36,7 +40,6 @@ vi.mock("@/features/waitlist/store/useWaitlistStatus", () => ({
 
 describe("WaitListPage", () => {
 	beforeEach(() => {
-		vi.clearAllMocks()
 		mockHasJoined.mockReturnValue(false)
 	})
 
@@ -84,5 +87,72 @@ describe("WaitListPage", () => {
 		mockHasJoined.mockReturnValue(true)
 		renderWithQueryClient(<WaitListPage />)
 		expect(screen.getByTestId("countdown-clock")).toBeInTheDocument()
+	})
+
+	describe("Planned features", () => {
+		it("should display planned features", async () => {
+			const mockData = {
+				data: [
+					{
+						id: "1",
+						name: "receive Gmail emails in your inbox",
+						votes: 10,
+						icon: "mail",
+						stage: RoadmapFeatureStage.PLANNED,
+					},
+					{
+						id: "2",
+						name: "send and receive images in chat",
+						votes: 5,
+						icon: "image",
+						stage: RoadmapFeatureStage.PLANNED,
+					},
+				],
+			}
+			const queryClient = createTestQueryClient()
+
+			queryClient.setQueryData([ROADMAP_FEATURES], mockData)
+
+			renderWithQueryClient(<WaitListPage />, {
+				queryClient,
+			})
+
+			await waitFor(() => {
+				expect(screen.getByTestId("planned-feature-1")).toBeInTheDocument()
+			})
+
+			const allFeatures = screen.queryAllByTestId(/^planned-feature-/)
+			expect(allFeatures).toHaveLength(2)
+		})
+	})
+
+	describe("Upcoming features", () => {
+		it("should display upcoming features", async () => {
+			const mockData = {
+				data: [
+					{
+						id: "1",
+						name: "receive Gmail emails in your inbox",
+						votes: 10,
+						icon: "mail",
+						stage: RoadmapFeatureStage.IN_PROGRESS,
+					},
+				],
+			}
+			const queryClient = createTestQueryClient()
+
+			queryClient.setQueryData([ROADMAP_FEATURES], mockData)
+
+			renderWithQueryClient(<WaitListPage />, {
+				queryClient,
+			})
+
+			await waitFor(() => {
+				expect(screen.getByTestId("upcoming-feature-1")).toBeInTheDocument()
+			})
+
+			const allFeatures = screen.queryAllByTestId(/^upcoming-feature-/)
+			expect(allFeatures).toHaveLength(1)
+		})
 	})
 })
