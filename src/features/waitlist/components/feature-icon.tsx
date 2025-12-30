@@ -1,10 +1,16 @@
-import { Mail, Image, Instagram, Phone, type LucideIcon } from "lucide-react"
+import {
+	Mail,
+	Image,
+	Instagram,
+	type LucideIcon,
+	MessageCircle,
+} from "lucide-react"
 
 const iconMap: Record<string, LucideIcon> = {
 	mail: Mail,
 	image: Image,
 	"message-square": Instagram,
-	phone: Phone,
+	"message-circle": MessageCircle,
 }
 
 export function FeatureIcon({
