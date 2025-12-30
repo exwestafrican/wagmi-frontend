@@ -49,7 +49,8 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 					<div className="flex items-center gap-2 mb-2">
 						<div className="bg-green-500 w-2 h-2 rounded-full" />
 						<p className="text-sm text-foreground">
-							{status.charAt(0).toUpperCase() + status.slice(1).replace("-", " ")}{" "}
+							{status.charAt(0).toUpperCase() +
+								status.slice(1).replace("-", " ")}{" "}
 							Last edited: {lastEdited}
 						</p>
 					</div>
