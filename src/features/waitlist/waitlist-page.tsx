@@ -15,7 +15,6 @@ import { Loader } from "lucide-react"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 
-
 function plannedFeatures(features: RoadmapFeature[]) {
 	return features.filter(
 		(feature: RoadmapFeature) => feature.stage === RoadmapFeatureStage.PLANNED,
@@ -30,7 +29,9 @@ function upcomingProgress(features: RoadmapFeature[]) {
 }
 function WaitListPage() {
 	const hasJoined = useWaitlistStore((state) => state.hasJoined)
-	const emptyUpcomingFeatures = new Array(3).fill(0).map((_, idx) =>({id: idx}))
+	const emptyUpcomingFeatures = new Array(3)
+		.fill(0)
+		.map((_, idx) => ({ id: idx }))
 	const { data: response, isLoading } = useGetRoadmapFeatures()
 
 	return (
