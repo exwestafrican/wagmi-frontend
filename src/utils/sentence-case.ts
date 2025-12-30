@@ -1,5 +1,5 @@
 function sentenceCase(str: string) {
-	return str.charAt(0).toLocaleUpperCase() + str.slice(1)
+	return str.charAt(0).toLocaleUpperCase() + str.slice(1).toLowerCase()
 }
 
 export default sentenceCase
