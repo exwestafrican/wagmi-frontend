@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { FeatureRequestPriority } from "@/features/waitlist/enums/feature-request-priority"
 import PriorityButton from "@/features/waitlist/components/priority-button"
-import z from "zod"
+import type z from "zod"
 import { Button } from "@/components/ui/button"
 import {
 	Form,

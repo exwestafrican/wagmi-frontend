@@ -7,7 +7,7 @@ import renderWithQueryClient, {
 import { screen, waitFor } from "@testing-library/react"
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 import { ROADMAP_FEATURES } from "./api/roadmap-features"
-import { type WaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
+import type { WaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 
 const mockMutate = vi.fn((_, options) => {
 	options?.onSuccess()
@@ -343,8 +343,8 @@ describe("WaitListPage", () => {
 				})
 			})
 
-            it("should clear email input when user submits email",async () => {
-                const user = userEvent.setup()
+			it("should clear email input when user submits email", async () => {
+				const user = userEvent.setup()
 				renderWithQueryClient(<WaitListPage />)
 
 				await openFeatureRequestModal(user)
@@ -354,10 +354,10 @@ describe("WaitListPage", () => {
 				)
 				await submitFeatureRequest(user)
 
-                await enterEmail(user, "chris@envoye.com")
+				await enterEmail(user, "chris@envoye.com")
 				await submitEmail(user)
 
-                await waitFor(() => {
+				await waitFor(() => {
 					expect(
 						screen.queryByTestId("feature-request-form"),
 					).not.toBeInTheDocument()
@@ -366,21 +366,19 @@ describe("WaitListPage", () => {
 					).not.toBeInTheDocument()
 				})
 
-
-                await openFeatureRequestModal(user)
+				await openFeatureRequestModal(user)
 				await enterFeatureRequestDescription(
 					user,
 					"I want the ability to create appointments for customers using a command",
 				)
-                await submitFeatureRequest(user)
+				await submitFeatureRequest(user)
 
+				const emailInput = screen.getByTestId("email-request-input")
 
-                const emailInput = screen.getByTestId("email-request-input")
-
-                await waitFor(() => {
-                    expect((emailInput as HTMLInputElement).value).toBe("")
-                })
-            })
+				await waitFor(() => {
+					expect((emailInput as HTMLInputElement).value).toBe("")
+				})
+			})
 		})
 	})
 })

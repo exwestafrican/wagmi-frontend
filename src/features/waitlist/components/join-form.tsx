@@ -43,7 +43,7 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
-				join() // update the store
+				join(values.email) // update the store
 				toast.success("Congratulations!!! You are on the wait list! 🍾🍾")
 			},
 			onError: (error: unknown) => {
