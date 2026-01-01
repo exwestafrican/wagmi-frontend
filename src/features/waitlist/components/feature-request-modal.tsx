@@ -73,8 +73,6 @@ export function FeatureRequestModal({
 	function submitFeatureRequest(
 		values: z.infer<typeof featureRequestFormSchema> & { email: string },
 	) {
-		console.log(values, values.email)
-
 		sendFeatureRequest(values, {
 			onSuccess: () => {
 				toast.success("Feature request sent successfully 🍾🍾")

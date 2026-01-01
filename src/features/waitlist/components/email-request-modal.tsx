@@ -49,7 +49,7 @@ export function EmailRequestModal({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent data-testid="email-request-modal " className="sm:max-w-sm">
+			<DialogContent data-testid="email-request-modal" className="sm:max-w-sm">
 				<DialogHeader>
 					<DialogTitle>Envoye</DialogTitle>
 				</DialogHeader>
