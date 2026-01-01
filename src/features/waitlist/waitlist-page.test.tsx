@@ -155,4 +155,14 @@ describe("WaitListPage", () => {
 			expect(allFeatures).toHaveLength(1)
 		})
 	})
+
+	describe("Contact Us button", () => {
+		it("should render contact us button", () => {
+			renderWithQueryClient(<WaitListPage />)
+
+			const contactButton = screen.getByTestId("contact-us-button")
+			expect(contactButton).toBeInTheDocument()
+			expect(contactButton).toHaveTextContent("Contact Us")
+		})
+	})
 })
