@@ -191,107 +191,94 @@ describe("WaitListPage", () => {
 				mockEmail.mockReturnValue("chris@envoye.com")
 			})
 
-			it("should clear form when dialog closes", async () => {
-				const user = userEvent.setup()
-				renderWithQueryClient(<WaitListPage />)
+		it("should clear form when dialog closes", async () => {
+			const user = userEvent.setup()
+			renderWithQueryClient(<WaitListPage />)
 
-				const featureRequestButton = screen.getByTestId(
-					"feature-request-button",
-				)
-				await user.click(featureRequestButton)
+			await openFeatureRequestModal(user)
 
-				await waitFor(() => {
-					expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
-				})
-
-				const descriptionInput = screen.getByTestId(
-					"feature-request-description",
-				)
-				const featureRequest =
-					"I want the ability to create appointments for customers using a command"
-				await user.type(descriptionInput, featureRequest)
-
-				expect(descriptionInput).toHaveValue(featureRequest)
-
-				await user.keyboard("{Escape}")
-
-				await user.click(featureRequestButton)
-
-				expect(descriptionInput).toHaveValue("")
+			await waitFor(() => {
+				expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
 			})
 
-			it("should not submit with no feature description", async () => {
-				const user = userEvent.setup()
-				renderWithQueryClient(<WaitListPage />)
+			const featureRequest =
+				"I want the ability to create appointments for customers using a command"
+			await enterFeatureRequestDescription(user, featureRequest)
 
-				const featureRequestButton = screen.getByTestId(
-					"feature-request-button",
-				)
-				await user.click(featureRequestButton)
+			const descriptionInput = screen.getByTestId(
+				"feature-request-description",
+			)
+			expect(descriptionInput).toHaveValue(featureRequest)
 
-				await waitFor(() => {
-					expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
-				})
+			await user.keyboard("{Escape}")
 
-				const descriptionInput = screen.getByTestId(
-					"feature-request-description",
-				)
-				expect(descriptionInput).toHaveValue("")
+			await openFeatureRequestModal(user)
 
-				const submitButton = screen.getByTestId("feature-request-submit-button")
-				expect(submitButton).toBeDisabled()
+			expect(descriptionInput).toHaveValue("")
+		})
+
+		it("should not submit with no feature description", async () => {
+			const user = userEvent.setup()
+			renderWithQueryClient(<WaitListPage />)
+
+			await openFeatureRequestModal(user)
+
+			await waitFor(() => {
+				expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
 			})
 
-			it("should submit and close modal when form is valid", async () => {
-				const user = userEvent.setup()
-				renderWithQueryClient(<WaitListPage />)
+			const descriptionInput = screen.getByTestId(
+				"feature-request-description",
+			)
+			expect(descriptionInput).toHaveValue("")
 
-				const featureRequestButton = screen.getByTestId(
-					"feature-request-button",
-				)
-				await user.click(featureRequestButton)
+			const submitButton = screen.getByTestId("feature-request-submit-button")
+			expect(submitButton).toBeDisabled()
+		})
 
-				const descriptionInput = screen.getByTestId(
-					"feature-request-description",
-				)
-				await user.type(
-					descriptionInput,
-					"I want the ability to create appointments for customers using a command",
-				)
+		it("should submit and close modal when form is valid", async () => {
+			const user = userEvent.setup()
+			renderWithQueryClient(<WaitListPage />)
 
-				const submitButton = screen.getByTestId("feature-request-submit-button")
-				await user.click(submitButton)
+			await openFeatureRequestModal(user)
 
-				await waitFor(() => {
-					expect(
-						screen.queryByTestId("feature-request-form"),
-					).not.toBeInTheDocument()
-				})
+			await enterFeatureRequestDescription(
+				user,
+				"I want the ability to create appointments for customers using a command",
+			)
 
-				await user.click(featureRequestButton)
+			await submitFeatureRequest(user)
 
-				expect(descriptionInput).toHaveValue("")
+			await waitFor(() => {
+				expect(
+					screen.queryByTestId("feature-request-form"),
+				).not.toBeInTheDocument()
 			})
 
-			it("should have dialog description that is not visible but accessible", async () => {
-				const user = userEvent.setup()
-				renderWithQueryClient(<WaitListPage />)
+			await openFeatureRequestModal(user)
 
-				const featureRequestButton = screen.getByTestId(
-					"feature-request-button",
-				)
-				await user.click(featureRequestButton)
+			const descriptionInput = screen.getByTestId(
+				"feature-request-description",
+			)
+			expect(descriptionInput).toHaveValue("")
+		})
 
-				await waitFor(() => {
-					expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
-				})
+		it("should have dialog description that is not visible but accessible", async () => {
+			const user = userEvent.setup()
+			renderWithQueryClient(<WaitListPage />)
 
-				const description = screen.getByTestId("dialog-description")
+			await openFeatureRequestModal(user)
 
-				// Verify it's in the DOM but not visible
-				expect(description).toBeInTheDocument()
-				expect(description).toHaveClass("sr-only") // this ensures the description is not visible to the user but accessible to screen readers. this test failing signals that the description is visible to the user.
+			await waitFor(() => {
+				expect(screen.getByTestId("feature-request-form")).toBeInTheDocument()
 			})
+
+			const description = screen.getByTestId("dialog-description")
+
+			// Verify it's in the DOM but not visible
+			expect(description).toBeInTheDocument()
+			expect(description).toHaveClass("sr-only") // this ensures the description is not visible to the user but accessible to screen readers. this test failing signals that the description is visible to the user.
+		})
 		})
 
 		describe("when user is not on waitlist", () => {
