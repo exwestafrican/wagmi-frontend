@@ -13,14 +13,15 @@ import { Button } from "@/components/ui/button"
 import { Bell, ArrowUp, Check } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-
-type FeatureStatus = "planned" | "in-progress" | "upcoming"
+import { FeatureIcon } from "./feature-icon"
+import { Status } from "./Status"
+import type { RoadmapFeatureStage } from "../enums/roadmap-feautre-stage"
 
 interface FeatureDetailSliderProps {
-	icon: React.ReactNode
+	icon: string
 	title: string
 	description: string
-	status: FeatureStatus
+	status: RoadmapFeatureStage
 	lastEdited: string
 }
 
@@ -39,7 +40,9 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 			</SheetTrigger>
 			<SheetContent>
 				<SheetHeader>
-					<div className="p-2 bg-muted/30 rounded-lg w-fit">{icon}</div>
+					<div className="p-2 bg-muted/30 rounded-lg w-fit">
+						<FeatureIcon icon={icon} />
+					</div>
 					<SheetTitle className="font-normal text-lg mb-1">{title}</SheetTitle>
 					<SheetDescription className="text-sm text-foreground/60">
 						{description}
@@ -47,12 +50,8 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 				</SheetHeader>
 				<div className="px-4">
 					<div className="flex items-center gap-2 mb-2">
-						<div className="bg-green-500 w-2 h-2 rounded-full" />
-						<p className="text-sm text-foreground">
-							{status.charAt(0).toUpperCase() +
-								status.slice(1).replace("-", " ")}{" "}
-							Last edited: {lastEdited}
-						</p>
+						<Status stage={status} />
+						<p className="text-sm text-foreground">Last edited: {lastEdited}</p>
 					</div>
 					<div className="relative">
 						<Textarea
