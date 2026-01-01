@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
 import CountdownClock from "@/features/waitlist/components/countdown-clock.tsx"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
-import { useGetRoadmapFeatures } from "@/features/waitlist/api/useRoadmapFeatures"
+import { useGetRoadmapFeatures } from "@/features/waitlist/api/roadmap-features"
 import {
 	UpcomingFeature,
 	UpcomingFeatureSkeleton,
@@ -15,7 +15,7 @@ import { Loader } from "lucide-react"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 import { useState } from "react"
-import { FeedbackModal } from "./components/feedback-modal"
+import { FeatureRequestModal } from "@/features/waitlist/components/feature-request-modal"
 
 function filterFeaturesByStage(
 	features: RoadmapFeature[],
@@ -90,7 +90,7 @@ function WaitListPage() {
 					<div className="space-y-2">
 						<div className="flex justify-between items-center gap-2">
 							<h2 className="tracking-wide text-sm"> upcoming features</h2>
-							<FeedbackModal
+							<FeatureRequestModal
 								open={isDialogOpen}
 								onOpenChange={setIsDialogOpen}
 							/>
