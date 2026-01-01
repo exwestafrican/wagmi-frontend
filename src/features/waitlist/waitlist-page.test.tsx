@@ -1,5 +1,5 @@
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import WaitListPage from "@/features/waitlist/waitlist-page"
 import renderWithQueryClient, {
 	createTestQueryClient,
