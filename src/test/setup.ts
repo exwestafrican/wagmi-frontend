@@ -1,7 +1,11 @@
-import { afterEach, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
 
 vi.mock("axios")
+
+beforeEach(() => {
+	localStorage.clear()
+})
 
 afterEach(() => {
 	vi.clearAllMocks()

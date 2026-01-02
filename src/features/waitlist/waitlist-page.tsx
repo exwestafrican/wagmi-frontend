@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
 import CountdownClock from "@/features/waitlist/components/countdown-clock.tsx"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
-import { useGetRoadmapFeatures } from "@/features/waitlist/api/useRoadmapFeatures"
+import { useGetRoadmapFeatures } from "@/features/waitlist/api/roadmap-features"
 import {
 	UpcomingFeature,
 	UpcomingFeatureSkeleton,
@@ -14,25 +14,23 @@ import {
 import { Loader } from "lucide-react"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
+import { useState } from "react"
+import { FeatureRequestModal } from "@/features/waitlist/components/feature-request-modal"
 
-function plannedFeatures(features: RoadmapFeature[]) {
-	return features.filter(
-		(feature: RoadmapFeature) => feature.stage === RoadmapFeatureStage.PLANNED,
-	)
+function filterFeaturesByStage(
+	features: RoadmapFeature[],
+	stage: RoadmapFeatureStage,
+) {
+	return features.filter((feature: RoadmapFeature) => feature.stage === stage)
 }
 
-function upcomingProgress(features: RoadmapFeature[]) {
-	return features.filter(
-		(feature: RoadmapFeature) =>
-			feature.stage === RoadmapFeatureStage.IN_PROGRESS,
-	)
-}
 function WaitListPage() {
 	const hasJoined = useWaitlistStore((state) => state.hasJoined)
 	const emptyUpcomingFeatures = new Array(3)
 		.fill(0)
 		.map((_, idx) => ({ id: idx }))
 	const { data: response, isLoading } = useGetRoadmapFeatures()
+	const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 	return (
 		<div
@@ -74,7 +72,10 @@ function WaitListPage() {
 						{isLoading ? (
 							<PlannedFeatureSkeleton />
 						) : (
-							plannedFeatures(response?.data ?? [])
+							filterFeaturesByStage(
+								response?.data ?? [],
+								RoadmapFeatureStage.PLANNED,
+							)
 								.sort((a, b) => b.votes - a.votes)
 								.map((feature) => (
 									<PlannedFeature
@@ -87,14 +88,21 @@ function WaitListPage() {
 					</div>
 
 					<div className="space-y-2">
-						<div className="flex items-center gap-2">
+						<div className="flex justify-between items-center gap-2">
 							<h2 className="tracking-wide text-sm"> upcoming features</h2>
+							<FeatureRequestModal
+								open={isDialogOpen}
+								onOpenChange={setIsDialogOpen}
+							/>
 						</div>
 						{isLoading
 							? emptyUpcomingFeatures.map((emptyFeature) => (
 									<UpcomingFeatureSkeleton key={emptyFeature.id} />
 								))
-							: upcomingProgress(response?.data ?? [])
+							: filterFeaturesByStage(
+									response?.data ?? [],
+									RoadmapFeatureStage.IN_PROGRESS,
+								)
 									.sort((a, b) => b.votes - a.votes)
 									.map((feature) => (
 										<UpcomingFeature key={feature.id} feature={feature} />

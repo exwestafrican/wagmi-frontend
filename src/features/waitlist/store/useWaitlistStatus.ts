@@ -3,16 +3,18 @@ import { persist } from "zustand/middleware"
 
 const WAITLIST_STATUS_KEY = "waitlist-store"
 
-interface WaitlistStore {
+export interface WaitlistStore {
 	hasJoined: boolean
-	join: () => void
+	email: string
+	join: (email: string) => void
 }
 
 export const useWaitlistStore = create<WaitlistStore>()(
 	persist(
 		(set) => ({
 			hasJoined: false,
-			join: () => set({ hasJoined: true }),
+			email: "",
+			join: (email: string) => set({ hasJoined: true, email }),
 		}),
 		{
 			name: WAITLIST_STATUS_KEY,

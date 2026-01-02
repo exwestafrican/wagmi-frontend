@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useJoinWaitList } from "@/features/waitlist/api/useJoinWaitlist"
+import { useJoinWaitList } from "@/features/waitlist/api/join-waitlist"
 import { toast } from "sonner"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 import type { AxiosError } from "axios"
@@ -43,7 +43,7 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
-				join() // update the store
+				join(values.email) // update the store
 				toast.success("Congratulations!!! You are on the wait list! 🍾🍾")
 			},
 			onError: (error: unknown) => {
