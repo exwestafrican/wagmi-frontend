@@ -17,6 +17,17 @@ import { Status } from "./Status"
 import type { RoadmapFeature } from "../interfaces/roadmap-feature"
 import { format } from "date-fns"
 import sentenceCase from "@/utils/sentence-case"
+import { useForm } from "react-hook-form"
+import { featureFeedbackSchema } from "../schema/feature-feedback"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/components/ui/form"
 
 interface FeatureDetailSliderProps {
 	feature: RoadmapFeature | null
@@ -31,8 +42,21 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 }) => {
 	const [isSubscribed, setIsSubscribed] = useState(false)
 
+	const form = useForm<z.infer<typeof featureFeedbackSchema>>({
+		resolver: zodResolver(featureFeedbackSchema),
+		mode: "onChange",
+		defaultValues: {
+			feedback: "",
+			// featureId: "",
+		},
+	})
+
 	if (!feature) {
 		return null
+	}
+
+	const submitFeedback = (values: z.infer<typeof featureFeedbackSchema>) => {
+		console.log(values) // to be changed on endpoint integration
 	}
 
 	return (
@@ -56,18 +80,39 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 							Last edited: {format(new Date(feature.updatedAt), "MMM dd, yyyy")}
 						</p>
 					</div>
-					<div className="relative">
-						<Textarea
-							placeholder="Leave feedback about this idea, your use-case and more..."
-							className="min-h-[100px] bg-muted/30 border-border resize-none text-sm pr-12 pb-12"
-						/>
-						<Button
-							variant={"outline"}
-							className="absolute bottom-3 right-3 p-2 rounded-full border"
-						>
-							<ArrowUp className="w-4 h-4" />
-						</Button>
-					</div>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(submitFeedback)}>
+							<FormField
+								control={form.control}
+								name="feedback"
+								render={({ field, fieldState }) => (
+									<FormItem>
+										<FormControl>
+											<div className="relative">
+												<Textarea
+													placeholder="Leave feedback about this idea, your use-case and more..."
+													{...field}
+													className={`min-h-[120px] bg-muted/30 border resize-none text-sm pr-12 pb-12 ${
+														fieldState.error
+															? "border-red-300 focus-visible:ring-red-300"
+															: "border-border"
+													}`}
+												/>
+												<Button
+													type="submit"
+													variant={"outline"}
+													className="absolute bottom-3 right-3 p-2 rounded-full border"
+												>
+													<ArrowUp className="w-4 h-4" />
+												</Button>
+											</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</form>
+					</Form>
 					<Separator className="mt-4" />
 				</div>
 				<SheetFooter className="mt-0 pt-0">
