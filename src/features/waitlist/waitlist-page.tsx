@@ -16,6 +16,7 @@ import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feat
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 import { useState } from "react"
 import { FeatureRequestModal } from "@/features/waitlist/components/feature-request-modal"
+import FeatureDetailSlider from "./components/feature-slider"
 
 function filterFeaturesByStage(
 	features: RoadmapFeature[],
@@ -31,6 +32,15 @@ function WaitListPage() {
 		.map((_, idx) => ({ id: idx }))
 	const { data: response, isLoading } = useGetRoadmapFeatures()
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
+	const [selectedFeature, setSelectedFeature] = useState<RoadmapFeature | null>(
+		null,
+	)
+	const [isSliderOpen, setIsSliderOpen] = useState(false)
+
+	const handleFeatureClick = (feature: RoadmapFeature) => {
+		setSelectedFeature(feature)
+		setIsSliderOpen(true)
+	}
 
 	return (
 		<div
@@ -105,9 +115,18 @@ function WaitListPage() {
 								)
 									.sort((a, b) => b.votes - a.votes)
 									.map((feature) => (
-										<UpcomingFeature key={feature.id} feature={feature} />
+										<UpcomingFeature
+											key={feature.id}
+											feature={feature}
+											onClick={handleFeatureClick}
+										/>
 									))}
 					</div>
+					<FeatureDetailSlider
+						feature={selectedFeature}
+						open={isSliderOpen}
+						onOpenChange={setIsSliderOpen}
+					/>
 				</div>
 			</main>
 		</div>

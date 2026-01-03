@@ -7,7 +7,6 @@ import {
 	SheetFooter,
 	SheetHeader,
 	SheetTitle,
-	SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Bell, ArrowUp, Check } from "lucide-react"
@@ -15,43 +14,47 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { FeatureIcon } from "./feature-icon"
 import { Status } from "./Status"
-import type { RoadmapFeatureStage } from "../enums/roadmap-feautre-stage"
+import type { RoadmapFeature } from "../interfaces/roadmap-feature"
+import { format } from "date-fns"
+import sentenceCase from "@/utils/sentence-case"
 
 interface FeatureDetailSliderProps {
-	icon: string
-	title: string
-	description: string
-	status: RoadmapFeatureStage
-	lastEdited: string
+	feature: RoadmapFeature | null
+	open: boolean
+	onOpenChange: (open: boolean) => void
 }
 
 const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
-	icon,
-	title,
-	description,
-	status,
-	lastEdited,
+	feature,
+	open,
+	onOpenChange,
 }) => {
 	const [isSubscribed, setIsSubscribed] = useState(false)
+
+	if (!feature) {
+		return null
+	}
+
 	return (
-		<Sheet>
-			<SheetTrigger asChild>
-				<Button>Open</Button>
-			</SheetTrigger>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent>
 				<SheetHeader>
 					<div className="p-2 bg-muted/30 rounded-lg w-fit">
-						<FeatureIcon icon={icon} />
+						<FeatureIcon icon={feature.icon} />
 					</div>
-					<SheetTitle className="font-normal text-lg mb-1">{title}</SheetTitle>
+					<SheetTitle className="font-normal text-lg mb-1">
+						{sentenceCase(feature.name)}
+					</SheetTitle>
 					<SheetDescription className="text-sm text-foreground/60">
-						{description}
+						{feature.description}
 					</SheetDescription>
 				</SheetHeader>
 				<div className="px-4">
 					<div className="flex items-center gap-2 mb-2">
-						<Status stage={status} />
-						<p className="text-sm text-foreground">Last edited: {lastEdited}</p>
+						<Status stage={feature.stage} />
+						<p className="text-sm text-foreground">
+							Last edited: {format(new Date(feature.updatedAt), "MMM dd, yyyy")}
+						</p>
 					</div>
 					<div className="relative">
 						<Textarea
@@ -85,6 +88,42 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 							{isSubscribed ? "Subscribed" : "Subscribe"}
 						</span>
 					</Button>
+				</SheetFooter>
+			</SheetContent>
+		</Sheet>
+	)
+}
+
+export function FeatureDetailSliderSkeleton() {
+	return (
+		<Sheet open={true}>
+			<SheetContent>
+				<SheetHeader>
+					<div className="p-2 bg-muted/30 rounded-lg w-fit animate-pulse">
+						<div className="w-6 h-6 bg-muted rounded" />
+					</div>
+					<div className="space-y-2">
+						<div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
+						<div className="h-4 w-full bg-muted rounded animate-pulse" />
+						<div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
+					</div>
+				</SheetHeader>
+				<div className="px-4">
+					<div className="flex items-center gap-2 mb-2 animate-pulse">
+						<div className="w-2 h-2 rounded-full bg-muted" />
+						<div className="h-4 w-48 bg-muted rounded" />
+					</div>
+					<div className="relative">
+						<div className="h-[100px] bg-muted/30 rounded-lg animate-pulse" />
+					</div>
+					<Separator className="mt-4" />
+				</div>
+				<SheetFooter className="mt-0 pt-0">
+					<div className="space-y-2 w-full">
+						<div className="h-4 w-24 bg-muted rounded animate-pulse" />
+						<div className="h-4 w-full bg-muted rounded animate-pulse" />
+						<div className="h-9 w-28 bg-muted rounded-lg animate-pulse" />
+					</div>
 				</SheetFooter>
 			</SheetContent>
 		</Sheet>
