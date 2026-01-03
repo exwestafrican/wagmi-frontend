@@ -3,31 +3,38 @@ import { FeatureIcon } from "./feature-icon"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 import { ChevronUp } from "lucide-react"
 import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal"
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 import { useToggleVotes } from "@/features/waitlist/api/toggle-votes"
 
 export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 	const [openEmailRequestModal, onOpenEmailRequestModalChange] = useState(false)
 	const email = useWaitlistStore((state) => state.email)
+    const [voteCount, setVoteCount] = useState<number>(feature.voteCount)
 	const [votedForFeature, setVotedForFeature] = useState(false)
-	const { mutate: voteOnFeature } = useToggleVotes()
+	const { mutate: voteOnFeature, isPending } = useToggleVotes()
 
 
-	function sendVote(email: string, feature: RoadmapFeature){
+
+    useEffect(() => {
+        setVoteCount(feature.voteCount)
+    }, [feature.voteCount])
+
+	async function sendVote(email: string, feature: RoadmapFeature){
 		if(votedForFeature){
-			feature.voteCount--
+			setVoteCount((prev) => prev  - 1)
 			setVotedForFeature(false)
 		} else {
-			feature.voteCount++
+            setVoteCount((prev) => prev + 1)
 			setVotedForFeature(true)
 		}
-		voteOnFeature({ email, featureId: feature.id })
+		await voteOnFeature({ email, featureId: feature.id })
 	}
 
 	function requestUserEmail() {
 		onOpenEmailRequestModalChange(true) //open email request modal
 	}
+
 
 	return (
 		<>
@@ -51,19 +58,20 @@ export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 					{sentenceCase(feature.name)}
 				</h3>
 				<button
+				    disabled={isPending}
 					onClick={() => {
+						if (isPending) return
 						if (email) {
-							console.log("vote for reature")
 							sendVote(email, feature)
 						} else {
 							requestUserEmail()
 						}
 					}}
 					type="button"
-					className="cursor-pointer p-1.5 py-0.5 rounded-md text-xs transition-all text-foreground/40 hover:bg-foreground/5"
+					className=" isabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent cursor-pointer p-1.5 py-0.5 rounded-md text-xs transition-all text-foreground/40 hover:bg-foreground/5"
 				>
 					<ChevronUp className="w-2.5 h-2.5" />
-					{feature.voteCount}
+					{voteCount}
 				</button>
 			</div>
 		</>
