@@ -2,17 +2,22 @@ import sentenceCase from "@/utils/sentence-case"
 import { FeatureIcon } from "./feature-icon"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 
-export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
+export function UpcomingFeature({
+	feature,
+	onClick,
+}: { feature: RoadmapFeature; onClick?: (feature: RoadmapFeature) => void }) {
 	return (
-		<div
+		<button
+			type="button"
 			data-testid={`upcoming-feature-${feature.id}`}
-			className="flex items-center gap-3 border cursor-pointer rounded-lg p-4 hover:border-foreground/20 hover:bg-foreground/5 transition-colors duration-200 ease-out"
+			className="w-full text-left flex items-center gap-3 border cursor-pointer rounded-lg p-4 hover:border-foreground/20 hover:bg-foreground/5 transition-colors duration-200 ease-out"
+			onClick={() => onClick?.(feature)}
 		>
 			<FeatureIcon className="w-5 h-5 text-foreground/60" icon={feature.icon} />
 			<h3 className="flex-1 text-foreground/60 truncate">
 				{sentenceCase(feature.name)}
 			</h3>
-		</div>
+		</button>
 	)
 }
 
