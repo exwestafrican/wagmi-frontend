@@ -106,7 +106,7 @@ export function FeatureRequestModal({
 					<DialogTrigger>
 						<div
 							data-testid="feature-request-button"
-							className="text-foreground/40 hover:text-foreground/60 transition-colors transition-colors shadow-[0_0_15px_rgba(0,0,0,0.3)] rounded-full p-1 cursor-pointer"
+							className="text-foreground/40 hover:text-foreground/60 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.3)] rounded-full p-1 cursor-pointer"
 						>
 							<Plus className="w-5 h-5 " />
 						</div>

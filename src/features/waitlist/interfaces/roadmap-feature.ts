@@ -3,7 +3,7 @@ import type { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feau
 export interface RoadmapFeature {
 	id: string
 	name: string
-	votes: number
+	voteCount: number
 	icon: string
 	stage: RoadmapFeatureStage
 }
