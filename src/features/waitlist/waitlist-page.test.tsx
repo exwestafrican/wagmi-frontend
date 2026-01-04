@@ -8,7 +8,17 @@ import { screen, waitFor } from "@testing-library/react"
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 import { ROADMAP_FEATURES } from "./api/roadmap-features"
 import type { WaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
+import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
+import {
+	USER_VOTES,
+	type UserVotesResponse,
+} from "@/features/waitlist/api/user-votes"
+import {
+	inProgressFeatureFactory,
+	plannedFeatureFactory,
+} from "@/test/factory/feature"
 
+vi.mock("axios")
 const mockMutate = vi.fn((_, options) => {
 	options?.onSuccess()
 })
@@ -40,9 +50,36 @@ vi.mock("@/features/waitlist/store/useWaitlistStatus", () => ({
 }))
 
 describe("WaitListPage", () => {
+	async function setupWaitListPage(
+		userVotes: UserVotesResponse,
+		roadmapFeatures: RoadmapFeature[],
+		waitlistUserEmail: string | undefined = undefined,
+	) {
+		const queryClient = createTestQueryClient()
+		queryClient.clear()
+		queryClient.setQueryData([USER_VOTES], {
+			data: userVotes,
+		})
+		queryClient.setQueryData([ROADMAP_FEATURES], {
+			data: roadmapFeatures,
+		})
+
+		if (waitlistUserEmail) {
+			mockHasJoined.mockReturnValue(true)
+			mockEmail.mockReturnValue(waitlistUserEmail)
+		}
+
+		renderWithQueryClient(<WaitListPage />, { queryClient })
+	}
+
 	async function openFeatureRequestModal(user: UserEvent) {
 		const featureRequestButton = screen.getByTestId("feature-request-button")
 		await user.click(featureRequestButton)
+	}
+
+	async function VoteFeatureButton(user: UserEvent, featureId: string) {
+		const voteButton = screen.getByTestId(`vote-button-${featureId}`)
+		await user.click(voteButton)
 	}
 
 	async function enterFeatureRequestDescription(
@@ -125,14 +162,14 @@ describe("WaitListPage", () => {
 					{
 						id: "1",
 						name: "receive Gmail emails in your inbox",
-						votes: 10,
+						voteCount: 10,
 						icon: "mail",
 						stage: RoadmapFeatureStage.PLANNED,
 					},
 					{
 						id: "2",
 						name: "send and receive images in chat",
-						votes: 5,
+						voteCount: 5,
 						icon: "image",
 						stage: RoadmapFeatureStage.PLANNED,
 					},
@@ -162,7 +199,7 @@ describe("WaitListPage", () => {
 					{
 						id: "1",
 						name: "receive Gmail emails in your inbox",
-						votes: 10,
+						voteCount: 10,
 						icon: "mail",
 						stage: RoadmapFeatureStage.IN_PROGRESS,
 					},
@@ -397,6 +434,46 @@ describe("WaitListPage", () => {
 				await user.type(emailInput, "invalid-email")
 				const submitButton = screen.getByTestId("email-request-submit-button")
 				expect(submitButton).toBeDisabled()
+			})
+		})
+	})
+
+	describe("Vote button", () => {
+		it("should request email when user without waitlist votes", async () => {
+			const user = userEvent.setup()
+			const roadmapFeatures = [
+				plannedFeatureFactory.build(),
+				...inProgressFeatureFactory.buildList(3),
+			]
+			const userVotes = {
+				featureIds: [],
+			}
+			await setupWaitListPage(userVotes, roadmapFeatures)
+
+			await VoteFeatureButton(user, roadmapFeatures[1].id)
+
+			await waitFor(() => {
+				expect(screen.getByTestId("email-request-modal")).toBeInTheDocument()
+			})
+		})
+
+		it("should not request email when user with waitlist votes", async () => {
+			const user = userEvent.setup()
+			const roadmapFeatures = [
+				plannedFeatureFactory.build(),
+				...inProgressFeatureFactory.buildList(3),
+			]
+			const userVotes = {
+				featureIds: [],
+			}
+
+			await setupWaitListPage(userVotes, roadmapFeatures, "chris@envoye.com")
+			await VoteFeatureButton(user, roadmapFeatures[1].id)
+
+			await waitFor(() => {
+				expect(
+					screen.queryByTestId("email-request-modal"),
+				).not.toBeInTheDocument()
 			})
 		})
 	})

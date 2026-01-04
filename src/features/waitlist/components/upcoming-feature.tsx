@@ -40,6 +40,7 @@ export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 					{sentenceCase(feature.name)}
 				</h3>
 				<button
+					data-testid={`vote-button-${feature.id}`}
 					disabled={isSendingVote}
 					onClick={() => {
 						if (email) {
