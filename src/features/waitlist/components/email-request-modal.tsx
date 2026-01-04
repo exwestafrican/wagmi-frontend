@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useUserVotes } from "@/features/waitlist/api/user-votes"
+
 
 export function EmailRequestModal({
 	open,
@@ -27,6 +29,7 @@ export function EmailRequestModal({
 	onOpenChange: (open: boolean) => void
 	onSubmitEmailRequest: (email: string) => void
 }) {
+
 	const formSchema = z.object({
 		email: z
 			.email({ message: "Please enter a valid email address." })
@@ -42,8 +45,13 @@ export function EmailRequestModal({
 		defaultValues: { email: "" },
 	})
 
+
+    const {  isLoading: isLoadingUserVotes } = useUserVotes(form.watch("email"))
+
+
+
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		onSubmitEmailRequest(values.email)
+        onSubmitEmailRequest(values.email)
 		form.reset()
 	}
 
@@ -83,7 +91,7 @@ export function EmailRequestModal({
 												className="cursor-pointer w-full bg-black text-white hover:bg-black/80 hover:text-white"
 												data-testid="email-request-submit-button"
 											>
-												Submit
+												{isLoadingUserVotes ? "Submitting..." : "Submit"}
 											</Button>
 										</div>
 									</FormControl>
