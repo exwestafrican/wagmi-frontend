@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useUserVotes } from "@/features/waitlist/api/user-votes"
+import { useState } from "react"
 
 export function EmailRequestModal({
 	open,
@@ -43,9 +44,11 @@ export function EmailRequestModal({
 		defaultValues: { email: "" },
 	})
 
-	const { isLoading: isLoadingUserVotes } = useUserVotes(form.watch("email"))
+	const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
+	const { isLoading: isLoadingUserVotes } = useUserVotes(submittedEmail)
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
+		setSubmittedEmail(values.email)
 		onSubmitEmailRequest(values.email)
 		form.reset()
 	}

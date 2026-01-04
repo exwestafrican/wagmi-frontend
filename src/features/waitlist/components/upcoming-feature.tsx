@@ -11,7 +11,7 @@ import { useUserVotes } from "@/features/waitlist/api/user-votes"
 export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 	const [openEmailRequestModal, openEmailRequestModalChange] = useState(false)
 	const email = useWaitlistStore((state) => state.email)
-	const { mutate: sendVote, isPending: isSendingVote } = useToggleVotes()
+	const { mutate: sendVote } = useToggleVotes()
 
 	// Get user's voted features
 	const { data: userVotesResponse } = useUserVotes(email)
@@ -25,7 +25,7 @@ export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 				onOpenChange={openEmailRequestModalChange}
 				onSubmitEmailRequest={async (email: string) => {
 					openEmailRequestModalChange(false) //close email request modal
-					sendVote({ email: email, featureId: feature.id })
+					await sendVote({ email: email, featureId: feature.id })
 				}}
 			/>
 			<div
@@ -41,10 +41,9 @@ export function UpcomingFeature({ feature }: { feature: RoadmapFeature }) {
 				</h3>
 				<button
 					data-testid={`vote-button-${feature.id}`}
-					disabled={isSendingVote}
-					onClick={() => {
+					onClick={async () => {
 						if (email) {
-							sendVote({ email: email, featureId: feature.id })
+							await sendVote({ email: email, featureId: feature.id })
 						} else {
 							openEmailRequestModalChange(true)
 						}

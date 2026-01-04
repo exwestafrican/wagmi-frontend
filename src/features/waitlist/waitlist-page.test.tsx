@@ -77,7 +77,7 @@ describe("WaitListPage", () => {
 		await user.click(featureRequestButton)
 	}
 
-	async function VoteFeatureButton(user: UserEvent, featureId: string) {
+	async function voteFeatureButton(user: UserEvent, featureId: string) {
 		const voteButton = screen.getByTestId(`vote-button-${featureId}`)
 		await user.click(voteButton)
 	}
@@ -450,7 +450,7 @@ describe("WaitListPage", () => {
 			}
 			await setupWaitListPage(userVotes, roadmapFeatures)
 
-			await VoteFeatureButton(user, roadmapFeatures[1].id)
+			await voteFeatureButton(user, roadmapFeatures[1].id)
 
 			await waitFor(() => {
 				expect(screen.getByTestId("email-request-modal")).toBeInTheDocument()
@@ -468,7 +468,7 @@ describe("WaitListPage", () => {
 			}
 
 			await setupWaitListPage(userVotes, roadmapFeatures, "chris@envoye.com")
-			await VoteFeatureButton(user, roadmapFeatures[1].id)
+			await voteFeatureButton(user, roadmapFeatures[1].id)
 
 			await waitFor(() => {
 				expect(

@@ -17,11 +17,14 @@ export function useToggleVotes() {
 			return axios.post(`${API_BASE_URL}/roadmap/vote`, payload)
 		},
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: [ROADMAP_FEATURES] })
-			await queryClient.invalidateQueries({ queryKey: [USER_VOTES] }) // Add this!
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: [ROADMAP_FEATURES] }),
+				queryClient.invalidateQueries({ queryKey: [USER_VOTES] }),
+			])
 		},
 		onError: (error) => {
 			console.error("Mutation error:", error)
 		},
+		retry: false,
 	})
 }
