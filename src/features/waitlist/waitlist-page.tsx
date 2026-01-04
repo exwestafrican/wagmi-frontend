@@ -76,7 +76,7 @@ function WaitListPage() {
 								response?.data ?? [],
 								RoadmapFeatureStage.PLANNED,
 							)
-								.sort((a, b) => b.votes - a.votes)
+								.sort((a, b) => b.voteCount - a.voteCount)
 								.map((feature) => (
 									<PlannedFeature
 										data-testid={`planned-feature-${feature.id}`}
@@ -103,7 +103,7 @@ function WaitListPage() {
 									response?.data ?? [],
 									RoadmapFeatureStage.IN_PROGRESS,
 								)
-									.sort((a, b) => b.votes - a.votes)
+									.sort((a, b) => b.voteCount - a.voteCount)
 									.map((feature) => (
 										<UpcomingFeature key={feature.id} feature={feature} />
 									))}
