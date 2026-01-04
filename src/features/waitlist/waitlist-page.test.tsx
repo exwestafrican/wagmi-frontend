@@ -18,6 +18,7 @@ vi.mock("@/features/waitlist/api/join-waitlist", () => ({
 		isPending: false,
 		isError: false,
 		error: null,
+
 	}),
 }))
 
