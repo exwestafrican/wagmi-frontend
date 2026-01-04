@@ -12,13 +12,15 @@ export function useUserVotes(email: string | null | undefined) {
 	return useQuery<AxiosResponse<UserVotesResponse>>({
 		queryKey: [USER_VOTES, email],
 		queryFn: () => {
-			return axios.get<UserVotesResponse>(`${API_BASE_URL}/roadmap/user-votes`, {
-				params: {
-					email: email,
+			return axios.get<UserVotesResponse>(
+				`${API_BASE_URL}/roadmap/user-votes`,
+				{
+					params: {
+						email: email,
+					},
 				},
-			})
+			)
 		},
 		enabled: !!email, // Only fetch when email is provided
 	})
 }
-
