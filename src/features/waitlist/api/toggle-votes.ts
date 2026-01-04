@@ -13,7 +13,6 @@ export function useToggleVotes() {
 	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: (payload: VoteOnFeaturePayload) => {
-			console.log("making api call")
 			return axios.post(`${API_BASE_URL}/roadmap/vote`, payload)
 		},
 		onSuccess: async () => {
