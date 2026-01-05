@@ -7,6 +7,7 @@ export const roadmapFeatureFactory = Factory.define<RoadmapFeature>(
 	({ sequence }) => ({
 		id: crypto.randomUUID(),
 		name: `Feature ${sequence}`,
+		description: `A description of the ${sequence}`,
 		voteCount: sequence * 10,
 		icon: "mail",
 		stage: RoadmapFeatureStage.IN_PROGRESS,
