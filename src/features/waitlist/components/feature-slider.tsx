@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/form"
 
 interface FeatureDetailSliderProps {
-	feature: RoadmapFeature | null
+	feature: RoadmapFeature
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }
@@ -47,7 +47,7 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 		mode: "onChange",
 		defaultValues: {
 			feedback: "",
-			// featureId: "",
+			featureId: feature.id,
 		},
 	})
 

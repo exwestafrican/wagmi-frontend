@@ -147,11 +147,13 @@ function WaitListPage() {
 										/>
 									))}
 					</div>
-					<FeatureDetailSlider
-						feature={selectedFeature}
-						open={isSliderOpen}
-						onOpenChange={setIsSliderOpen}
-					/>
+					{selectedFeature && (
+						<FeatureDetailSlider
+							feature={selectedFeature}
+							open={isSliderOpen}
+							onOpenChange={setIsSliderOpen}
+						/>
+					)}
 				</div>
 			</main>
 		</div>

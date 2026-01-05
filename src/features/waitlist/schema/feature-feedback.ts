@@ -9,5 +9,5 @@ export const featureFeedbackSchema = z.object({
 		.max(5000, {
 			message: "Feedback must be less than 5000 characters.",
 		}),
-	// featureId: z.string() // so we know what feature has this feedback
+	featureId: z.string(),
 })
