@@ -38,7 +38,7 @@ function WaitListPage() {
 	)
 	const [isSliderOpen, setIsSliderOpen] = useState(false)
 
-	const handleFeatureClick = (feature: RoadmapFeature) => {
+	const openFeatureSlider = (feature: RoadmapFeature) => {
 		setSelectedFeature(feature)
 		setIsSliderOpen(true)
 	}
@@ -143,7 +143,7 @@ function WaitListPage() {
 										<UpcomingFeature
 											key={feature.id}
 											feature={feature}
-											onClick={handleFeatureClick}
+											onClick={openFeatureSlider}
 										/>
 									))}
 					</div>
