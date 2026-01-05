@@ -50,7 +50,8 @@ export function UpcomingFeature({
 				</h3>
 				<button
 					data-testid={`vote-button-${feature.id}`}
-					onClick={async () => {
+					onClick={async (e) => {
+						e.stopPropagation()
 						if (email) {
 							await sendVote({ email: email, featureId: feature.id })
 						} else {
