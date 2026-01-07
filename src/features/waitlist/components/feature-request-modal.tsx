@@ -121,7 +121,7 @@ export function FeatureRequestModal({
 							data-testid="dialog-description"
 							className="sr-only"
 						>
-							{t('featureRequestModal.description')}
+							{t("featureRequestModal.description")}
 						</DialogDescription>
 
 						<form
@@ -142,7 +142,7 @@ export function FeatureRequestModal({
 									<FormItem>
 										<FormControl>
 											<Textarea
-												placeholder={`${t('featureRequestModal.description')}...`}
+												placeholder={`${t("featureRequestModal.description")}...`}
 												{...field}
 												className="bg-muted/30 border-none min-h-[120px] resize-none"
 												required
@@ -162,7 +162,7 @@ export function FeatureRequestModal({
 										<FormControl>
 											<div className="flex items-start gap-3 flex-col">
 												<Label className="text-xs text-foreground/60">
-													{t('featureRequestModal.priority')}
+													{t("featureRequestModal.priority")}
 												</Label>
 												<div className="flex gap-4  w-full justify-between items-center">
 													{priorities.map((priority) => (

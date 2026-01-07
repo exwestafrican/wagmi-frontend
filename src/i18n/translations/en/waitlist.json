@@ -13,7 +13,7 @@
 		"description": "Share your feature idea with us. We'll review it and consider adding it to our roadmap.",
 		"priority": "priority",
 		"low": "Low",
-        "medium": "Medium",
-        "high": "High"
+		"medium": "Medium",
+		"high": "High"
 	}
 }

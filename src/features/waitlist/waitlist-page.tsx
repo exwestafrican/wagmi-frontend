@@ -74,13 +74,13 @@ function WaitListPage() {
 					<div>
 						<h2 className="text-4xl tracking-tight">{t("heading")}</h2>
 						<p className="text-foreground/60 tracking-tight">
-							{t('subheading')}{" "}
+							{t("subheading")}{" "}
 						</p>
 					</div>
 					{hasJoined ? (
 						<div>
 							<p className=" text-sm  text-foreground/40 tracking-tight mb-2">
-								{t('launchingIn')}
+								{t("launchingIn")}
 							</p>
 							<CountdownClock />
 						</div>
@@ -92,7 +92,7 @@ function WaitListPage() {
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
 							<Loader className="size-4 animate-spin" />
-							<h2 className="tracking-wide text-sm"> {t('workInProgress')}</h2>
+							<h2 className="tracking-wide text-sm"> {t("workInProgress")}</h2>
 						</div>
 						{isLoading ? (
 							<PlannedFeatureSkeleton />
@@ -114,7 +114,10 @@ function WaitListPage() {
 
 					<div className="space-y-2">
 						<div className="flex justify-between items-center gap-2">
-							<h2 className="tracking-wide text-sm"> {t('upcomingFeatures')}</h2>
+							<h2 className="tracking-wide text-sm">
+								{" "}
+								{t("upcomingFeatures")}
+							</h2>
 							<FeatureRequestModal
 								open={isDialogOpen}
 								onOpenChange={setIsDialogOpen}
