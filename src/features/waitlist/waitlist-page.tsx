@@ -16,6 +16,7 @@ import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feat
 import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-stage"
 import { useState } from "react"
 import { FeatureRequestModal } from "@/features/waitlist/components/feature-request-modal"
+import { useTranslation } from "react-i18next"
 
 function filterFeaturesByStage(
 	features: RoadmapFeature[],
@@ -25,6 +26,7 @@ function filterFeaturesByStage(
 }
 
 function WaitListPage() {
+	const { t, i18n } = useTranslation("waitlist")
 	const hasJoined = useWaitlistStore((state) => state.hasJoined)
 	const emptyUpcomingFeatures = new Array(3)
 		.fill(0)
@@ -40,22 +42,45 @@ function WaitListPage() {
 					"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 120, 120, 0.15), transparent 50%), #ffffff",
 			}}
 		>
+			{/* Temporary language switcher for testing */}
+			<div className="fixed top-4 right-4 z-50 flex gap-2">
+				<button
+					type="button"
+					onClick={() => i18n.changeLanguage("en")}
+					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+						i18n.language === "en"
+							? "bg-blue-600 text-white"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+					}`}
+				>
+					EN
+				</button>
+				<button
+					type="button"
+					onClick={() => i18n.changeLanguage("fr")}
+					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+						i18n.language === "fr"
+							? "bg-blue-600 text-white"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+					}`}
+				>
+					FR
+				</button>
+			</div>
+
 			<Toaster richColors test-id="toaster" position="top-right" />
 			<main className="mx-auto max-w-6xl  w-full flex flex-col lg:flex-row gap-10">
 				<div className="flex-1 gap-8  flex flex-col justify-center">
 					<div>
-						<h2 className="text-4xl tracking-tight">
-							Creating a remarkable customer experience
-						</h2>
+						<h2 className="text-4xl tracking-tight">{t("heading")}</h2>
 						<p className="text-foreground/60 tracking-tight">
-							{" "}
-							Unify all your customer communications in one powerful inbox.{" "}
+							{t('subheading')}{" "}
 						</p>
 					</div>
 					{hasJoined ? (
 						<div>
 							<p className=" text-sm  text-foreground/40 tracking-tight mb-2">
-								Launching in
+								{t('launchingIn')}
 							</p>
 							<CountdownClock />
 						</div>
@@ -67,7 +92,7 @@ function WaitListPage() {
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
 							<Loader className="size-4 animate-spin" />
-							<h2 className="tracking-wide text-sm"> work in progress</h2>
+							<h2 className="tracking-wide text-sm"> {t('workInProgress')}</h2>
 						</div>
 						{isLoading ? (
 							<PlannedFeatureSkeleton />
@@ -89,7 +114,7 @@ function WaitListPage() {
 
 					<div className="space-y-2">
 						<div className="flex justify-between items-center gap-2">
-							<h2 className="tracking-wide text-sm"> upcoming features</h2>
+							<h2 className="tracking-wide text-sm"> {t('upcomingFeatures')}</h2>
 							<FeatureRequestModal
 								open={isDialogOpen}
 								onOpenChange={setIsDialogOpen}

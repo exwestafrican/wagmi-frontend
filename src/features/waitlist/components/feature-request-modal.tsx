@@ -28,6 +28,7 @@ import { toast } from "sonner"
 import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal"
 import featureRequestFormSchema from "@/features/waitlist/schema/feature-request-schema"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 export function FeatureRequestModal({
 	open,
@@ -36,23 +37,24 @@ export function FeatureRequestModal({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
+	const { t } = useTranslation("waitlist")
 	const [openEmailRequestModal, onOpenEmailRequestModalChange] = useState(false)
 	const email = useWaitlistStore((state) => state.email)
 	const { mutate: sendFeatureRequest } = useSendFeatureRequest()
 	const priorities = [
 		{
 			value: FeatureRequestPriority.LOW,
-			label: "Low",
+			label: t("featureRequestModal.low"),
 			icon: <Diamond className="w-4 h-4" />,
 		},
 		{
 			value: FeatureRequestPriority.MEDIUM,
-			label: "Medium",
+			label: t("featureRequestModal.medium"),
 			icon: <Diamond className="w-4 h-4" />,
 		},
 		{
 			value: FeatureRequestPriority.HIGH,
-			label: "High",
+			label: t("featureRequestModal.high"),
 			icon: <Diamond className="w-4 h-4 fill-foreground" />,
 		},
 	]
@@ -113,14 +115,13 @@ export function FeatureRequestModal({
 					</DialogTrigger>
 					<DialogContent>
 						<DialogHeader>
-							<DialogTitle>Submit a request</DialogTitle>
+							<DialogTitle>{t("featureRequestModal.title")}</DialogTitle>
 						</DialogHeader>
 						<DialogDescription
 							data-testid="dialog-description"
 							className="sr-only"
 						>
-							Share your feature idea with us. We'll review it and consider
-							adding it to our roadmap.
+							{t('featureRequestModal.description')}
 						</DialogDescription>
 
 						<form
@@ -141,7 +142,7 @@ export function FeatureRequestModal({
 									<FormItem>
 										<FormControl>
 											<Textarea
-												placeholder="Share your feature idea with us. We'll review it and consider adding it to our roadmap..."
+												placeholder={`${t('featureRequestModal.description')}...`}
 												{...field}
 												className="bg-muted/30 border-none min-h-[120px] resize-none"
 												required
@@ -161,7 +162,7 @@ export function FeatureRequestModal({
 										<FormControl>
 											<div className="flex items-start gap-3 flex-col">
 												<Label className="text-xs text-foreground/60">
-													Priority
+													{t('featureRequestModal.priority')}
 												</Label>
 												<div className="flex gap-4  w-full justify-between items-center">
 													{priorities.map((priority) => (
