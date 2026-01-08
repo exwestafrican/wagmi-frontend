@@ -1,4 +1,4 @@
-import { useEffect, useState, useTransition } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
