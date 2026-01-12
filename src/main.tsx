@@ -15,7 +15,6 @@ import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
 import WaitListPage from "@/features/waitlist/waitlist-page"
-import LoginPage from "@/features/auth/login-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 
 // Create a client
@@ -48,15 +47,9 @@ const signupRoute = createRoute({
 	component: SignupPage,
 })
 
-const loginRoute = createRoute({
-	getParentRoute: () => authRoute,
-	path: "/login",
-	component: LoginPage,
-})
-
 const routeTree = rootRoute.addChildren([
 	indexRoute,
-	authRoute.addChildren([signupRoute, loginRoute]),
+	authRoute.addChildren([signupRoute]),
 ])
 
 const router = createRouter({
