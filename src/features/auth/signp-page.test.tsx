@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest"
+import { beforeEach, describe, expect, test } from "vitest"
 import type { SignupData } from "@/features/auth/schema/signupSchema.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
@@ -9,6 +9,9 @@ import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 describe("Signup page", () => {
+	let user: UserEvent
+	let userInput: ReturnType<typeof inputHelpers>
+
 	function makeSignupDetails(details: Partial<SignupData>): SignupData {
 		return {
 			firstName: "John",
@@ -45,13 +48,16 @@ describe("Signup page", () => {
 		}
 	}
 
+	beforeEach(() => {
+		user = userEvent.setup()
+		userInput = inputHelpers(user)
+	})
+
 	describe("disable button for invalid input", () => {
 		describe("Email", () => {
 			test.each(["invalid-email", "tum@c", " "])(
 				"should disable submit button",
 				async (email) => {
-					const user = userEvent.setup()
-					const userInput = inputHelpers(user)
 					setupSignupPage()
 
 					expect(
@@ -91,8 +97,6 @@ describe("Signup page", () => {
 			test.each([" ", "f", "firstNameMoreThan!0Characters"])(
 				"should disable submit button for invalid first name %s",
 				async (firstName) => {
-					const user = userEvent.setup()
-					const userInput = inputHelpers(user)
 					setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.firstNameErrorMessage),
@@ -130,8 +134,6 @@ describe("Signup page", () => {
 			test.each([" ", "d", "lastNameMoreThan!0Characters"])(
 				"should disable submit button for invalid last name %s",
 				async (lastName) => {
-					const user = userEvent.setup()
-					const userInput = inputHelpers(user)
 					setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.lastNameErrorMessage),
@@ -169,8 +171,6 @@ describe("Signup page", () => {
 			test.each([" ", "A".repeat(51)])(
 				"should disable submit button for invalid company name %s",
 				async (companyName) => {
-					const user = userEvent.setup()
-					const userInput = inputHelpers(user)
 					setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.companyNameErrorMessage),
@@ -207,8 +207,6 @@ describe("Signup page", () => {
 
 	describe("valid input", () => {
 		test("button is enabled when input is valid", async () => {
-			const user = userEvent.setup()
-			const userInput = inputHelpers(user)
 			setupSignupPage()
 
 			const signupDetails = makeSignupDetails({})
