@@ -56,7 +56,7 @@ describe("Signup page", () => {
 	describe("disable button for invalid input", () => {
 		describe("Email", () => {
 			test.each(["invalid-email", "tum@c", " "])(
-				"should disable submit button",
+				"should disable submit button for email %s",
 				async (email) => {
 					setupSignupPage()
 
@@ -94,7 +94,7 @@ describe("Signup page", () => {
 		})
 
 		describe("First name", () => {
-			test.each([" ", "f", "firstNameMoreThan!0Characters"])(
+			test.each([" ", "f", "d".repeat(19), "firstNameMoreThan!0Characters"])(
 				"should disable submit button for invalid first name %s",
 				async (firstName) => {
 					setupSignupPage()
@@ -131,7 +131,7 @@ describe("Signup page", () => {
 		})
 
 		describe("Last name", () => {
-			test.each([" ", "d", "lastNameMoreThan!0Characters"])(
+			test.each([" ", "d", "d".repeat(19), "lastNameMoreThan!0Characters"])(
 				"should disable submit button for invalid last name %s",
 				async (lastName) => {
 					setupSignupPage()
