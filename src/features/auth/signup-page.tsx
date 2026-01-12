@@ -112,7 +112,7 @@ const SignupPage = () => {
 										{...field}
 									/>
 								</FormControl>
-								<FormMessage />
+								<FormMessage data-testid="companyname-form-message" />
 							</FormItem>
 						)}
 					/>

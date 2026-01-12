@@ -28,6 +28,7 @@ describe("Signup page", () => {
 		workEmailErrorMessage: "email-form-message",
 		firstNameErrorMessage: "firstname-form-message",
 		lastNameErrorMessage: "lastname-form-message",
+		companyNameErrorMessage: "companyname-form-message",
 	}
 
 	function setupSignupPage() {
@@ -158,6 +159,45 @@ describe("Signup page", () => {
 						expect(submitButton).toBeDisabled()
 						expect(
 							screen.getByTestId(formFields.lastNameErrorMessage),
+						).toBeInTheDocument()
+					})
+				},
+			)
+		})
+
+		describe("Company name", () => {
+			test.each([" ", "A".repeat(51),])(
+				"should disable submit button for invalid company name %s",
+				async (companyName) => {
+					const user = userEvent.setup()
+					const userInput = inputHelpers(user)
+					setupSignupPage()
+					expect(
+						screen.queryByTestId(formFields.companyNameErrorMessage),
+					).not.toBeInTheDocument()
+
+					const signupDetails = makeSignupDetails({})
+
+					await userInput.enterInput(
+						signupDetails.firstName,
+						formFields.firstName,
+					)
+					await userInput.enterInput(
+						signupDetails.lastName,
+						formFields.lastName,
+					)
+					await userInput.enterInput(
+						signupDetails.workEmail,
+						formFields.workEmail,
+					)
+					await userInput.enterInput(companyName, formFields.companyName)
+
+					const submitButton = screen.getByTestId(formFields.submit)
+
+					await waitFor(() => {
+						expect(submitButton).toBeDisabled()
+						expect(
+							screen.getByTestId(formFields.companyNameErrorMessage),
 						).toBeInTheDocument()
 					})
 				},
