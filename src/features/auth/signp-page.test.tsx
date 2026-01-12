@@ -166,7 +166,7 @@ describe("Signup page", () => {
 		})
 
 		describe("Company name", () => {
-			test.each([" ", "A".repeat(51),])(
+			test.each([" ", "A".repeat(51)])(
 				"should disable submit button for invalid company name %s",
 				async (companyName) => {
 					const user = userEvent.setup()
@@ -202,6 +202,30 @@ describe("Signup page", () => {
 					})
 				},
 			)
+		})
+	})
+
+	describe("valid input", () => {
+		test("button is enabled when input is valid", async () => {
+			const user = userEvent.setup()
+			const userInput = inputHelpers(user)
+			setupSignupPage()
+
+			const signupDetails = makeSignupDetails({})
+
+			await userInput.enterInput(signupDetails.firstName, formFields.firstName)
+			await userInput.enterInput(signupDetails.lastName, formFields.lastName)
+			await userInput.enterInput(signupDetails.workEmail, formFields.workEmail)
+			await userInput.enterInput(
+				signupDetails.companyName,
+				formFields.companyName,
+			)
+
+			const submitButton = screen.getByTestId(formFields.submit)
+
+			await waitFor(() => {
+				expect(submitButton).toBeEnabled()
+			})
 		})
 	})
 })
