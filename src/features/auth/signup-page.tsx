@@ -19,13 +19,12 @@ import { useForm } from "react-hook-form"
 const SignupPage = () => {
 	const form = useForm<SignupData>({
 		resolver: zodResolver(signupSchema),
-		mode: "onSubmit",
+		mode: "onChange",
 		defaultValues: {
 			firstName: "",
 			lastName: "",
 			workEmail: "",
 			companyName: "",
-			phoneNumber: "",
 		},
 	})
 
@@ -53,9 +52,13 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
-									<Input placeholder="John" {...field} />
+									<Input
+										data-testid="first-name"
+										placeholder="John"
+										{...field}
+									/>
 								</FormControl>
-								<FormMessage />
+								<FormMessage data-testid="firstname-form-message" />
 							</FormItem>
 						)}
 					/>
@@ -67,7 +70,7 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
-									<Input placeholder="Doe" {...field} />
+									<Input data-testid="last-name" placeholder="Doe" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -81,13 +84,17 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Work Email</FormLabel>
 								<FormControl>
-									<Input placeholder="jd@xxx.com" {...field} />
+									<Input
+										data-testid="email"
+										placeholder="jd@xxx.com"
+										{...field}
+									/>
 								</FormControl>
 								<FormDescription className="text-xs">
 									In the absence of work email, please provide personal email
 									address
 								</FormDescription>
-								<FormMessage />
+								<FormMessage data-testid="email-form-message" />
 							</FormItem>
 						)}
 					/>
@@ -99,28 +106,23 @@ const SignupPage = () => {
 							<FormItem>
 								<FormLabel>Company Name</FormLabel>
 								<FormControl>
-									<Input placeholder="Doe.inc" {...field} />
+									<Input
+										data-testid="company-name"
+										placeholder="Doe.inc"
+										{...field}
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 
-					<FormField
-						control={form.control}
-						name="phoneNumber"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Phone Number</FormLabel>
-								<FormControl>
-									<Input placeholder="091xxxxxxx" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<Button type="submit" className="w-full">
+					<Button
+						disabled={!form.formState.isValid}
+						type="submit"
+						className="w-full"
+						data-testid="submit-button"
+					>
 						Sign Up
 					</Button>
 				</form>
