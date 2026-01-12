@@ -72,7 +72,7 @@ const SignupPage = () => {
 								<FormControl>
 									<Input data-testid="last-name" placeholder="Doe" {...field} />
 								</FormControl>
-								<FormMessage />
+								<FormMessage data-testid="lastname-form-message" />
 							</FormItem>
 						)}
 					/>

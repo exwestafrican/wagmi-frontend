@@ -1,16 +1,14 @@
-import { describe, expect, test, vi, beforeEach } from "vitest"
+import { describe, expect, test } from "vitest"
 import type { SignupData } from "@/features/auth/schema/signupSchema.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
-import type { UserEvent } from "@testing-library/user-event/index"
+import type { UserEvent } from "@testing-library/user-event"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 describe("Signup page", () => {
-	const userInput = inputHelpers(userEvent)
-
 	function makeSignupDetails(details: Partial<SignupData>): SignupData {
 		return {
 			firstName: "John",
@@ -29,6 +27,7 @@ describe("Signup page", () => {
 		submit: "submit-button",
 		workEmailErrorMessage: "email-form-message",
 		firstNameErrorMessage: "firstname-form-message",
+		lastNameErrorMessage: "lastname-form-message",
 	}
 
 	function setupSignupPage() {
@@ -50,6 +49,8 @@ describe("Signup page", () => {
 			test.each(["invalid-email", "tum@c", " "])(
 				"should disable submit button",
 				async (email) => {
+					const user = userEvent.setup()
+					const userInput = inputHelpers(user)
 					setupSignupPage()
 
 					expect(
@@ -89,6 +90,8 @@ describe("Signup page", () => {
 			test.each([" ", "f", "firstNameMoreThan!0Characters"])(
 				"should disable submit button for invalid first name %s",
 				async (firstName) => {
+					const user = userEvent.setup()
+					const userInput = inputHelpers(user)
 					setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.firstNameErrorMessage),
@@ -116,6 +119,45 @@ describe("Signup page", () => {
 						expect(submitButton).toBeDisabled()
 						expect(
 							screen.getByTestId(formFields.firstNameErrorMessage),
+						).toBeInTheDocument()
+					})
+				},
+			)
+		})
+
+		describe("Last name", () => {
+			test.each([" ", "d", "lastNameMoreThan!0Characters"])(
+				"should disable submit button for invalid last name %s",
+				async (lastName) => {
+					const user = userEvent.setup()
+					const userInput = inputHelpers(user)
+					setupSignupPage()
+					expect(
+						screen.queryByTestId(formFields.lastNameErrorMessage),
+					).not.toBeInTheDocument()
+
+					const signupDetails = makeSignupDetails({})
+
+					await userInput.enterInput(
+						signupDetails.firstName,
+						formFields.firstName,
+					)
+					await userInput.enterInput(lastName, formFields.lastName)
+					await userInput.enterInput(
+						signupDetails.workEmail,
+						formFields.workEmail,
+					)
+					await userInput.enterInput(
+						signupDetails.companyName,
+						formFields.companyName,
+					)
+
+					const submitButton = screen.getByTestId(formFields.submit)
+
+					await waitFor(() => {
+						expect(submitButton).toBeDisabled()
+						expect(
+							screen.getByTestId(formFields.lastNameErrorMessage),
 						).toBeInTheDocument()
 					})
 				},
