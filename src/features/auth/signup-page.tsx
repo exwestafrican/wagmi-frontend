@@ -15,7 +15,6 @@ import {
 } from "@/features/auth/schema/signupSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Link } from "@tanstack/react-router"
 
 const SignupPage = () => {
 	const form = useForm<SignupData>({
@@ -126,9 +125,6 @@ const SignupPage = () => {
 					</Button>
 				</form>
 			</Form>
-			<p className="mt-2 text-sm">
-				Already have an account? <Link to="/auth/login" className="font-bold cursor-pointer">Login</Link>
-			</p>
 		</div>
 	)
 }
