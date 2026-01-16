@@ -1,34 +1,59 @@
-import { beforeEach, describe, expect, test } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import type { SignupData } from "@/features/auth/schema/signupSchema.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import type { UserEvent } from "@testing-library/user-event"
-import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { screen, waitFor } from "@testing-library/react"
+import axios, {AxiosError, HttpStatusCode} from "axios"
+import { Pages } from "@/utils/pages.ts"
+
+const mockNavigate = vi.fn()
+vi.mock("@tanstack/react-router", async () => {
+	const actual = await vi.importActual("@tanstack/react-router")
+	return {
+		...actual,
+		useNavigate: () => mockNavigate,
+	}
+})
 
 describe("Signup page", () => {
 	let user: UserEvent
 	let userInput: ReturnType<typeof inputHelpers>
+	const mockAxiosPost = vi.mocked(axios.post)
 
 	function makeSignupDetails(details: Partial<SignupData>): SignupData {
 		return {
 			firstName: "John",
 			lastName: "Doe",
-			workEmail: "james@gmail.com",
+			email: "james@gmail.com",
 			companyName: "sandpaper",
 			...details,
 		}
 	}
 
+	function mockError(statusCode: HttpStatusCode) {
+		const code = "ERR_BAD_REQUEST"
+		const axiosError = new AxiosError(
+			"request failed with status code 401",
+			code,
+			undefined,
+			{},
+            undefined,
+		)
+		axiosError.status = statusCode
+		return axiosError
+	}
+
 	const formFields = {
 		firstName: "first-name",
 		lastName: "last-name",
-		workEmail: "email",
+		email: "email",
 		companyName: "company-name",
 		submit: "submit-button",
-		workEmailErrorMessage: "email-form-message",
+		emailErrorMessage: "email-form-message",
 		firstNameErrorMessage: "firstname-form-message",
 		lastNameErrorMessage: "lastname-form-message",
 		companyNameErrorMessage: "companyname-form-message",
@@ -44,6 +69,17 @@ describe("Signup page", () => {
 			enterInput: async function enterInput(value: string, inputId: string) {
 				const input = screen.getByTestId(inputId)
 				await user.type(input, value)
+				await user.tab()
+			},
+			enterSignUpDetails: async function (details: Partial<SignupData>) {
+				const signupDetails = makeSignupDetails(details)
+				await this.enterInput(signupDetails.firstName, formFields.firstName)
+				await this.enterInput(signupDetails.lastName, formFields.lastName)
+				await this.enterInput(signupDetails.email, formFields.email)
+				await this.enterInput(signupDetails.companyName, formFields.companyName)
+			},
+			click: async (button: HTMLElement) => {
+				await userEvent.click(button)
 			},
 		}
 	}
@@ -61,28 +97,17 @@ describe("Signup page", () => {
 					setupSignupPage()
 
 					expect(
-						screen.queryByTestId(formFields.workEmailErrorMessage),
+						screen.queryByTestId(formFields.emailErrorMessage),
 					).not.toBeInTheDocument()
 
-					const signupDetails = makeSignupDetails({})
-					await userInput.enterInput(
-						signupDetails.firstName,
-						formFields.firstName,
-					)
-					await userInput.enterInput(
-						signupDetails.lastName,
-						formFields.lastName,
-					)
-					await userInput.enterInput(email, formFields.workEmail)
-					await userInput.enterInput(
-						signupDetails.companyName,
-						formFields.companyName,
-					)
+					await userInput.enterSignUpDetails({
+						email,
+					})
 
 					const submitButton = screen.getByTestId(formFields.submit)
 
 					const emailErrorMessage = screen.getByTestId(
-						formFields.workEmailErrorMessage,
+						formFields.emailErrorMessage,
 					)
 
 					await waitFor(() => {
@@ -102,21 +127,9 @@ describe("Signup page", () => {
 						screen.queryByTestId(formFields.firstNameErrorMessage),
 					).not.toBeInTheDocument()
 
-					const signupDetails = makeSignupDetails({})
-
-					await userInput.enterInput(firstName, formFields.firstName)
-					await userInput.enterInput(
-						signupDetails.lastName,
-						formFields.lastName,
-					)
-					await userInput.enterInput(
-						signupDetails.workEmail,
-						formFields.workEmail,
-					)
-					await userInput.enterInput(
-						signupDetails.companyName,
-						formFields.companyName,
-					)
+					await userInput.enterSignUpDetails({
+						firstName,
+					})
 
 					const submitButton = screen.getByTestId(formFields.submit)
 
@@ -139,21 +152,9 @@ describe("Signup page", () => {
 						screen.queryByTestId(formFields.lastNameErrorMessage),
 					).not.toBeInTheDocument()
 
-					const signupDetails = makeSignupDetails({})
-
-					await userInput.enterInput(
-						signupDetails.firstName,
-						formFields.firstName,
-					)
-					await userInput.enterInput(lastName, formFields.lastName)
-					await userInput.enterInput(
-						signupDetails.workEmail,
-						formFields.workEmail,
-					)
-					await userInput.enterInput(
-						signupDetails.companyName,
-						formFields.companyName,
-					)
+					await userInput.enterSignUpDetails({
+						lastName,
+					})
 
 					const submitButton = screen.getByTestId(formFields.submit)
 
@@ -176,21 +177,9 @@ describe("Signup page", () => {
 						screen.queryByTestId(formFields.companyNameErrorMessage),
 					).not.toBeInTheDocument()
 
-					const signupDetails = makeSignupDetails({})
-
-					await userInput.enterInput(
-						signupDetails.firstName,
-						formFields.firstName,
-					)
-					await userInput.enterInput(
-						signupDetails.lastName,
-						formFields.lastName,
-					)
-					await userInput.enterInput(
-						signupDetails.workEmail,
-						formFields.workEmail,
-					)
-					await userInput.enterInput(companyName, formFields.companyName)
+					await userInput.enterSignUpDetails({
+						companyName,
+					})
 
 					const submitButton = screen.getByTestId(formFields.submit)
 
@@ -209,20 +198,33 @@ describe("Signup page", () => {
 		test("button is enabled when input is valid", async () => {
 			setupSignupPage()
 
-			const signupDetails = makeSignupDetails({})
-
-			await userInput.enterInput(signupDetails.firstName, formFields.firstName)
-			await userInput.enterInput(signupDetails.lastName, formFields.lastName)
-			await userInput.enterInput(signupDetails.workEmail, formFields.workEmail)
-			await userInput.enterInput(
-				signupDetails.companyName,
-				formFields.companyName,
-			)
+			await userInput.enterSignUpDetails({})
 
 			const submitButton = screen.getByTestId(formFields.submit)
 
 			await waitFor(() => {
 				expect(submitButton).toBeEnabled()
+			})
+		})
+
+		describe("unsuccessful signup", () => {
+			beforeEach(async () => {
+				mockAxiosPost.mockRejectedValueOnce(
+					mockError(HttpStatusCode.Unauthorized),
+				)
+			})
+			test("when user is unauthorized we transition to waitlist page", async () => {
+				setupSignupPage()
+				await userInput.enterSignUpDetails({})
+
+				const submitButton = screen.getByTestId(formFields.submit)
+				await userInput.click(submitButton)
+
+				await waitFor(() => {
+					expect(mockNavigate).toHaveBeenCalledWith({
+						to: Pages.WAITLIST,
+					})
+				})
 			})
 		})
 	})

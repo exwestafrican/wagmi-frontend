@@ -15,11 +15,12 @@ export const signupSchema = z.object({
 		.max(18),
 	companyName: z
 		.string()
-		.nonempty({ message: "Company name is required" })
-		.min(5, { message: "Company name must contain at least 2 characters" })
-		.max(50, { message: "Company name cannot be more than 50 characters" })
-		.trim(),
-	workEmail: z
+		.trim()
+		.toLowerCase()
+		.min(5, { message: "Company name must contain at least 5 characters" })
+		.max(50, { message: "Company name cannot be more than 50 characters" }),
+
+	email: z
 		.email({ message: "Invalid email address, please try again" })
 		.nonempty({ message: "Work email is required" })
 		.trim()
