@@ -21,14 +21,20 @@ import { Toaster } from "sonner"
 // Create a client
 const queryClient = new QueryClient({})
 
-const rootRoute = createRootRoute({
-	component: () => (
+export function RootRouteComponent() {
+	return (
 		<>
 			<Outlet />
-			<Toaster richColors test-id="toaster" position="top-right" />
+			<div data-testid="toaster">
+				<Toaster richColors position="top-right" />
+			</div>
 			<TanStackRouterDevtools />
 		</>
-	),
+	)
+}
+
+const rootRoute = createRootRoute({
+	component: RootRouteComponent,
 })
 
 const indexRoute = createRoute({

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render } from "@testing-library/react"
+import { Toaster } from "sonner"
 
 export function createTestQueryClient() {
 	return new QueryClient({
@@ -24,6 +25,9 @@ export default function renderWithQueryClient(
 		...render(
 			<QueryClientProvider client={queryClient}>
 				{component}
+				<div data-testid="toaster">
+					<Toaster richColors position="top-right" />
+				</div>
 			</QueryClientProvider>,
 		),
 		queryClient,
