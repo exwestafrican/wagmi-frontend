@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
 import CountdownClock from "@/features/waitlist/components/countdown-clock.tsx"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"

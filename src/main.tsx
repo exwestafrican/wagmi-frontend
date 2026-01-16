@@ -16,6 +16,7 @@ import reportWebVitals from "./reportWebVitals.ts"
 
 import WaitListPage from "@/features/waitlist/waitlist-page"
 import SignupPage from "@/features/auth/signup-page.tsx"
+import { Toaster } from "sonner"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -24,6 +25,7 @@ const rootRoute = createRootRoute({
 	component: () => (
 		<>
 			<Outlet />
+			<Toaster richColors test-id="toaster" position="top-right" />
 			<TanStackRouterDevtools />
 		</>
 	),

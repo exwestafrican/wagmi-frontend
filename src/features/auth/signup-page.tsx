@@ -21,6 +21,7 @@ import SignupSuccess from "@/features/auth/component/signup.success.tsx"
 import { type AxiosError, HttpStatusCode } from "axios"
 import { useNavigate } from "@tanstack/react-router"
 import { Pages } from "@/utils/pages.ts"
+import { toast } from "sonner"
 
 const SignupPage = () => {
 	const { mutate: signupUser } = useSignup()
@@ -39,7 +40,6 @@ const SignupPage = () => {
 	})
 
 	const onSubmit = (data: SignupData) => {
-		console.log(`Signup Data: ${data}`)
 		signupUser(data, {
 			onSuccess: () => {
 				form.reset()
@@ -48,12 +48,13 @@ const SignupPage = () => {
 			onError: async (error: unknown) => {
 				form.reset()
 				const axiosError = error as AxiosError
-				console.log("axios status", axiosError.status)
 				if (axiosError.status === HttpStatusCode.Unauthorized) {
-					// add Toast, unable to create account please join waitlist
-					await navigate({ to: Pages.HOME })
+					toast.error("Unable to create account", {
+						description:
+							"Please join the waitlist to get notified when accounts are available.",
+					})
+					await navigate({ to: Pages.WAITLIST })
 				}
-				console.log(axiosError)
 			},
 		})
 	}
