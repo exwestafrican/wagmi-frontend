@@ -7,7 +7,7 @@ import SignupPage from "@/features/auth/signup-page.tsx"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { screen, waitFor } from "@testing-library/react"
-import axios, {AxiosError, HttpStatusCode} from "axios"
+import axios, { AxiosError, HttpStatusCode } from "axios"
 import { Pages } from "@/utils/pages.ts"
 
 const mockNavigate = vi.fn()
@@ -41,7 +41,7 @@ describe("Signup page", () => {
 			code,
 			undefined,
 			{},
-            undefined,
+			undefined,
 		)
 		axiosError.status = statusCode
 		return axiosError
