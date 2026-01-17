@@ -16,8 +16,6 @@ import { RoadmapFeatureStage } from "@/features/waitlist/enums/roadmap-feautre-s
 import { useState } from "react"
 import { FeatureRequestModal } from "@/features/waitlist/components/feature-request-modal"
 import { useTranslation } from "react-i18next"
-import { Pages } from "@/utils/pages"
-import { useNavigate } from "@tanstack/react-router"
 
 function filterFeaturesByStage(
 	features: RoadmapFeature[],
@@ -34,7 +32,6 @@ function WaitListPage() {
 		.map((_, idx) => ({ id: idx }))
 	const { data: response, isLoading } = useGetRoadmapFeatures()
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
-	const navigate = useNavigate()
 
 	return (
 		<div
@@ -66,13 +63,6 @@ function WaitListPage() {
 					}`}
 				>
 					FR
-				</button>
-				<button
-					type="button"
-					className="cursor-pointer"
-					onClick={() => navigate({ to: Pages.SIGNUP })}
-				>
-					Sign up
 				</button>
 			</div>
 
