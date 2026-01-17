@@ -48,13 +48,32 @@ const SignupPage = () => {
 			onError: async (error: unknown) => {
 				form.reset()
 				const axiosError = error as AxiosError
-				if (axiosError.status === HttpStatusCode.Unauthorized) {
-					toast.error("Unable to create account", {
-						description:
-							"Please join the waitlist to get notified when accounts are available.",
-					})
-					await navigate({ to: Pages.WAITLIST })
+
+				switch (axiosError.status) {
+					case HttpStatusCode.Unauthorized:
+						toast.error("Unable to create account", {
+							description:
+								"Please join the waitlist to get notified when accounts are available.",
+						})
+						await navigate({ to: Pages.WAITLIST })
+						break
+					case HttpStatusCode.Conflict:
+						toast.error("Unable to create account", {
+							description: "Please login to your account.",
+						})
+						break
+					default:
+						toast.error("Unable to create account", {
+							description: "😢Something went wrong.",
+						})
 				}
+				// if (axiosError.status === HttpStatusCode.Unauthorized) {
+				// 	toast.error("Unable to create account", {
+				// 		description:
+				// 			"Please join the waitlist to get notified when accounts are available.",
+				// 	})
+				// 	await navigate({ to: Pages.WAITLIST })
+				// }
 			},
 		})
 	}
@@ -151,7 +170,7 @@ const SignupPage = () => {
 					<Button
 						disabled={!form.formState.isValid}
 						type="submit"
-						className="w-full"
+						className="w-full cursor-pointer"
 						data-testid="submit-button"
 					>
 						Sign Up

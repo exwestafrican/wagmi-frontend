@@ -17,6 +17,7 @@ import reportWebVitals from "./reportWebVitals.ts"
 import WaitListPage from "@/features/waitlist/waitlist-page"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { Toaster } from "sonner"
+import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -37,26 +38,35 @@ const rootRoute = createRootRoute({
 	component: RootRouteComponent,
 })
 
-const indexRoute = createRoute({
-	getParentRoute: () => rootRoute,
-	path: "/",
-	component: WaitListPage,
-})
-
 const authRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "auth",
 	component: () => <Outlet />,
 })
 
+const indexRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/",
+	component: WaitListPage,
+})
+
+// auth routes
 const signupRoute = createRoute({
 	getParentRoute: () => authRoute,
 	path: "/signup",
 	component: SignupPage,
 })
 
+// setup routes
+const workspaceSetupRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/setup/workspace",
+	component: SetupWorkspacePage,
+})
+
 const routeTree = rootRoute.addChildren([
 	indexRoute,
+	workspaceSetupRoute,
 	authRoute.addChildren([signupRoute]),
 ])
 
