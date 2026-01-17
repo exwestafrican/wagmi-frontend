@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
 	return (
@@ -14,6 +15,7 @@ const MARCH = 2
 const LAUNCH_DATE = new Date(2026, MARCH, 14) // Move outside component
 
 export default function CountdownClock() {
+	const { t } = useTranslation("waitlist")
 	const ONE_SECOND = 1000 // 1,000ms -> 1sec
 	const SECONDS_IN_A_DAY = 86400
 	const SECONDS_IN_AN_HOUR = 3600
@@ -50,13 +52,13 @@ export default function CountdownClock() {
 		//TODO: Translate the label to the user's language
 		switch (key) {
 			case "days":
-				return "DAYS"
+				return t("days")
 			case "hours":
-				return "HOURS"
+				return t("hours")
 			case "minutes":
-				return "MINUTES"
+				return t("minutes")
 			case "seconds":
-				return "SECONDS"
+				return t("seconds")
 			default:
 				return ""
 		}

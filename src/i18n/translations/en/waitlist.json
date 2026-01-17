@@ -1,0 +1,19 @@
+{
+	"heading": "Creating a remarkable customer experience",
+	"subheading": "Unify all your customer communications in one powerful inbox.",
+	"launchingIn": "Launching In",
+	"workInProgress": "work in progress",
+	"upcomingFeatures": "upcoming features",
+	"days": "DAYS",
+	"hours": "HOURS",
+	"minutes": "MINUTES",
+	"seconds": "SECONDS",
+	"featureRequestModal": {
+		"title": "Submit a Request",
+		"description": "Share your feature idea with us. We'll review it and consider adding it to our roadmap.",
+		"priority": "priority",
+		"low": "Low",
+		"medium": "Medium",
+		"high": "High"
+	}
+}

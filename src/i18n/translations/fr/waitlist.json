@@ -1,0 +1,19 @@
+{
+	"heading": "Créer une expérience client remarquable",
+	"subheading": "Unifiez toutes vos communications clients dans une boîte de réception puissante",
+	"launchingIn": "Lancement dans",
+	"workInProgress": "travaux en cours",
+	"upcomingFeatures": "fonctionnalités à venir",
+	"days": "JOURS",
+	"hours": "HEURES",
+	"minutes": "MINUTES",
+	"seconds": "SECONDES",
+	"featureRequestModal": {
+		"title": "Soumettre une demande",
+		"description": "Partagez votre idée de fonctionnalité avec nous. Nous l'examinerons et envisagerons de l'ajouter à notre feuille de route.",
+		"priority": "priorité",
+		"low": "Faible",
+		"medium": "Moyenne",
+		"high": "Élevée"
+	}
+}

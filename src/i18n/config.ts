@@ -8,7 +8,8 @@ i18n
 	.use(initReactI18next)
 	.init({
 		fallbackLng: "en",
-		ns: ["common"],
+		load: "languageOnly",
+		ns: ["common", "waitlist"],
 		defaultNS: "common",
 		fallbackNS: "common",
 		debug: import.meta.env.DEV ?? false, // true in dev, false in prod
@@ -17,5 +18,7 @@ i18n
 			escapeValue: false,
 		},
 	})
+
+export const t = i18n.t.bind(i18n)
 
 export default i18n
