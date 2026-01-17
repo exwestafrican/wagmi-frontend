@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner"
 import JoinWaitListForm from "@/features/waitlist/components/join-form"
 import CountdownClock from "@/features/waitlist/components/countdown-clock.tsx"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
@@ -67,7 +66,6 @@ function WaitListPage() {
 				</button>
 			</div>
 
-			<Toaster richColors test-id="toaster" position="top-right" />
 			<main className="mx-auto max-w-6xl  w-full flex flex-col lg:flex-row gap-10">
 				<div className="flex-1 gap-8  flex flex-col justify-center">
 					<div>

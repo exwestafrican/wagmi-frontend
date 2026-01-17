@@ -15,17 +15,26 @@ import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
 import WaitListPage from "@/features/waitlist/waitlist-page"
+import SignupPage from "@/features/auth/signup-page.tsx"
+import { Toaster } from "sonner"
 
 // Create a client
 const queryClient = new QueryClient({})
 
-const rootRoute = createRootRoute({
-	component: () => (
+export function RootRouteComponent() {
+	return (
 		<>
 			<Outlet />
+			<div data-testid="toaster">
+				<Toaster richColors position="top-right" />
+			</div>
 			<TanStackRouterDevtools />
 		</>
-	),
+	)
+}
+
+const rootRoute = createRootRoute({
+	component: RootRouteComponent,
 })
 
 const indexRoute = createRoute({
@@ -34,7 +43,22 @@ const indexRoute = createRoute({
 	component: WaitListPage,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
+const authRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "auth",
+	component: () => <Outlet />,
+})
+
+const signupRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/signup",
+	component: SignupPage,
+})
+
+const routeTree = rootRoute.addChildren([
+	indexRoute,
+	authRoute.addChildren([signupRoute]),
+])
 
 const router = createRouter({
 	routeTree,
