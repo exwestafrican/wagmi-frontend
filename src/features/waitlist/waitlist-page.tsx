@@ -42,15 +42,14 @@ function WaitListPage() {
 					"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 120, 120, 0.15), transparent 50%), #ffffff",
 			}}
 		>
-			{/* Temporary language switcher for testing */}
 			<div className="fixed top-4 right-4 z-50 flex gap-2">
 				<button
 					type="button"
 					onClick={() => i18n.changeLanguage("en")}
 					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
 						i18n.language === "en"
-							? "bg-blue-600 text-white"
-							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+							? "bg-black text-white"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow"
 					}`}
 				>
 					EN
@@ -60,8 +59,8 @@ function WaitListPage() {
 					onClick={() => i18n.changeLanguage("fr")}
 					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
 						i18n.language === "fr"
-							? "bg-blue-600 text-white"
-							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+							? "bg-black text-white"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow"
 					}`}
 				>
 					FR
