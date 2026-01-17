@@ -49,7 +49,7 @@ function WaitListPage() {
 					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
 						i18n.language === "en"
 							? "bg-black text-white"
-							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow cursor-pointer"
 					}`}
 				>
 					EN
@@ -60,7 +60,7 @@ function WaitListPage() {
 					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
 						i18n.language === "fr"
 							? "bg-black text-white"
-							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow cursor-pointer"
 					}`}
 				>
 					FR
