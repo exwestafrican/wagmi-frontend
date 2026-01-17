@@ -67,7 +67,11 @@ function WaitListPage() {
 				>
 					FR
 				</button>
-				<button className="cursor-pointer" onClick={() => navigate({ to: Pages.SIGNUP })}>
+				<button
+					type="button"
+					className="cursor-pointer"
+					onClick={() => navigate({ to: Pages.SIGNUP })}
+				>
 					Sign up
 				</button>
 			</div>
