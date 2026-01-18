@@ -77,11 +77,13 @@ export function FeatureRequestModal({
 	) {
 		sendFeatureRequest(values, {
 			onSuccess: () => {
+				// TODO: add translation
 				toast.success("Feature request sent successfully 🍾🍾")
 				form.reset()
 				onOpenChange(false)
 			},
 			onError: (error: unknown) => {
+				// TODO: add translation
 				toast.error("Uh oh! Something went wrong.", {
 					description:
 						"Failed to send feature request. Please try again later or contact support.",

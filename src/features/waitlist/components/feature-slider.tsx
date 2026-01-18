@@ -28,6 +28,10 @@ import {
 	FormItem,
 	FormMessage,
 } from "@/components/ui/form"
+import { useSendFeatureFeedback } from "@/features/waitlist/api/send-feature-feedback.ts"
+import { toast } from "sonner"
+import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus.ts"
+import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal.tsx"
 
 interface FeatureDetailSliderProps {
 	feature: RoadmapFeature
@@ -41,6 +45,9 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 	onOpenChange,
 }) => {
 	const [isSubscribed, setIsSubscribed] = useState(false)
+	const [openEmailRequestModal, onOpenEmailRequestModalChange] = useState(false)
+	const email = useWaitlistStore((state) => state.email)
+	const { mutate: sendFeatureFeedback } = useSendFeatureFeedback()
 
 	const form = useForm<z.infer<typeof featureFeedbackSchema>>({
 		resolver: zodResolver(featureFeedbackSchema),
@@ -51,91 +58,133 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 		},
 	})
 
+	function requestUserEmail() {
+		onOpenEmailRequestModalChange(true) //open email request modal
+	}
+
 	if (!feature) {
 		return null
 	}
 
-	const submitFeedback = (values: z.infer<typeof featureFeedbackSchema>) => {
-		console.log(values) // to be changed on endpoint integration
+	const submitFeatureFeedback = (
+		values: z.infer<typeof featureFeedbackSchema> & { email: string },
+	) => {
+		sendFeatureFeedback(values, {
+			onSuccess: () => {
+				// TODO: add translation
+				toast.success("Thank you for your feedback!")
+				setIsSubscribed(true) // when the user submits a feedback, they are automatically subscribed
+				form.reset()
+				onOpenChange(false)
+			},
+			onError: (error: unknown) => {
+				toast.error("Uh oh! Something went wrong.", {
+					description:
+						"Failed to send feedback. Please try again later or contact support.",
+				})
+				console.error("Failed to send feature request", error)
+			},
+		})
 	}
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent>
-				<SheetHeader>
-					<div className="p-2 bg-muted/30 rounded-lg w-fit">
-						<FeatureIcon icon={feature.icon} />
+		<>
+			<Sheet open={open} onOpenChange={onOpenChange}>
+				<SheetContent>
+					<SheetHeader>
+						<div className="p-2 bg-muted/30 rounded-lg w-fit">
+							<FeatureIcon icon={feature.icon} />
+						</div>
+						<SheetTitle className="font-normal text-lg mb-1">
+							{sentenceCase(feature.name)}
+						</SheetTitle>
+						<SheetDescription className="text-sm text-foreground/60">
+							{feature.description}
+						</SheetDescription>
+					</SheetHeader>
+					<div className="px-4">
+						<div className="flex items-center gap-2 mb-2">
+							<Status stage={feature.stage} />
+							<p className="text-sm text-foreground">
+								Last edited:{" "}
+								{format(new Date(feature.updatedAt), "MMM dd, yyyy")}
+							</p>
+						</div>
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(() => {
+									if (email) {
+										submitFeatureFeedback({ ...form.getValues(), email: email })
+									} else {
+										requestUserEmail()
+									}
+								})}
+							>
+								<FormField
+									control={form.control}
+									name="feedback"
+									render={({ field, fieldState }) => (
+										<FormItem>
+											<FormControl>
+												<div className="relative">
+													<Textarea
+														placeholder="Leave feedback about this idea, your use-case and more..."
+														{...field}
+														className={`min-h-[120px] bg-muted/30 border resize-none text-sm pr-12 pb-12 ${
+															fieldState.error
+																? "border-red-300 focus-visible:ring-red-300"
+																: "border-border"
+														}`}
+													/>
+													<Button
+														type="submit"
+														variant={"outline"}
+														className="absolute bottom-3 right-3 p-2 rounded-full border"
+													>
+														<ArrowUp className="w-4 h-4" />
+													</Button>
+												</div>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</form>
+						</Form>
+						<Separator className="mt-4" />
 					</div>
-					<SheetTitle className="font-normal text-lg mb-1">
-						{sentenceCase(feature.name)}
-					</SheetTitle>
-					<SheetDescription className="text-sm text-foreground/60">
-						{feature.description}
-					</SheetDescription>
-				</SheetHeader>
-				<div className="px-4">
-					<div className="flex items-center gap-2 mb-2">
-						<Status stage={feature.stage} />
-						<p className="text-sm text-foreground">
-							Last edited: {format(new Date(feature.updatedAt), "MMM dd, yyyy")}
+					<SheetFooter className="mt-0 pt-0">
+						<p className="text-sm">Stay updated</p>
+						<p className="text-sm text-foreground/60">
+							Subscribe to get notified when this item is updated.
 						</p>
-					</div>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(submitFeedback)}>
-							<FormField
-								control={form.control}
-								name="feedback"
-								render={({ field, fieldState }) => (
-									<FormItem>
-										<FormControl>
-											<div className="relative">
-												<Textarea
-													placeholder="Leave feedback about this idea, your use-case and more..."
-													{...field}
-													className={`min-h-[120px] bg-muted/30 border resize-none text-sm pr-12 pb-12 ${
-														fieldState.error
-															? "border-red-300 focus-visible:ring-red-300"
-															: "border-border"
-													}`}
-												/>
-												<Button
-													type="submit"
-													variant={"outline"}
-													className="absolute bottom-3 right-3 p-2 rounded-full border"
-												>
-													<ArrowUp className="w-4 h-4" />
-												</Button>
-											</div>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</form>
-					</Form>
-					<Separator className="mt-4" />
-				</div>
-				<SheetFooter className="mt-0 pt-0">
-					<p className="text-sm">Stay updated</p>
-					<p className="text-sm text-foreground/60">
-						Subscribe to get notified when this item is updated.
-					</p>
-					<Button
-						onClick={() => setIsSubscribed(!isSubscribed)}
-						className="w-fit flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border rounded-lg hover:bg-foreground/5 transition-colors text-sm"
-					>
-						{isSubscribed ? (
-							<Check className="w-4 h-4 text-foreground/60" />
-						) : (
-							<Bell className="w-4 h-4 text-foreground/60" />
-						)}
-						<span className="text-foreground">
-							{isSubscribed ? "Subscribed" : "Subscribe"}
-						</span>
-					</Button>
-				</SheetFooter>
-			</SheetContent>
-		</Sheet>
+						<Button
+							onClick={() => setIsSubscribed(!isSubscribed)}
+							className="w-fit flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border rounded-lg hover:bg-foreground/5 transition-colors text-sm"
+						>
+							{isSubscribed ? (
+								<Check className="w-4 h-4 text-foreground/60" />
+							) : (
+								<Bell className="w-4 h-4 text-foreground/60" />
+							)}
+							<span className="text-foreground">
+								{isSubscribed ? "Subscribed" : "Subscribe"}
+							</span>
+						</Button>
+					</SheetFooter>
+				</SheetContent>
+			</Sheet>
+			<EmailRequestModal
+				open={openEmailRequestModal}
+				onOpenChange={onOpenEmailRequestModalChange}
+				onSubmitEmailRequest={async (email: string) => {
+					submitFeatureFeedback({ ...form.getValues(), email: email })
+					onOpenEmailRequestModalChange(false)
+					onOpenChange(false)
+					form.reset()
+				}}
+			/>
+		</>
 	)
 }
 
