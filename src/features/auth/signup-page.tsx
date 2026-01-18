@@ -67,13 +67,6 @@ const SignupPage = () => {
 							description: "😢Something went wrong.",
 						})
 				}
-				// if (axiosError.status === HttpStatusCode.Unauthorized) {
-				// 	toast.error("Unable to create account", {
-				// 		description:
-				// 			"Please join the waitlist to get notified when accounts are available.",
-				// 	})
-				// 	await navigate({ to: Pages.WAITLIST })
-				// }
 			},
 		})
 	}
