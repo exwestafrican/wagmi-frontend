@@ -37,7 +37,7 @@ export function FeatureRequestModal({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
-	const { t } = useTranslation("waitlist")
+	const { t } = useTranslation(["waitlist", "toast"])
 	const [openEmailRequestModal, onOpenEmailRequestModalChange] = useState(false)
 	const email = useWaitlistStore((state) => state.email)
 	const { mutate: sendFeatureRequest } = useSendFeatureRequest()
@@ -77,16 +77,15 @@ export function FeatureRequestModal({
 	) {
 		sendFeatureRequest(values, {
 			onSuccess: () => {
-				// TODO: add translation
-				toast.success("Feature request sent successfully 🍾🍾")
+				toast.success(t("toast:waitlist.featureRequestModal.success"))
 				form.reset()
 				onOpenChange(false)
 			},
 			onError: (error: unknown) => {
-				// TODO: add translation
-				toast.error("Uh oh! Something went wrong.", {
-					description:
-						"Failed to send feature request. Please try again later or contact support.",
+				toast.error(t("toast:somethingWentWrong"), {
+					description: t(
+						"toast:waitlist.featureRequestModal.error.description",
+					),
 				})
 				console.error("Failed to send feature request", error)
 			},
@@ -110,7 +109,7 @@ export function FeatureRequestModal({
 					<DialogTrigger>
 						<div
 							data-testid="feature-request-button"
-							className="text-foreground/40 hover:text-foreground/60 transition-colors transition-colors shadow-[0_0_15px_rgba(0,0,0,0.3)] rounded-full p-1 cursor-pointer"
+							className="text-foreground/40 hover:text-foreground/60 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.3)] rounded-full p-1 cursor-pointer"
 						>
 							<Plus className="w-5 h-5 " />
 						</div>

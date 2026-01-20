@@ -32,6 +32,7 @@ import { useSendFeatureFeedback } from "@/features/waitlist/api/send-feature-fee
 import { toast } from "sonner"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus.ts"
 import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal.tsx"
+import { useTranslation } from "react-i18next"
 
 interface FeatureDetailSliderProps {
 	feature: RoadmapFeature
@@ -44,6 +45,7 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 	open,
 	onOpenChange,
 }) => {
+	const { t } = useTranslation(["waitlist", "toast"])
 	const [isSubscribed, setIsSubscribed] = useState(false)
 	const [openEmailRequestModal, onOpenEmailRequestModalChange] = useState(false)
 	const email = useWaitlistStore((state) => state.email)
@@ -72,15 +74,16 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 		sendFeatureFeedback(values, {
 			onSuccess: () => {
 				// TODO: add translation
-				toast.success("Thank you for your feedback!")
+				toast.success(t("toast:waitlist.featureDetailSlider.success"))
 				setIsSubscribed(true) // when the user submits a feedback, they are automatically subscribed
 				form.reset()
 				onOpenChange(false)
 			},
 			onError: (error: unknown) => {
-				toast.error("Uh oh! Something went wrong.", {
-					description:
-						"Failed to send feedback. Please try again later or contact support.",
+				toast.error(t("toast:somethingWentWrong"), {
+					description: t(
+						"toast:waitlist.featureDetailSlider.error.description",
+					),
 				})
 				console.error("Failed to send feature request", error)
 			},
@@ -106,7 +109,7 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 						<div className="flex items-center gap-2 mb-2">
 							<Status stage={feature.stage} />
 							<p className="text-sm text-foreground">
-								Last edited:{" "}
+								{t("featureDetailSlider.lastEdited")}:{" "}
 								{format(new Date(feature.updatedAt), "MMM dd, yyyy")}
 							</p>
 						</div>
@@ -128,7 +131,9 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 											<FormControl>
 												<div className="relative">
 													<Textarea
-														placeholder="Leave feedback about this idea, your use-case and more..."
+														placeholder={t(
+															"featureDetailSlider.feedbackPlaceholder",
+														)}
 														{...field}
 														className={`min-h-[120px] bg-muted/30 border resize-none text-sm pr-12 pb-12 ${
 															fieldState.error
@@ -154,9 +159,9 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 						<Separator className="mt-4" />
 					</div>
 					<SheetFooter className="mt-0 pt-0">
-						<p className="text-sm">Stay updated</p>
+						<p className="text-sm">{t("featureDetailSlider.stayUpdated")}</p>
 						<p className="text-sm text-foreground/60">
-							Subscribe to get notified when this item is updated.
+							{t("featureDetailSlider.subscribeToGetNotified")}
 						</p>
 						<Button
 							onClick={() => setIsSubscribed(!isSubscribed)}
@@ -168,7 +173,9 @@ const FeatureDetailSlider: React.FC<FeatureDetailSliderProps> = ({
 								<Bell className="w-4 h-4 text-foreground/60" />
 							)}
 							<span className="text-foreground">
-								{isSubscribed ? "Subscribed" : "Subscribe"}
+								{isSubscribed
+									? t("featureDetailSlider.subscribed")
+									: t("featureDetailSlider.subscribe")}
 							</span>
 						</Button>
 					</SheetFooter>

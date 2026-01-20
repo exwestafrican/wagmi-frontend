@@ -14,15 +14,7 @@ import { useJoinWaitList } from "@/features/waitlist/api/join-waitlist"
 import { toast } from "sonner"
 import { useWaitlistStore } from "@/features/waitlist/store/useWaitlistStatus"
 import type { AxiosError } from "axios"
-
-const formSchema = z.object({
-	email: z
-		.email({
-			message: "Please enter a valid email address.",
-		})
-		.trim()
-		.toLowerCase(),
-})
+import { useTranslation } from "react-i18next"
 
 interface ErrorResponse {
 	message: string
@@ -31,6 +23,16 @@ interface ErrorResponse {
 }
 
 const JoinWaitListForm = () => {
+	const { t } = useTranslation(["waitlist", "toast"])
+	const formSchema = z.object({
+		email: z
+			.email({
+				message: t("pleaseEnterAValidEmailAddress"),
+			})
+			.trim()
+			.toLowerCase(),
+	})
+
 	const { mutate: joinWaitList, isPending } = useJoinWaitList()
 	const join = useWaitlistStore((state) => state.join)
 
@@ -43,8 +45,8 @@ const JoinWaitListForm = () => {
 		joinWaitList(values.email, {
 			onSuccess: () => {
 				form.reset()
+				toast.success(t("toast:waitlist.joinWaitListForm.success"))
 				join(values.email) // update the store
-				toast.success("Congratulations!!! You are on the wait list! 🍾🍾")
 			},
 			onError: (error: unknown) => {
 				const apiError = error as AxiosError<ErrorResponse>
@@ -53,14 +55,15 @@ const JoinWaitListForm = () => {
 				if (errorResponse) {
 					const errorMessage = errorResponse.message
 						? errorResponse.message
-						: "Failed to join wait list"
-					toast.error("Uh oh! Something went wrong.", {
+						: t("toast:waitlist.joinWaitListForm.error.descriptionMain")
+					toast.error(t("toast:somethingWentWrong"), {
 						description: errorMessage,
 					})
 				} else {
-					toast.error("Uh oh! Something went wrong.", {
-						description:
-							"We could not add you to the wait list at this time. Please try again later.",
+					toast.error(t("toast:somethingWentWrong"), {
+						description: t(
+							"toast:waitlist.joinWaitListForm.error.descriptionFallback",
+						),
 					})
 				}
 			},
@@ -89,7 +92,9 @@ const JoinWaitListForm = () => {
 										type="submit"
 										disabled={isPending}
 									>
-										{isPending ? "Joining..." : "Get Notified"}
+										{isPending
+											? t("joinForm.joining...")
+											: t("joinForm.getNotified")}
 									</Button>
 								</div>
 							</FormControl>
