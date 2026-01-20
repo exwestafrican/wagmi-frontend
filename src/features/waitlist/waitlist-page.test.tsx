@@ -18,6 +18,16 @@ import {
 	plannedFeatureFactory,
 } from "@/test/factory/feature"
 
+vi.mock("react-i18next", () => ({
+	useTranslation: () => ({
+		t: (key: string) => key,
+		i18n: {
+			language: "en",
+			changeLanguage: vi.fn(() => Promise.resolve()),
+		},
+	}),
+}))
+
 vi.mock("axios")
 const mockMutate = vi.fn((_, options) => {
 	options?.onSuccess()
@@ -127,7 +137,7 @@ describe("WaitListPage", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText("Congratulations!!! You are on the wait list! 🍾🍾"),
+				screen.getByText("toast:waitlist.joinWaitListForm.success"),
 			).toBeInTheDocument()
 		})
 	})
