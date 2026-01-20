@@ -8,6 +8,7 @@
 	"hours": "HEURES",
 	"minutes": "MINUTES",
 	"seconds": "SECONDES",
+	"pleaseEnterAValidEmailAddress": "S'il vous plaît, mettez une adresse email valide.",
 	"featureRequestModal": {
 		"title": "Soumettre une demande",
 		"description": "Partagez votre idée de fonctionnalité avec nous. Nous l'examinerons et envisagerons de l'ajouter à notre feuille de route.",
@@ -15,5 +16,23 @@
 		"low": "Faible",
 		"medium": "Moyenne",
 		"high": "Élevée"
+	},
+	"featureDetailSlider": {
+		"lastEdited": "Dernière modification",
+		"feedbackPlaceholder": "Laissez un retour sur cette idée, votre cas d’usage et plus encore...",
+		"stayUpdated": "Restez informé",
+		"subscribeToGetNotified": "Abonnez-vous pour être informé lorsque cet élément est mis à jour",
+		"subscribe": "S’abonner",
+		"subscribed": "Abonné"
+	},
+	"emailRequestModal": {
+		"enterEmailToSubmitFeatureRequest": "Saisissez votre adresse e-mail pour soumettre une demande de fonctionnalité.",
+		"submitting...": "Soumission...",
+		"submit": "Soumettre",
+		"emailCannotBeEmpty": "L'e-mail ne peut pas être vide"
+	},
+	"joinForm": {
+		"joining...": "Adhésion...",
+		"getNotified": "Soyez averti"
 	}
 }
