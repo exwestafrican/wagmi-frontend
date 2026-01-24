@@ -29,9 +29,6 @@ const LoginPage = () => {
 		defaultValues: { email: "" },
 	})
 
-	//Test -> we reset form on login, we redirect
-	// Test -> we show success page
-
 	const onSubmit = (data: LoginData) => {
 		console.log(`Login Data: ${data}`)
 		loginUser(data, {
