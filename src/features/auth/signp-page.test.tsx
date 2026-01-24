@@ -7,8 +7,9 @@ import SignupPage from "@/features/auth/signup-page.tsx"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { screen, waitFor } from "@testing-library/react"
-import axios, { AxiosError, HttpStatusCode } from "axios"
+import axios, { HttpStatusCode } from "axios"
 import { Pages } from "@/utils/pages.ts"
+import { mockError } from "@/test/helpers/mocks.ts"
 
 const mockNavigate = vi.fn()
 vi.mock("@tanstack/react-router", async () => {
@@ -32,19 +33,6 @@ describe("Signup page", () => {
 			companyName: "sandpaper",
 			...details,
 		}
-	}
-
-	function mockError(statusCode: HttpStatusCode) {
-		const code = "ERR_BAD_REQUEST"
-		const axiosError = new AxiosError(
-			"request failed with status code 401",
-			code,
-			undefined,
-			{},
-			undefined,
-		)
-		axiosError.status = statusCode
-		return axiosError
 	}
 
 	const formFields = {

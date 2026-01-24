@@ -18,6 +18,7 @@ import WaitListPage from "@/features/waitlist/waitlist-page"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { Toaster } from "sonner"
 import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
+import LoginPage from "@/features/auth/login-page.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -57,6 +58,12 @@ const signupRoute = createRoute({
 	component: SignupPage,
 })
 
+const loginRoute = createRoute({
+	getParentRoute: () => authRoute,
+	path: "/login",
+	component: LoginPage,
+})
+
 // setup routes
 const workspaceSetupRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -67,7 +74,7 @@ const workspaceSetupRoute = createRoute({
 const routeTree = rootRoute.addChildren([
 	indexRoute,
 	workspaceSetupRoute,
-	authRoute.addChildren([signupRoute]),
+	authRoute.addChildren([signupRoute, loginRoute]),
 ])
 
 const router = createRouter({

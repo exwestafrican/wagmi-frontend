@@ -1,7 +1,7 @@
-export default function SignupSuccess() {
+export default function AuthSuccess({ message }: { message: string }) {
 	return (
 		<div className="flex flex-row min-h-screen justify-center items-center">
-			Sign up successful!
+			{message}
 		</div>
 	)
 }

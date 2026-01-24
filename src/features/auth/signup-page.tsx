@@ -15,13 +15,13 @@ import {
 } from "@/features/auth/schema/signupSchema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useSignup } from "@/features/waitlist/api/signup.ts"
+import { useSignup } from "@/features/auth/api/signup.ts"
 import { useState } from "react"
-import SignupSuccess from "@/features/auth/component/signup.success.tsx"
 import { type AxiosError, HttpStatusCode } from "axios"
 import { useNavigate } from "@tanstack/react-router"
 import { Pages } from "@/utils/pages.ts"
 import { toast } from "sonner"
+import AuthSuccess from "@/features/auth/component/auth.success.tsx"
 
 const SignupPage = () => {
 	const { mutate: signupUser } = useSignup()
@@ -72,7 +72,7 @@ const SignupPage = () => {
 	}
 
 	if (signupSuccessful) {
-		return <SignupSuccess />
+		return <AuthSuccess message={"Signup successful"} />
 	}
 
 	return (
