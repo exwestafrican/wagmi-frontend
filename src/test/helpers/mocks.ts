@@ -1,4 +1,4 @@
-import { AxiosError, HttpStatusCode } from "axios"
+import { AxiosError, type HttpStatusCode } from "axios"
 
 export function mockError(statusCode: HttpStatusCode) {
 	const code = "ERR_BAD_REQUEST"
