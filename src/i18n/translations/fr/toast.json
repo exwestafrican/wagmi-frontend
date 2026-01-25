@@ -1,0 +1,24 @@
+{
+	"somethingWentWrong": "Oups ! Quelque chose a mal tourné.",
+	"waitlist": {
+		"featureRequestModal": {
+			"success": "Demande de fonctionnalité envoyée avec succès \uD83C\uDF7E\uD83C\uDF7E",
+			"error": {
+				"description": "L'envoi de la demande de fonctionnalité a échoué. Veuillez réessayer plus tard ou contacter l'assistance."
+			}
+		},
+		"joinWaitListForm": {
+			"success": "Félicitations !!! Vous êtes sur la liste d'attente ! 🍾🍾",
+			"error": {
+				"descriptionMain": "Impossible de s'inscrire sur la liste d'attente",
+				"descriptionFallback": "Nous n'avons pas pu vous ajouter à la liste d'attente pour le moment. Veuillez réessayer plus tard."
+			}
+		},
+		"featureDetailSlider": {
+			"success": "Merci pour vos commentaires !",
+			"error": {
+				"description": "Impossible d'envoyer les commentaires. Veuillez réessayer plus tard ou contacter l'assistance."
+			}
+		}
+	}
+}

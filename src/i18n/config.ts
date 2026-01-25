@@ -9,7 +9,7 @@ i18n
 	.init({
 		fallbackLng: "en",
 		load: "languageOnly",
-		ns: ["common", "waitlist"],
+		ns: ["common", "waitlist", "toast"],
 		defaultNS: "common",
 		fallbackNS: "common",
 		debug: import.meta.env.DEV ?? false, // true in dev, false in prod
