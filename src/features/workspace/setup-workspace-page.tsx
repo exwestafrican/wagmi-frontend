@@ -1,3 +1,4 @@
+import { useParams } from "@tanstack/react-router"
 import WithErrorHandling from "@/common/with-error-handling.tsx"
 import {
 	Empty,
@@ -17,6 +18,9 @@ function getHashParams(key: string): string | null {
 	return params.get(key)
 }
 export default function SetupWorkspacePage() {
+	const { preVerificationId } = useParams({
+		from: "/setup/$preVerificationId/workspace",
+	})
 	const accessToken = getHashParams("access_token")
 	const [progress, setProgress] = React.useState(10)
 
