@@ -67,7 +67,7 @@ const loginRoute = createRoute({
 // setup routes
 const workspaceSetupRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/setup/workspace",
+	path: "/setup/$preVerificationId/workspace",
 	component: SetupWorkspacePage,
 })
 
