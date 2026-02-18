@@ -40,7 +40,10 @@ const SignupPage = () => {
 	})
 
 	const onSubmit = (data: SignupData) => {
-		const signUpdata = {...data, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone};
+		const signUpdata = {
+			...data,
+			timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+		}
 		signupUser(signUpdata, {
 			onSuccess: () => {
 				form.reset()
