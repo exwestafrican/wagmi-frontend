@@ -17,6 +17,7 @@ import { Pages } from "@/utils/pages.ts"
 import { WORKSPACE } from "@/features/workspace/api/workspace.ts"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
+import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 
 function getHashParams(key: string): string | undefined {
 	const hash = window.location.hash.substring(1)
@@ -24,23 +25,16 @@ function getHashParams(key: string): string | undefined {
 	return params.get(key) ?? undefined
 }
 export default function SetupWorkspacePage() {
-	const INITIAL_PROGRESS = 0
-
 	const accessToken = getHashParams("access_token")
 
-	const [progress, setProgress] = useState(INITIAL_PROGRESS)
 	const [isCompleted, setIsCompleted] = useState(false)
 	const [hasSetupError, setHasSetupError] = useState(false)
 
 	const { mutate: setupWorkspace } = useSetupWorkspace()
 	const queryClient = useQueryClient()
 	const navigate = useNavigate()
-	console.log(
-		"user params",
-		useParams({
-			from: "/setup/$preVerificationId/workspace",
-		}),
-	)
+	const progress = useFakeProgress(isCompleted)
+
 	const { preVerificationId } = useParams({
 		from: "/setup/$preVerificationId/workspace",
 	})
@@ -79,23 +73,6 @@ export default function SetupWorkspacePage() {
 			},
 		)
 	}, [accessToken, preVerificationId, setupWorkspace, navigate, queryClient])
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setProgress((prev) => {
-				if (isCompleted) return 100
-
-				if (prev < 30) return prev + 8
-				if (prev < 60) return prev + 4
-				if (prev < 85) return prev + 2
-				if (prev < 95) return prev + 0.5
-
-				return prev
-			})
-		}, 400)
-
-		return () => clearInterval(interval)
-	}, [isCompleted])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>

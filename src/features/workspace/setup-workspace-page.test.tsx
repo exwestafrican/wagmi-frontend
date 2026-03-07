@@ -46,9 +46,9 @@ describe("SetupWorkspacePage", () => {
 			() => {
 				expect(navigateMock).toHaveBeenCalledWith({
 					to: Pages.WORKSPACE,
+                    search: { code: "e8r4z7", accessToken: fakeAccessToken },
 				})
-			},
-			{ timeout: 2000 },
+			}
 		)
 	})
 
@@ -70,7 +70,6 @@ describe("SetupWorkspacePage", () => {
 
 	it("should render error page when no access token is provided", async () => {
 		await setupWorkspacePage()
-
 		await waitFor(() => {
 			expect(
 				screen.getByText(
