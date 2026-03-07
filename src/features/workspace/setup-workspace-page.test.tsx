@@ -45,7 +45,7 @@ describe("SetupWorkspacePage", () => {
 		await waitFor(() => {
 			expect(navigateMock).toHaveBeenCalledWith({
 				to: Pages.WORKSPACE,
-				search: { code: "e8r4z7", accessToken: fakeAccessToken },
+				search: { code: "e8r4z7" },
 			})
 		})
 	})
