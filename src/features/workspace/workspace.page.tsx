@@ -15,11 +15,14 @@ import { MoreVertical } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
 import { useWorkspace } from "@/features/workspace/api/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
+import { useIsMobile } from "@/hooks/use-mobile.ts"
 
 export default function WorkspacePage() {
 	//TODO load everything
 	const { code, accessToken } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace({ code, accessToken })
+	const isMobile = useIsMobile()
+
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace)
 
 	return (
@@ -32,7 +35,10 @@ export default function WorkspacePage() {
 						</span>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<button className="text-gray-600 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-1 py-1.5 transition-colors cursor-pointer">
+								<button
+									type="button"
+									className="text-gray-600 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-1 py-1.5 transition-colors cursor-pointer"
+								>
 									<MoreVertical size={18} strokeWidth={1.5} />
 								</button>
 							</DropdownMenuTrigger>
@@ -52,7 +58,7 @@ export default function WorkspacePage() {
 				</SidebarHeader>
 			</Sidebar>
 			<div className="relative flex min-h-svh w-full">
-				<SidebarTrigger className="fixed top-4 right-4 z-50" />
+				{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}
 				<div className="m-auto flex items-center justify-center">
 					{`Welcome to ${workspace.name} workspace`}
 				</div>

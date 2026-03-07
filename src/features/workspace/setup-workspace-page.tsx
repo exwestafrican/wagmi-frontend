@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
 import { useNavigate, useParams } from "@tanstack/react-router"
@@ -29,8 +29,8 @@ export default function SetupWorkspacePage() {
 	const accessToken = getHashParams("access_token")
 
 	const [progress, setProgress] = useState(INITIAL_PROGRESS)
+	const [isCompleted, setIsCompleted] = useState(false)
 	const [hasSetupError, setHasSetupError] = useState(false)
-	const [isWorkspaceSetupCompleted] = useState(false)
 
 	const { mutate: setupWorkspace } = useSetupWorkspace()
 	const queryClient = useQueryClient()
@@ -45,73 +45,57 @@ export default function SetupWorkspacePage() {
 		from: "/setup/$preVerificationId/workspace",
 	})
 
-	const setupWorkspaceOnce = useCallback(() => {
-		if (progress === INITIAL_PROGRESS) {
-			setupWorkspace(
-				{
-					preverificationId: preVerificationId,
-					accessToken: accessToken ?? "",
-				},
-				{
-					onSuccess: (response) => {
-						// load app => send app code return teammate details
-						// load teammate => sendToken return teammate details
-						// load permissions
-						// load feature
-						const workspace: Workspace = {
-							code: response.data.code,
-							name: response.data.name,
-							status: response.data.status,
-						}
-						queryClient.setQueryData([WORKSPACE, workspace.code], {
-							data: workspace,
-						})
-						setProgress(100)
+	useEffect(() => {
+		setupWorkspace(
+			{
+				preverificationId: preVerificationId,
+				accessToken: accessToken ?? "",
+			},
+			{
+				onSuccess: (response) => {
+					const workspace: Workspace = {
+						code: response.data.code,
+						name: response.data.name,
+						status: response.data.status,
+					}
+
+					queryClient.setQueryData([WORKSPACE, workspace.code], {
+						data: workspace,
+					})
+
+					setIsCompleted(true)
+
+					setTimeout(() => {
 						navigate({
 							to: Pages.WORKSPACE,
-							search: { code: workspace.code, accessToken: accessToken },
+							search: { code: workspace.code, accessToken },
 						})
-					},
-					onError: () => {
-						toast.error("Failed to setup workspace")
-						setHasSetupError(true)
-					},
+					}, 400)
 				},
-			)
-		}
-	}, [
-		progress,
-		setupWorkspace,
-		preVerificationId,
-		accessToken,
-		queryClient,
-		navigate,
-	])
-
-	const moveProgressBar = useCallback(() => {
-		return setTimeout(() => {
-			if (progress < 70) {
-				setProgress(Math.min(progress + 10, 70))
-			} else if (progress >= 70 && !isWorkspaceSetupCompleted) {
-				setProgress(Math.min(progress + 3, 90))
-			} else {
-				setProgress(100)
-			}
-		}, 500)
-	}, [])
+				onError: () => {
+					toast.error("Failed to setup workspace")
+					setHasSetupError(true)
+				},
+			},
+		)
+	}, [accessToken, preVerificationId, setupWorkspace, navigate, queryClient])
 
 	useEffect(() => {
-		setupWorkspaceOnce()
-		//TODO set token
-	}, [setupWorkspaceOnce])
+		const interval = setInterval(() => {
+			setProgress((prev) => {
+				if (isCompleted) return 100
 
-	useEffect(() => {
-		const progressTimer = setTimeout(() => {
-			moveProgressBar()
-		}, 500)
+				if (prev < 30) return prev + 8
+				if (prev < 60) return prev + 4
+				if (prev < 85) return prev + 2
+				if (prev < 95) return prev + 0.5
 
-		return () => clearTimeout(progressTimer)
-	}, [progress, moveProgressBar])
+				return prev
+			})
+		}, 400)
+
+		return () => clearInterval(interval)
+	}, [isCompleted])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
