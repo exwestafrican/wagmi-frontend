@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import { useEffect, useState } from "react"
+import {useCallback, useEffect, useState} from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
 import { useNavigate, useParams } from "@tanstack/react-router"
@@ -45,10 +45,8 @@ export default function SetupWorkspacePage() {
 		from: "/setup/$preVerificationId/workspace",
 	})
 
-	function setupWorkspaceOnce() {
+    const setupWorkspaceOnce = useCallback(() =>  {
 		if (progress === INITIAL_PROGRESS) {
-			console.log("preVerificationId", preVerificationId)
-			console.log("accessToken", accessToken)
 			setupWorkspace(
 				{
 					preverificationId: preVerificationId,
@@ -60,7 +58,6 @@ export default function SetupWorkspacePage() {
 						// load teammate => sendToken return teammate details
 						// load permissions
 						// load feature
-						console.log(response)
 						const workspace: Workspace = {
 							code: response.data.code,
 							name: response.data.name,
@@ -82,9 +79,9 @@ export default function SetupWorkspacePage() {
 				},
 			)
 		}
-	}
+	},[progress, setupWorkspace, preVerificationId, accessToken, queryClient, navigate])
 
-	function moveProgressBar() {
+    const moveProgressBar = useCallback(() => {
 		return setTimeout(() => {
 			if (progress < 70) {
 				setProgress(Math.min(progress + 10, 70))
@@ -94,17 +91,20 @@ export default function SetupWorkspacePage() {
 				setProgress(100)
 			}
 		}, 500)
-	}
+	}, []);
+
+    useEffect(() => {
+        setupWorkspaceOnce()
+        //TODO set token
+    }, [setupWorkspaceOnce])
 
 	useEffect(() => {
-		setupWorkspaceOnce()
-		//TODO set token
 		const progressTimer = setTimeout(() => {
 			moveProgressBar()
 		}, 500)
 
 		return () => clearTimeout(progressTimer)
-	}, [progress])
+	}, [progress, moveProgressBar])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
