@@ -9,27 +9,105 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import React from "react"
+import { useEffect, useState } from "react"
+import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
+import { toast } from "sonner"
+import { useNavigate, useParams } from "@tanstack/react-router"
+import { Pages } from "@/utils/pages.ts"
+import { WORKSPACE } from "@/features/workspace/api/workspace.ts"
+import { useQueryClient } from "@tanstack/react-query"
+import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 
-function getHashParams(key: string): string | null {
+function getHashParams(key: string): string | undefined {
 	const hash = window.location.hash.substring(1)
 	const params = new URLSearchParams(hash)
-	return params.get(key)
+	return params.get(key) ?? undefined
 }
 export default function SetupWorkspacePage() {
-	const accessToken = getHashParams("access_token")
-	const [progress, setProgress] = React.useState(10)
+	const INITIAL_PROGRESS = 0
 
-	React.useEffect(() => {
-		const timer = setTimeout(
-			() => setProgress(Math.min(progress + 10, 70)),
-			500,
-		)
-		return () => clearTimeout(timer)
+	const accessToken = getHashParams("access_token")
+
+	const [progress, setProgress] = useState(INITIAL_PROGRESS)
+	const [hasSetupError, setHasSetupError] = useState(false)
+	const [isWorkspaceSetupCompleted] = useState(false)
+
+	const { mutate: setupWorkspace } = useSetupWorkspace()
+	const queryClient = useQueryClient()
+	const navigate = useNavigate()
+	console.log(
+		"user params",
+		useParams({
+			from: "/setup/$preVerificationId/workspace",
+		}),
+	)
+	const { preVerificationId } = useParams({
+		from: "/setup/$preVerificationId/workspace",
+	})
+
+	function setupWorkspaceOnce() {
+		if (progress === INITIAL_PROGRESS) {
+			console.log("preVerificationId", preVerificationId)
+			console.log("accessToken", accessToken)
+			setupWorkspace(
+				{
+					preverificationId: preVerificationId,
+					accessToken: accessToken ?? "",
+				},
+				{
+					onSuccess: (response) => {
+						// load app => send app code return teammate details
+						// load teammate => sendToken return teammate details
+						// load permissions
+						// load feature
+						console.log(response)
+						const workspace: Workspace = {
+							code: response.data.code,
+							name: response.data.name,
+							status: response.data.status,
+						}
+						queryClient.setQueryData([WORKSPACE, workspace.code], {
+							data: workspace,
+						})
+						setProgress(100)
+						navigate({
+							to: Pages.WORKSPACE,
+							search: { code: workspace.code, accessToken: accessToken },
+						})
+					},
+					onError: () => {
+						toast.error("Failed to setup workspace")
+						setHasSetupError(true)
+					},
+				},
+			)
+		}
+	}
+
+	function moveProgressBar() {
+		return setTimeout(() => {
+			if (progress < 70) {
+				setProgress(Math.min(progress + 10, 70))
+			} else if (progress >= 70 && !isWorkspaceSetupCompleted) {
+				setProgress(Math.min(progress + 3, 90))
+			} else {
+				setProgress(100)
+			}
+		}, 500)
+	}
+
+	useEffect(() => {
+		setupWorkspaceOnce()
+		//TODO set token
+		const progressTimer = setTimeout(() => {
+			moveProgressBar()
+		}, 500)
+
+		return () => clearTimeout(progressTimer)
 	}, [progress])
 
 	return (
-		<WithErrorHandling hasError={() => accessToken == null}>
+		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
 			<Empty className="w-full min-h-screen justify-center items-center">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">

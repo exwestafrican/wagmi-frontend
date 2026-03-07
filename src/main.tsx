@@ -19,6 +19,8 @@ import SignupPage from "@/features/auth/signup-page.tsx"
 import { Toaster } from "sonner"
 import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
 import LoginPage from "@/features/auth/login-page.tsx"
+import WorkspacePage from "@/features/workspace/workspace.page.tsx"
+import { z } from "zod"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -71,9 +73,20 @@ const workspaceSetupRoute = createRoute({
 	component: SetupWorkspacePage,
 })
 
+const workspaceRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/workspace",
+	validateSearch: z.object({
+		code: z.string(),
+		accessToken: z.string(), //TODO: take this out use local store
+	}),
+	component: WorkspacePage,
+})
+
 const routeTree = rootRoute.addChildren([
 	indexRoute,
 	workspaceSetupRoute,
+	workspaceRoute,
 	authRoute.addChildren([signupRoute, loginRoute]),
 ])
 
