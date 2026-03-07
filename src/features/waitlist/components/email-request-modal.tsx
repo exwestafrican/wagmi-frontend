@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useUserVotes } from "@/features/waitlist/api/user-votes"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 export function EmailRequestModal({
 	open,
@@ -29,13 +30,14 @@ export function EmailRequestModal({
 	onOpenChange: (open: boolean) => void
 	onSubmitEmailRequest: (email: string) => void
 }) {
+	const { t } = useTranslation("waitlist")
 	const formSchema = z.object({
 		email: z
-			.email({ message: "Please enter a valid email address." })
+			.email({ message: t("pleaseEnterAValidEmailAddress") })
 			.trim()
 			.toLowerCase()
 			.nonempty({
-				message: "Email cannot be empty",
+				message: t("emailRequestModal.emailCannotBeEmpty"),
 			}),
 	})
 
@@ -60,7 +62,7 @@ export function EmailRequestModal({
 					<DialogTitle>Envoye</DialogTitle>
 				</DialogHeader>
 				<DialogDescription data-testid="dialog-description" className="sr-only">
-					Enter your email to submit a feature request.
+					{t("emailRequestModal.enterEmailToSubmitFeatureRequest")}
 				</DialogDescription>
 
 				<Form {...form}>
@@ -89,7 +91,9 @@ export function EmailRequestModal({
 												className="cursor-pointer w-full bg-black text-white hover:bg-black/80 hover:text-white"
 												data-testid="email-request-submit-button"
 											>
-												{isLoadingUserVotes ? "Submitting..." : "Submit"}
+												{isLoadingUserVotes
+													? t("emailRequestModal.submitting...")
+													: t("emailRequestModal.submit")}
 											</Button>
 										</div>
 									</FormControl>

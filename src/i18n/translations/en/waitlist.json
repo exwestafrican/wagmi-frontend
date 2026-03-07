@@ -8,6 +8,7 @@
 	"hours": "HOURS",
 	"minutes": "MINUTES",
 	"seconds": "SECONDS",
+	"pleaseEnterAValidEmailAddress": "Please enter a valid email address.",
 	"featureRequestModal": {
 		"title": "Submit a Request",
 		"description": "Share your feature idea with us. We'll review it and consider adding it to our roadmap.",
@@ -15,5 +16,23 @@
 		"low": "Low",
 		"medium": "Medium",
 		"high": "High"
+	},
+	"featureDetailSlider": {
+		"lastEdited": "Last edited",
+		"feedbackPlaceholder": "Leave feedback about this idea, your use-case and more...",
+		"stayUpdated": "Stay updated",
+		"subscribeToGetNotified": "Subscribe to get notified when this item is updated",
+		"subscribe": "Subscribe",
+		"subscribed": "Subscribed"
+	},
+	"emailRequestModal": {
+		"enterEmailToSubmitFeatureRequest": "Enter your email to submit a feature request.",
+		"submitting...": "Submitting...",
+		"submit": "Submit",
+		"emailCannotBeEmpty": "Email cannot be empty"
+	},
+	"joinForm": {
+		"joining...": "Joining...",
+		"getNotified": "Get Notified"
 	}
 }

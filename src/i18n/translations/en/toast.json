@@ -1,0 +1,24 @@
+{
+	"somethingWentWrong": "Uh oh! Something went wrong.",
+	"waitlist": {
+		"featureRequestModal": {
+			"success": "Feature request sent successfully \uD83C\uDF7E\uD83C\uDF7E",
+			"error": {
+				"description": "Failed to send feature request. Please try again later or contact support."
+			}
+		},
+		"joinWaitListForm": {
+			"success": "Congratulations!!! You are on the wait list! 🍾🍾",
+			"error": {
+				"descriptionMain": "Failed to join wait list",
+				"descriptionFallback": "We could not add you to the wait list at this time. Please try again later."
+			}
+		},
+		"featureDetailSlider": {
+			"success": "Thank you for your feedback!",
+			"error": {
+				"description": "Failed to send feedback. Please try again later or contact support."
+			}
+		}
+	}
+}
