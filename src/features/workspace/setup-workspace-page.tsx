@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import {useCallback, useEffect, useState} from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
 import { useNavigate, useParams } from "@tanstack/react-router"
@@ -45,7 +45,7 @@ export default function SetupWorkspacePage() {
 		from: "/setup/$preVerificationId/workspace",
 	})
 
-    const setupWorkspaceOnce = useCallback(() =>  {
+	const setupWorkspaceOnce = useCallback(() => {
 		if (progress === INITIAL_PROGRESS) {
 			setupWorkspace(
 				{
@@ -79,9 +79,16 @@ export default function SetupWorkspacePage() {
 				},
 			)
 		}
-	},[progress, setupWorkspace, preVerificationId, accessToken, queryClient, navigate])
+	}, [
+		progress,
+		setupWorkspace,
+		preVerificationId,
+		accessToken,
+		queryClient,
+		navigate,
+	])
 
-    const moveProgressBar = useCallback(() => {
+	const moveProgressBar = useCallback(() => {
 		return setTimeout(() => {
 			if (progress < 70) {
 				setProgress(Math.min(progress + 10, 70))
@@ -91,12 +98,12 @@ export default function SetupWorkspacePage() {
 				setProgress(100)
 			}
 		}, 500)
-	}, []);
+	}, [])
 
-    useEffect(() => {
-        setupWorkspaceOnce()
-        //TODO set token
-    }, [setupWorkspaceOnce])
+	useEffect(() => {
+		setupWorkspaceOnce()
+		//TODO set token
+	}, [setupWorkspaceOnce])
 
 	useEffect(() => {
 		const progressTimer = setTimeout(() => {
