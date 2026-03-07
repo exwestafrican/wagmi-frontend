@@ -7,7 +7,7 @@ import { useAuthStore } from "@/stores/auth.store.ts"
 export const WORKSPACE = "workspace"
 
 export function useWorkspace(code: string) {
-	const token = useAuthStore((store) => store.setAuthToken)
+	const token = useAuthStore((store) => store.token)
 	return useQuery<AxiosResponse<Workspace>>({
 		queryKey: [WORKSPACE, code],
 		queryFn: () =>
