@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
 import { useNavigate, useParams } from "@tanstack/react-router"
@@ -26,13 +26,13 @@ function getHashParams(key: string): string | undefined {
 	return params.get(key) ?? undefined
 }
 export default function SetupWorkspacePage() {
-	const accessToken = getHashParams("access_token")
+	const accessToken = useMemo(() => getHashParams("access_token"), [])
 
 	const [isCompleted, setIsCompleted] = useState(false)
 	const [hasSetupError, setHasSetupError] = useState(false)
 
 	const { mutate: setupWorkspace } = useSetupWorkspace()
-	const { setAuthToken } = useAuthStore()
+	const setAuthToken = useAuthStore((state) => state.setAuthToken)
 
 	const queryClient = useQueryClient()
 	const navigate = useNavigate()
@@ -71,7 +71,14 @@ export default function SetupWorkspacePage() {
 				setHasSetupError(true)
 			},
 		})
-	}, [accessToken, preVerificationId, setupWorkspace, navigate, queryClient])
+	}, [
+		accessToken,
+		preVerificationId,
+		setupWorkspace,
+		navigate,
+		queryClient,
+		setAuthToken,
+	])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>

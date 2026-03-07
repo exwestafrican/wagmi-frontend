@@ -4,7 +4,7 @@ import { API_BASE_URL } from "@/constants.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
 
 export function useSetupWorkspace() {
-	const { token } = useAuthStore()
+	const token = useAuthStore((state) => state.token)
 	return useMutation({
 		mutationFn: (preverificationId: string) => {
 			return axios.post(

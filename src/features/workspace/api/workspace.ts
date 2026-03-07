@@ -2,12 +2,12 @@ import type { Workspace } from "@/features/workspace/interface/workspace.interfa
 import axios, { type AxiosResponse } from "axios"
 import { useQuery } from "@tanstack/react-query"
 import { API_BASE_URL } from "@/constants.ts"
-import {useAuthStore} from "@/stores/auth.store.ts";
+import { useAuthStore } from "@/stores/auth.store.ts"
 
 export const WORKSPACE = "workspace"
 
 export function useWorkspace(code: string) {
-    const { token } = useAuthStore();
+	const token = useAuthStore((store) => store.setAuthToken)
 	return useQuery<AxiosResponse<Workspace>>({
 		queryKey: [WORKSPACE, code],
 		queryFn: () =>
@@ -17,6 +17,6 @@ export function useWorkspace(code: string) {
 					Authorization: `Bearer ${token}`,
 				},
 			}),
-        staleTime: Number.POSITIVE_INFINITY,
+		staleTime: Number.POSITIVE_INFINITY,
 	})
 }
