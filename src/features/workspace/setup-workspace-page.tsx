@@ -28,8 +28,6 @@ export default function SetupWorkspacePage() {
 		return () => clearTimeout(timer)
 	}, [progress])
 
-	console.log(accessToken)
-
 	return (
 		<WithErrorHandling hasError={() => accessToken == null}>
 			<Empty className="w-full min-h-screen justify-center items-center">
