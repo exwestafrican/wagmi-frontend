@@ -2,22 +2,21 @@ import type { Workspace } from "@/features/workspace/interface/workspace.interfa
 import axios, { type AxiosResponse } from "axios"
 import { useQuery } from "@tanstack/react-query"
 import { API_BASE_URL } from "@/constants.ts"
+import {useAuthStore} from "@/stores/auth.store.ts";
 
 export const WORKSPACE = "workspace"
 
-//TODO use local storage to load auth-token
-export function useWorkspace({
-	code,
-	accessToken,
-}: { code: string; accessToken: string }) {
+export function useWorkspace(code: string) {
+    const { token } = useAuthStore();
 	return useQuery<AxiosResponse<Workspace>>({
 		queryKey: [WORKSPACE, code],
 		queryFn: () =>
 			axios.get(`${API_BASE_URL}/workspace`, {
 				params: { code },
 				headers: {
-					Authorization: `Bearer ${accessToken}`,
+					Authorization: `Bearer ${token}`,
 				},
 			}),
+        staleTime: Number.POSITIVE_INFINITY,
 	})
 }

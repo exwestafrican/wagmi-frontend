@@ -18,9 +18,8 @@ import type { Workspace } from "@/features/workspace/interface/workspace.interfa
 import { useIsMobile } from "@/hooks/use-mobile.ts"
 
 export default function WorkspacePage() {
-	//TODO load everything
-	const { code, accessToken } = useSearch({ from: "/workspace" })
-	const { data: workspaceDataResponse } = useWorkspace({ code, accessToken })
+	const { code } = useSearch({ from: "/workspace" })
+	const { data: workspaceDataResponse } = useWorkspace(code)
 	const isMobile = useIsMobile()
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace)

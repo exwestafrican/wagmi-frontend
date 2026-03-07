@@ -76,10 +76,7 @@ const workspaceSetupRoute = createRoute({
 const workspaceRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/workspace",
-	validateSearch: z.object({
-		code: z.string(),
-		accessToken: z.string(), //TODO: take this out use local store
-	}),
+	validateSearch: z.object({ code: z.string() }),
 	component: WorkspacePage,
 })
 

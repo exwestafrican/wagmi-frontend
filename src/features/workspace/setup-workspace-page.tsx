@@ -18,6 +18,7 @@ import { WORKSPACE } from "@/features/workspace/api/workspace.ts"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
+import { useAuthStore } from "@/stores/auth.store.ts"
 
 function getHashParams(key: string): string | undefined {
 	const hash = window.location.hash.substring(1)
@@ -31,6 +32,8 @@ export default function SetupWorkspacePage() {
 	const [hasSetupError, setHasSetupError] = useState(false)
 
 	const { mutate: setupWorkspace } = useSetupWorkspace()
+	const { setAuthToken } = useAuthStore()
+
 	const queryClient = useQueryClient()
 	const navigate = useNavigate()
 	const progress = useFakeProgress(isCompleted)
@@ -40,38 +43,34 @@ export default function SetupWorkspacePage() {
 	})
 
 	useEffect(() => {
-		setupWorkspace(
-			{
-				preverificationId: preVerificationId,
-				accessToken: accessToken ?? "",
-			},
-			{
-				onSuccess: (response) => {
-					const workspace: Workspace = {
-						code: response.data.code,
-						name: response.data.name,
-						status: response.data.status,
-					}
+		if (!accessToken) return
+		setAuthToken(accessToken)
+		setupWorkspace(preVerificationId, {
+			onSuccess: (response) => {
+				const workspace: Workspace = {
+					code: response.data.code,
+					name: response.data.name,
+					status: response.data.status,
+				}
 
-					queryClient.setQueryData([WORKSPACE, workspace.code], {
-						data: workspace,
+				queryClient.setQueryData([WORKSPACE, workspace.code], {
+					data: workspace,
+				})
+
+				setIsCompleted(true)
+
+				setTimeout(() => {
+					navigate({
+						to: Pages.WORKSPACE,
+						search: { code: workspace.code },
 					})
-
-					setIsCompleted(true)
-
-					setTimeout(() => {
-						navigate({
-							to: Pages.WORKSPACE,
-							search: { code: workspace.code, accessToken },
-						})
-					}, 400)
-				},
-				onError: () => {
-					toast.error("Failed to setup workspace")
-					setHasSetupError(true)
-				},
+				}, 400)
 			},
-		)
+			onError: () => {
+				toast.error("Failed to setup workspace")
+				setHasSetupError(true)
+			},
+		})
 	}, [accessToken, preVerificationId, setupWorkspace, navigate, queryClient])
 
 	return (
