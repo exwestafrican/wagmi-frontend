@@ -9,27 +9,73 @@ import {
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress"
-import React from "react"
+import { useEffect, useState } from "react"
+import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
+import { toast } from "sonner"
+import { useNavigate, useParams } from "@tanstack/react-router"
+import { Pages } from "@/utils/pages.ts"
+import { WORKSPACE } from "@/features/workspace/api/workspace.ts"
+import { useQueryClient } from "@tanstack/react-query"
+import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
+import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 
-function getHashParams(key: string): string | null {
+function getHashParams(key: string): string | undefined {
 	const hash = window.location.hash.substring(1)
 	const params = new URLSearchParams(hash)
-	return params.get(key)
+	return params.get(key) ?? undefined
 }
 export default function SetupWorkspacePage() {
 	const accessToken = getHashParams("access_token")
-	const [progress, setProgress] = React.useState(10)
 
-	React.useEffect(() => {
-		const timer = setTimeout(
-			() => setProgress(Math.min(progress + 10, 70)),
-			500,
+	const [isCompleted, setIsCompleted] = useState(false)
+	const [hasSetupError, setHasSetupError] = useState(false)
+
+	const { mutate: setupWorkspace } = useSetupWorkspace()
+	const queryClient = useQueryClient()
+	const navigate = useNavigate()
+	const progress = useFakeProgress(isCompleted)
+
+	const { preVerificationId } = useParams({
+		from: "/setup/$preVerificationId/workspace",
+	})
+
+	useEffect(() => {
+		setupWorkspace(
+			{
+				preverificationId: preVerificationId,
+				accessToken: accessToken ?? "",
+			},
+			{
+				onSuccess: (response) => {
+					const workspace: Workspace = {
+						code: response.data.code,
+						name: response.data.name,
+						status: response.data.status,
+					}
+
+					queryClient.setQueryData([WORKSPACE, workspace.code], {
+						data: workspace,
+					})
+
+					setIsCompleted(true)
+
+					setTimeout(() => {
+						navigate({
+							to: Pages.WORKSPACE,
+							search: { code: workspace.code, accessToken },
+						})
+					}, 400)
+				},
+				onError: () => {
+					toast.error("Failed to setup workspace")
+					setHasSetupError(true)
+				},
+			},
 		)
-		return () => clearTimeout(timer)
-	}, [progress])
+	}, [accessToken, preVerificationId, setupWorkspace, navigate, queryClient])
 
 	return (
-		<WithErrorHandling hasError={() => accessToken == null}>
+		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
 			<Empty className="w-full min-h-screen justify-center items-center">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">
