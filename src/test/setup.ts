@@ -5,7 +5,7 @@ vi.mock("axios")
 
 beforeEach(() => {
 	localStorage.clear()
-    window.location.hash = ""
+	window.location.hash = ""
 })
 
 afterEach(() => {

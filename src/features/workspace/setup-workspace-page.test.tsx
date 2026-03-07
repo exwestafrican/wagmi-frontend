@@ -42,14 +42,12 @@ describe("SetupWorkspacePage", () => {
 
 		await setupWorkspacePage()
 
-		await waitFor(
-			() => {
-				expect(navigateMock).toHaveBeenCalledWith({
-					to: Pages.WORKSPACE,
-                    search: { code: "e8r4z7", accessToken: fakeAccessToken },
-				})
-			}
-		)
+		await waitFor(() => {
+			expect(navigateMock).toHaveBeenCalledWith({
+				to: Pages.WORKSPACE,
+				search: { code: "e8r4z7", accessToken: fakeAccessToken },
+			})
+		})
 	})
 
 	it("should render error page on setup error", async () => {
