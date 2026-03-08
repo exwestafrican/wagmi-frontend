@@ -19,12 +19,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
-function getHashParams(key: string): string | undefined {
-	const hash = window.location.hash.substring(1)
-	const params = new URLSearchParams(hash)
-	return params.get(key) ?? undefined
-}
 export default function NewWorkspaceSetup() {
 	const accessToken = useMemo(() => getHashParams("access_token"), [])
 
@@ -43,8 +39,6 @@ export default function NewWorkspaceSetup() {
 	})
 
 	useEffect(() => {
-		if (!accessToken) return
-		setAuthToken(accessToken)
 		setupWorkspace(preVerificationId, {
 			onSuccess: (response) => {
 				const workspace: Workspace = {
@@ -71,14 +65,12 @@ export default function NewWorkspaceSetup() {
 				setHasSetupError(true)
 			},
 		})
-	}, [
-		accessToken,
-		preVerificationId,
-		setupWorkspace,
-		navigate,
-		queryClient,
-		setAuthToken,
-	])
+	}, [preVerificationId, setupWorkspace, navigate, queryClient])
+
+	useEffect(() => {
+		if (!accessToken) return
+		setAuthToken(accessToken)
+	}, [accessToken, setAuthToken])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
