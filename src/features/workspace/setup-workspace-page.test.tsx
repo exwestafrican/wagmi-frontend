@@ -54,7 +54,9 @@ describe("SetupWorkspacePage", () => {
 	it("should render error page on setup error", async () => {
 		const fakeAccessToken = faker.string.alphanumeric(20)
 		window.location.hash = `access_token=${fakeAccessToken}`
-		mockApiClientPost.mockRejectedValueOnce(mockError(HttpStatusCode.BadRequest))
+		mockApiClientPost.mockRejectedValueOnce(
+			mockError(HttpStatusCode.BadRequest),
+		)
 
 		await setupWorkspacePage()
 

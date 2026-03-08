@@ -57,7 +57,9 @@ describe("Login page", () => {
 	})
 
 	test("unauthorized user cannot login", async () => {
-		mockApiClientPost.mockRejectedValueOnce(mockError(HttpStatusCode.Unauthorized))
+		mockApiClientPost.mockRejectedValueOnce(
+			mockError(HttpStatusCode.Unauthorized),
+		)
 
 		setupLoginPage()
 		assertSubmitButtonIsDisabled()
