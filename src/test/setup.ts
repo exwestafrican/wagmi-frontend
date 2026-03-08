@@ -1,7 +1,15 @@
 import { afterEach, beforeEach, vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
 
-vi.mock("axios")
+vi.mock("@/lib/api-client", () => ({
+	apiClient: {
+		get: vi.fn(),
+		post: vi.fn(),
+		put: vi.fn(),
+		patch: vi.fn(),
+		delete: vi.fn(),
+	},
+}))
 
 beforeEach(() => {
 	localStorage.clear()

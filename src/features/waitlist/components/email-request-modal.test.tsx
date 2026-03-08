@@ -4,14 +4,12 @@ import { screen, waitFor } from "@testing-library/react"
 import renderWithQueryClient from "@/common/renderWithQueryClient"
 import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import axios from "axios"
-
-vi.mock("axios")
+import { apiClient } from "@/lib/api-client"
 
 describe("EmailRequestModal", () => {
 	const mockOnSubmitEmailRequest = vi.fn()
 	const mockOnOpenChange = vi.fn()
-	const mockAxiosGet = vi.mocked(axios.get)
+	const mockApiClientGet = vi.mocked(apiClient.get)
 
 	const defaultProps = {
 		open: true,
@@ -31,7 +29,7 @@ describe("EmailRequestModal", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks()
-		mockAxiosGet.mockResolvedValue({
+		mockApiClientGet.mockResolvedValue({
 			data: {
 				featureIds: [],
 			},
@@ -49,7 +47,7 @@ describe("EmailRequestModal", () => {
 				],
 			},
 		}
-		mockAxiosGet.mockResolvedValue(mockUserVotesResponse)
+		mockApiClientGet.mockResolvedValue(mockUserVotesResponse)
 
 		renderWithQueryClient(<EmailRequestModal {...defaultProps} />)
 
@@ -57,13 +55,12 @@ describe("EmailRequestModal", () => {
 		await submitEmail(user)
 
 		await waitFor(() => {
-			expect(mockAxiosGet).toHaveBeenCalled()
+			expect(mockApiClientGet).toHaveBeenCalled()
 		})
 
-		expect(mockAxiosGet).toHaveBeenCalledWith(
-			expect.stringContaining("/roadmap/user-votes"),
-			{ params: { email: email } },
-		)
+		expect(mockApiClientGet).toHaveBeenCalledWith("/roadmap/user-votes", {
+			params: { email: email },
+		})
 	})
 
 	it("should disable submit button when email input is empty", async () => {
@@ -74,6 +71,6 @@ describe("EmailRequestModal", () => {
 
 	it("should not get user votes when email input is empty", async () => {
 		renderWithQueryClient(<EmailRequestModal {...defaultProps} />)
-		expect(mockAxiosGet).not.toHaveBeenCalled()
+		expect(mockApiClientGet).not.toHaveBeenCalled()
 	})
 })

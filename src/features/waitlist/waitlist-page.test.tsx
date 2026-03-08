@@ -17,19 +17,7 @@ import {
 	inProgressFeatureFactory,
 	plannedFeatureFactory,
 } from "@/test/factory/feature"
-
-vi.mock("axios")
-const mockMutate = vi.fn((_, options) => {
-	options?.onSuccess()
-})
-vi.mock("@/features/waitlist/api/join-waitlist", () => ({
-	useJoinWaitList: () => ({
-		mutate: mockMutate,
-		isPending: false,
-		isError: false,
-		error: null,
-	}),
-}))
+import { apiClient } from "@/lib/api-client"
 
 // Mock the Zustand store
 const mockJoin = vi.fn()
@@ -105,8 +93,26 @@ describe("WaitListPage", () => {
 		await user.click(submitButton)
 	}
 
+	function mockRoadmapApi(
+		roadmapFeatures: RoadmapFeature[],
+		userVotes: UserVotesResponse,
+	) {
+		vi.mocked(apiClient.get).mockImplementation((url: string) => {
+			if (url === "/roadmap/future-features") {
+				return Promise.resolve({ data: roadmapFeatures })
+			}
+			if (url === "/roadmap/user-votes") {
+				return Promise.resolve({ data: userVotes })
+			}
+			return Promise.resolve({ data: [] })
+		})
+	}
+
 	beforeEach(() => {
 		mockHasJoined.mockReturnValue(false)
+		mockEmail.mockReturnValue("")
+		vi.mocked(apiClient.get).mockResolvedValue({ data: [] })
+		vi.mocked(apiClient.post).mockResolvedValue({ data: {} })
 	})
 
 	it("should send send data to server when user joins wait list", async () => {
@@ -123,7 +129,9 @@ describe("WaitListPage", () => {
 			expect((emailInput as HTMLInputElement).value).toBe("")
 		})
 
-		expect(mockMutate).toHaveBeenCalledTimes(1)
+		expect(apiClient.post).toHaveBeenCalledWith("/waitlist/join", {
+			email: "test@example.com",
+		})
 
 		await waitFor(() => {
 			expect(
@@ -142,7 +150,9 @@ describe("WaitListPage", () => {
 		await user.click(screen.getByTestId("join-button"))
 
 		await waitFor(() => {
-			expect(mockMutate).toHaveBeenCalledTimes(1)
+			expect(apiClient.post).toHaveBeenCalledWith("/waitlist/join", {
+				email: "test@example.com",
+			})
 		})
 
 		// Verify join() is called
@@ -448,7 +458,14 @@ describe("WaitListPage", () => {
 			const userVotes = {
 				featureIds: [],
 			}
+			mockRoadmapApi(roadmapFeatures, userVotes)
 			await setupWaitListPage(userVotes, roadmapFeatures)
+
+			await waitFor(() => {
+				expect(
+					screen.getByTestId(`vote-button-${roadmapFeatures[1].id}`),
+				).toBeInTheDocument()
+			})
 
 			await voteFeatureButton(user, roadmapFeatures[1].id)
 
@@ -466,7 +483,7 @@ describe("WaitListPage", () => {
 			const userVotes = {
 				featureIds: [],
 			}
-
+			mockRoadmapApi(roadmapFeatures, userVotes)
 			await setupWaitListPage(userVotes, roadmapFeatures, "chris@envoye.com")
 			await voteFeatureButton(user, roadmapFeatures[1].id)
 

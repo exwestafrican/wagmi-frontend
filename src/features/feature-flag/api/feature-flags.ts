@@ -1,6 +1,5 @@
-import { API_BASE_URL } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
+import { apiClient } from "@/lib/api-client"
 
 export const ENABLED_FEATURES = "enabled-features"
 
@@ -8,7 +7,7 @@ export function featureFlagsQueryOptions(workspaceCode: string) {
 	return {
 		queryKey: [ENABLED_FEATURES, workspaceCode],
 		queryFn: () =>
-			axios.get<string[]>(`${API_BASE_URL}/feature-flags/enabled`, {
+			apiClient.get<string[]>("/feature-flags/enabled", {
 				params: {
 					workspaceCode: workspaceCode,
 				},

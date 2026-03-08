@@ -3,7 +3,8 @@ import renderWithQueryClient, {
 } from "@/common/renderWithQueryClient.tsx"
 import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
 import { vi, it, describe, expect } from "vitest"
-import axios, { HttpStatusCode } from "axios"
+import { HttpStatusCode } from "axios"
+import { apiClient } from "@/lib/api-client"
 import { waitFor, screen } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
 import { Pages } from "@/utils/pages.ts"
@@ -18,7 +19,7 @@ vi.mock("@tanstack/react-router", () => ({
 }))
 
 describe("SetupWorkspacePage", () => {
-	const mockAxiosPost = vi.mocked(axios.post)
+	const mockApiClientPost = vi.mocked(apiClient.post)
 
 	async function setupWorkspacePage() {
 		const queryClient = createTestQueryClient()
@@ -38,7 +39,7 @@ describe("SetupWorkspacePage", () => {
 	it("should navigate to workspace page on successful setup", async () => {
 		const fakeAccessToken = faker.string.alphanumeric(20)
 		window.location.hash = `access_token=${fakeAccessToken}`
-		mockAxiosPost.mockResolvedValue({ data: buildWorkspaceDetails() })
+		mockApiClientPost.mockResolvedValue({ data: buildWorkspaceDetails() })
 
 		await setupWorkspacePage()
 
@@ -53,7 +54,9 @@ describe("SetupWorkspacePage", () => {
 	it("should render error page on setup error", async () => {
 		const fakeAccessToken = faker.string.alphanumeric(20)
 		window.location.hash = `access_token=${fakeAccessToken}`
-		mockAxiosPost.mockRejectedValueOnce(mockError(HttpStatusCode.BadRequest))
+		mockApiClientPost.mockRejectedValueOnce(
+			mockError(HttpStatusCode.BadRequest),
+		)
 
 		await setupWorkspacePage()
 
