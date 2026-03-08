@@ -93,6 +93,21 @@ describe("WaitListPage", () => {
 		await user.click(submitButton)
 	}
 
+	function mockRoadmapApi(
+		roadmapFeatures: RoadmapFeature[],
+		userVotes: UserVotesResponse,
+	) {
+		vi.mocked(apiClient.get).mockImplementation((url: string) => {
+			if (url === "/roadmap/future-features") {
+				return Promise.resolve({ data: roadmapFeatures })
+			}
+			if (url === "/roadmap/user-votes") {
+				return Promise.resolve({ data: userVotes })
+			}
+			return Promise.resolve({ data: [] })
+		})
+	}
+
 	beforeEach(() => {
 		mockHasJoined.mockReturnValue(false)
 		mockEmail.mockReturnValue("")
@@ -443,15 +458,7 @@ describe("WaitListPage", () => {
 			const userVotes = {
 				featureIds: [],
 			}
-			vi.mocked(apiClient.get).mockImplementation((url: string) => {
-				if (url === "/roadmap/future-features") {
-					return Promise.resolve({ data: roadmapFeatures })
-				}
-				if (url === "/roadmap/user-votes") {
-					return Promise.resolve({ data: userVotes })
-				}
-				return Promise.resolve({ data: [] })
-			})
+			mockRoadmapApi(roadmapFeatures, userVotes)
 			await setupWaitListPage(userVotes, roadmapFeatures)
 
 			await waitFor(() => {
@@ -476,15 +483,7 @@ describe("WaitListPage", () => {
 			const userVotes = {
 				featureIds: [],
 			}
-			vi.mocked(apiClient.get).mockImplementation((url: string) => {
-				if (url === "/roadmap/future-features") {
-					return Promise.resolve({ data: roadmapFeatures })
-				}
-				if (url === "/roadmap/user-votes") {
-					return Promise.resolve({ data: userVotes })
-				}
-				return Promise.resolve({ data: [] })
-			})
+			mockRoadmapApi(roadmapFeatures, userVotes)
 			await setupWaitListPage(userVotes, roadmapFeatures, "chris@envoye.com")
 			await voteFeatureButton(user, roadmapFeatures[1].id)
 
