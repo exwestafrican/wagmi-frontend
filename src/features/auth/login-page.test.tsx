@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, vi, test } from "vitest"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
+import { ApiPaths } from "@/constants"
 import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
@@ -48,7 +49,7 @@ describe("Login page", () => {
 
 		await waitFor(() => {
 			expect(mockApiClientPost).toHaveBeenCalledWith(
-				"/auth/magic-link/request",
+				ApiPaths.MAGIC_LINK_REQUEST,
 				{ email: "sam@useenvoye.co" },
 			)
 			expect(screen.getByTestId("toaster")).toBeInTheDocument()

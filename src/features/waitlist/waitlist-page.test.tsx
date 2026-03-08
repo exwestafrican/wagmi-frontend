@@ -17,6 +17,7 @@ import {
 	inProgressFeatureFactory,
 	plannedFeatureFactory,
 } from "@/test/factory/feature"
+import { ApiPaths } from "@/constants"
 import { apiClient } from "@/lib/api-client"
 
 // Mock the Zustand store
@@ -129,7 +130,7 @@ describe("WaitListPage", () => {
 			expect((emailInput as HTMLInputElement).value).toBe("")
 		})
 
-		expect(apiClient.post).toHaveBeenCalledWith("/waitlist/join", {
+		expect(apiClient.post).toHaveBeenCalledWith(ApiPaths.WAITLIST_JOIN, {
 			email: "test@example.com",
 		})
 
@@ -150,7 +151,7 @@ describe("WaitListPage", () => {
 		await user.click(screen.getByTestId("join-button"))
 
 		await waitFor(() => {
-			expect(apiClient.post).toHaveBeenCalledWith("/waitlist/join", {
+			expect(apiClient.post).toHaveBeenCalledWith(ApiPaths.WAITLIST_JOIN, {
 				email: "test@example.com",
 			})
 		})
