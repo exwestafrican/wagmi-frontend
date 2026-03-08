@@ -8,7 +8,7 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/progress.tsx"
 import { useEffect, useMemo, useState } from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
@@ -19,13 +19,9 @@ import { useQueryClient } from "@tanstack/react-query"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
-function getHashParams(key: string): string | undefined {
-	const hash = window.location.hash.substring(1)
-	const params = new URLSearchParams(hash)
-	return params.get(key) ?? undefined
-}
-export default function SetupWorkspacePage() {
+export default function NewWorkspaceSetup() {
 	const accessToken = useMemo(() => getHashParams("access_token"), [])
 
 	const [isCompleted, setIsCompleted] = useState(false)
@@ -43,8 +39,6 @@ export default function SetupWorkspacePage() {
 	})
 
 	useEffect(() => {
-		if (!accessToken) return
-		setAuthToken(accessToken)
 		setupWorkspace(preVerificationId, {
 			onSuccess: (response) => {
 				const workspace: Workspace = {
@@ -71,14 +65,12 @@ export default function SetupWorkspacePage() {
 				setHasSetupError(true)
 			},
 		})
-	}, [
-		accessToken,
-		preVerificationId,
-		setupWorkspace,
-		navigate,
-		queryClient,
-		setAuthToken,
-	])
+	}, [preVerificationId, setupWorkspace, navigate, queryClient])
+
+	useEffect(() => {
+		if (!accessToken) return
+		setAuthToken(accessToken)
+	}, [accessToken, setAuthToken])
 
 	return (
 		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>

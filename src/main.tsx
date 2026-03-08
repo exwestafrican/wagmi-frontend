@@ -17,10 +17,11 @@ import reportWebVitals from "./reportWebVitals.ts"
 import WaitListPage from "@/features/waitlist/waitlist-page"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { Toaster } from "sonner"
-import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
+import SetupWorkspacePage from "@/features/workspace/new-workspace-setup.tsx"
 import LoginPage from "@/features/auth/login-page.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import { z } from "zod"
+import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -73,6 +74,17 @@ const workspaceSetupRoute = createRoute({
 	component: SetupWorkspacePage,
 })
 
+const existingWorkspaceSetupRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/setup/workspace",
+	validateSearch: z.object({
+		code: z.string(),
+		access_token: z.string().optional(),
+	}),
+	component: ExistingWorkspaceSetup,
+})
+
+// workspace route
 const workspaceRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/workspace",
@@ -83,6 +95,7 @@ const workspaceRoute = createRoute({
 const routeTree = rootRoute.addChildren([
 	indexRoute,
 	workspaceSetupRoute,
+	existingWorkspaceSetupRoute,
 	workspaceRoute,
 	authRoute.addChildren([signupRoute, loginRoute]),
 ])
