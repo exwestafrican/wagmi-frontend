@@ -6,6 +6,7 @@ import {
 	createRootRoute,
 	createRoute,
 	createRouter,
+	redirect,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -22,6 +23,7 @@ import LoginPage from "@/features/auth/login-page.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import { z } from "zod"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
+import { useAuthStore } from "@/stores/auth.store.ts"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -57,26 +59,26 @@ const indexRoute = createRoute({
 // auth routes
 const signupRoute = createRoute({
 	getParentRoute: () => authRoute,
-	path: "/signup",
+	path: "signup",
 	component: SignupPage,
 })
 
 const loginRoute = createRoute({
 	getParentRoute: () => authRoute,
-	path: "/login",
+	path: "login",
 	component: LoginPage,
 })
 
 // setup routes
 const workspaceSetupRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/setup/$preVerificationId/workspace",
+	path: "setup/$preVerificationId/workspace",
 	component: SetupWorkspacePage,
 })
 
 const existingWorkspaceSetupRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/setup/workspace",
+	path: "setup/workspace",
 	validateSearch: z.object({
 		code: z.string(),
 		access_token: z.string().optional(),
@@ -87,8 +89,19 @@ const existingWorkspaceSetupRoute = createRoute({
 // workspace route
 const workspaceRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/workspace",
-	validateSearch: z.object({ code: z.string() }),
+	path: "workspace",
+	validateSearch: (search) =>
+		z
+			.object({
+				code: z.string(),
+			})
+			.parse(search),
+	beforeLoad: ({ location }) => {
+		const token = useAuthStore.getState().token
+		if (!token) {
+			throw redirect({ to: "/auth/login", search: { redirect: location.href } })
+		}
+	},
 	component: WorkspacePage,
 })
 
@@ -108,7 +121,7 @@ const router = createRouter({
 	defaultStructuralSharing: true,
 	defaultPreloadStaleTime: 0,
 })
-
+console.log(router.routesByPath)
 declare module "@tanstack/react-router" {
 	interface Register {
 		router: typeof router
