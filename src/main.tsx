@@ -121,7 +121,7 @@ const router = createRouter({
 	defaultStructuralSharing: true,
 	defaultPreloadStaleTime: 0,
 })
-console.log(router.routesByPath)
+
 declare module "@tanstack/react-router" {
 	interface Register {
 		router: typeof router
