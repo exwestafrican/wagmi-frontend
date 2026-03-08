@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { ApiPaths } from "@/constants"
 import { apiClient } from "@/lib/api-client"
 import { ROADMAP_FEATURES } from "@/features/waitlist/api/roadmap-features.ts"
 import { USER_VOTES } from "@/features/waitlist/api/user-votes"
@@ -12,7 +13,7 @@ export function useToggleVotes() {
 	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: (payload: VoteOnFeaturePayload) => {
-			return apiClient.post("/roadmap/vote", payload)
+			return apiClient.post(ApiPaths.ROADMAP_VOTE, payload)
 		},
 		onSuccess: async () => {
 			await Promise.all([

@@ -4,6 +4,7 @@ import { screen, waitFor } from "@testing-library/react"
 import renderWithQueryClient from "@/common/renderWithQueryClient"
 import { EmailRequestModal } from "@/features/waitlist/components/email-request-modal"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { ApiPaths } from "@/constants"
 import { apiClient } from "@/lib/api-client"
 
 describe("EmailRequestModal", () => {
@@ -58,7 +59,7 @@ describe("EmailRequestModal", () => {
 			expect(mockApiClientGet).toHaveBeenCalled()
 		})
 
-		expect(mockApiClientGet).toHaveBeenCalledWith("/roadmap/user-votes", {
+		expect(mockApiClientGet).toHaveBeenCalledWith(ApiPaths.ROADMAP_USER_VOTES, {
 			params: { email: email },
 		})
 	})
