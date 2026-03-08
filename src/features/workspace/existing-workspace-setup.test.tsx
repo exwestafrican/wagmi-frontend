@@ -62,17 +62,6 @@ describe("Existing workspace setup", () => {
 		return { router, navigateSpy }
 	}
 
-	describe("Auto Redirect is not mocked", () => {
-		beforeEach(async () => {
-			const { useCountDown: realUseCountDown } = await vi.importActual<
-				typeof import("@/hooks/user-countdown")
-			>("@/hooks/user-countdown")
-			vi.mocked(useCountDown).mockImplementation(
-				realUseCountDown as typeof useCountDown,
-			)
-		})
-	})
-
 	describe("Auto redirect works as expected", () => {
 		beforeEach(() => {
 			vi.mocked(useCountDown).mockReturnValue({ count: 0, isFinished: true })
