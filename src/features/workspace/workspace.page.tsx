@@ -22,7 +22,7 @@ export default function WorkspacePage() {
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const isMobile = useIsMobile()
 
-	const workspace = workspaceDataResponse?.data ?? ({} as Workspace)
+	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
 
 	return (
 		<SidebarProvider>
