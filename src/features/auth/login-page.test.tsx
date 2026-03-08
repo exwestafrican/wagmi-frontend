@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, vi, test } from "vitest"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import axios, { HttpStatusCode } from "axios"
+import { HttpStatusCode } from "axios"
+import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
@@ -10,7 +11,7 @@ import { mockError } from "@/test/helpers/mocks.ts"
 
 describe("Login page", () => {
 	let user: UserEvent
-	const mockAxiosPost = vi.mocked(axios.post)
+	const mockApiClientPost = vi.mocked(apiClient.post)
 
 	beforeEach(() => {
 		user = userEvent.setup()
@@ -46,8 +47,8 @@ describe("Login page", () => {
 		await user.click(screen.getByRole("button"))
 
 		await waitFor(() => {
-			expect(mockAxiosPost).toHaveBeenCalledWith(
-				expect.stringContaining("/auth/magic-link/request"),
+			expect(mockApiClientPost).toHaveBeenCalledWith(
+				"/auth/magic-link/request",
 				{ email: "sam@useenvoye.co" },
 			)
 			expect(screen.getByTestId("toaster")).toBeInTheDocument()
@@ -56,7 +57,7 @@ describe("Login page", () => {
 	})
 
 	test("unauthorized user cannot login", async () => {
-		mockAxiosPost.mockRejectedValueOnce(mockError(HttpStatusCode.Unauthorized))
+		mockApiClientPost.mockRejectedValueOnce(mockError(HttpStatusCode.Unauthorized))
 
 		setupLoginPage()
 		assertSubmitButtonIsDisabled()

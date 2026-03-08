@@ -1,6 +1,5 @@
-import { API_BASE_URL } from "@/constants"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
+import { apiClient } from "@/lib/api-client"
 import { ROADMAP_FEATURES } from "@/features/waitlist/api/roadmap-features.ts"
 import { USER_VOTES } from "@/features/waitlist/api/user-votes"
 
@@ -13,7 +12,7 @@ export function useToggleVotes() {
 	const queryClient = useQueryClient()
 	return useMutation({
 		mutationFn: (payload: VoteOnFeaturePayload) => {
-			return axios.post(`${API_BASE_URL}/roadmap/vote`, payload)
+			return apiClient.post("/roadmap/vote", payload)
 		},
 		onSuccess: async () => {
 			await Promise.all([

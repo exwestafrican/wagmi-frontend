@@ -1,6 +1,6 @@
-import { API_BASE_URL } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
-import axios, { type AxiosResponse } from "axios"
+import type { AxiosResponse } from "axios"
+import { apiClient } from "@/lib/api-client"
 import type { RoadmapFeature } from "@/features/waitlist/interfaces/roadmap-feature"
 
 export const ROADMAP_FEATURES = "roadmap-features"
@@ -8,7 +8,6 @@ export const ROADMAP_FEATURES = "roadmap-features"
 export function useGetRoadmapFeatures() {
 	return useQuery<AxiosResponse<RoadmapFeature[]>>({
 		queryKey: [ROADMAP_FEATURES],
-		//TODO get token from store
-		queryFn: () => axios.get(`${API_BASE_URL}/roadmap/future-features`),
+		queryFn: () => apiClient.get("/roadmap/future-features"),
 	})
 }

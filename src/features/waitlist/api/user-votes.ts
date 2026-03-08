@@ -1,6 +1,6 @@
-import { API_BASE_URL } from "@/constants"
 import { useQuery } from "@tanstack/react-query"
-import axios, { type AxiosResponse } from "axios"
+import type { AxiosResponse } from "axios"
+import { apiClient } from "@/lib/api-client"
 
 export const USER_VOTES = "user-votes"
 
@@ -12,14 +12,11 @@ export function useUserVotes(email: string | null | undefined) {
 	return useQuery<AxiosResponse<UserVotesResponse>>({
 		queryKey: [USER_VOTES, email],
 		queryFn: () => {
-			return axios.get<UserVotesResponse>(
-				`${API_BASE_URL}/roadmap/user-votes`,
-				{
-					params: {
-						email: email,
-					},
+			return apiClient.get<UserVotesResponse>("/roadmap/user-votes", {
+				params: {
+					email: email,
 				},
-			)
+			})
 		},
 		enabled: !!email, // Only fetch when email is provided
 	})

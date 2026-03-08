@@ -1,12 +1,11 @@
 import { useMutation } from "@tanstack/react-query"
 import type { LoginData } from "@/features/auth/schema/loginSchema.ts"
-import axios from "axios"
-import { API_BASE_URL } from "@/constants.ts"
+import { apiClient } from "@/lib/api-client"
 
 export function useLogin() {
 	return useMutation({
 		mutationFn: (data: LoginData) => {
-			return axios.post(`${API_BASE_URL}/auth/magic-link/request`, data)
+			return apiClient.post("/auth/magic-link/request", data)
 		},
 	})
 }

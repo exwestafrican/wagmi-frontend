@@ -1,11 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query"
 import { renderHook, waitFor } from "@testing-library/react"
-import axios from "axios"
+import { apiClient } from "@/lib/api-client"
 import { describe, expect, test, vi } from "vitest"
 import { createTestQueryClient } from "@/common/renderWithQueryClient"
 import { useEnabledFeature } from "@/features/feature-flag/hooks/use-enabled-feature"
 
-const mockAxiosGet = vi.mocked(axios.get)
+const mockApiClientGet = vi.mocked(apiClient.get)
 
 function wrapper({ children }: { children: React.ReactNode }) {
 	const queryClient = createTestQueryClient()
@@ -16,7 +16,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 describe("useEnabledFeature", () => {
 	test("returns isLoading true while fetching", () => {
-		mockAxiosGet.mockReturnValue(new Promise(() => {}))
+		mockApiClientGet.mockReturnValue(new Promise(() => {}))
 
 		const { result } = renderHook(
 			() => useEnabledFeature("workspace-123", "can_integrate_whatsapp"),
@@ -28,7 +28,7 @@ describe("useEnabledFeature", () => {
 	})
 
 	test("returns isEnabled true when the feature key is in the enabled list", async () => {
-		mockAxiosGet.mockResolvedValueOnce({
+		mockApiClientGet.mockResolvedValueOnce({
 			data: ["can_integrate_whatsapp", "can_integrate_gmail"],
 		})
 
@@ -44,7 +44,7 @@ describe("useEnabledFeature", () => {
 	})
 
 	test("returns isEnabled false when the feature key is not in the enabled list", async () => {
-		mockAxiosGet.mockResolvedValueOnce({ data: ["can_integrate_gmail"] })
+		mockApiClientGet.mockResolvedValueOnce({ data: ["can_integrate_gmail"] })
 
 		const { result } = renderHook(
 			() => useEnabledFeature("workspace-123", "can_integrate_whatsapp"),
@@ -58,7 +58,7 @@ describe("useEnabledFeature", () => {
 	})
 
 	test("returns isEnabled false when the enabled list is empty", async () => {
-		mockAxiosGet.mockResolvedValueOnce({ data: [] })
+		mockApiClientGet.mockResolvedValueOnce({ data: [] })
 
 		const { result } = renderHook(
 			() => useEnabledFeature("workspace-123", "can_integrate_whatsapp"),

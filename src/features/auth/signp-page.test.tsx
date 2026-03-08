@@ -7,7 +7,8 @@ import SignupPage from "@/features/auth/signup-page.tsx"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { screen, waitFor } from "@testing-library/react"
-import axios, { HttpStatusCode } from "axios"
+import { HttpStatusCode } from "axios"
+import { apiClient } from "@/lib/api-client"
 import { Pages } from "@/utils/pages.ts"
 import { mockError } from "@/test/helpers/mocks.ts"
 
@@ -23,7 +24,7 @@ vi.mock("@tanstack/react-router", async () => {
 describe("Signup page", () => {
 	let user: UserEvent
 	let userInput: ReturnType<typeof inputHelpers>
-	const mockAxiosPost = vi.mocked(axios.post)
+	const mockApiClientPost = vi.mocked(apiClient.post)
 
 	function makeSignupDetails(details: Partial<SignupData>): SignupData {
 		return {
@@ -197,7 +198,7 @@ describe("Signup page", () => {
 
 		describe("unsuccessful signup", () => {
 			beforeEach(async () => {
-				mockAxiosPost.mockRejectedValueOnce(
+				mockApiClientPost.mockRejectedValueOnce(
 					mockError(HttpStatusCode.Unauthorized),
 				)
 			})
