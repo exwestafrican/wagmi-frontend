@@ -8,7 +8,7 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/progress.tsx"
 import { useEffect, useMemo, useState } from "react"
 import { useSetupWorkspace } from "@/features/workspace/api/setup-workspace.ts"
 import { toast } from "sonner"
@@ -25,7 +25,7 @@ function getHashParams(key: string): string | undefined {
 	const params = new URLSearchParams(hash)
 	return params.get(key) ?? undefined
 }
-export default function SetupWorkspacePage() {
+export default function NewWorkspaceSetup() {
 	const accessToken = useMemo(() => getHashParams("access_token"), [])
 
 	const [isCompleted, setIsCompleted] = useState(false)

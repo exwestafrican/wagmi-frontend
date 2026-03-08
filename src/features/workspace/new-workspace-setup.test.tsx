@@ -1,10 +1,10 @@
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
-import SetupWorkspacePage from "@/features/workspace/setup-workspace-page.tsx"
+import SetupWorkspacePage from "@/features/workspace/new-workspace-setup.tsx"
 import { vi, it, describe, expect } from "vitest"
 import { HttpStatusCode } from "axios"
-import { apiClient } from "@/lib/api-client"
+import { apiClient } from "@/lib/api-client.ts"
 import { waitFor, screen } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
 import { Pages } from "@/utils/pages.ts"
