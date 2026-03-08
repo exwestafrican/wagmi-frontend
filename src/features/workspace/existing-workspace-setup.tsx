@@ -48,7 +48,7 @@ export function ExistingWorkspaceSetup() {
 				navigate({ to: Pages.LOGIN }).then()
 			}, 1000)
 		}
-	}, [code, navigate, isFinished])
+	}, [navigate, isFinished])
 
 	const invalidLink = useMemo(() => {
 		return accessToken == null
