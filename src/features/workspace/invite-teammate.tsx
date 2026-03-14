@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
-import { EmailPillInput } from "@/features/workspace/email-pill-input"
+import {
+	EmailPillInput,
+	type EmailEntry,
+} from "@/features/workspace/email-pill-input"
 import { Label } from "@/components/ui/label.tsx"
 import { Checkbox } from "@/components/ui/checkbox.tsx"
 
@@ -16,14 +19,15 @@ export function TeammateInviteModal({
 	open,
 	onOpenChange,
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-	const [emails, setEmails] = useState<string[]>([])
+	const [emails, setEmails] = useState<EmailEntry[]>([])
 	const [inviteAsWorkspaceAdmin, setInviteAsWorkspaceAdmin] = useState<
 		boolean | undefined
 	>(true)
 
 	const handleInvite = () => {
 		// TODO: API call to invite emails
-		console.log("Inviting:", emails)
+		const emailAddresses = emails.map((e) => e.email)
+		console.log("Inviting:", emailAddresses)
 		onOpenChange(false)
 	}
 
