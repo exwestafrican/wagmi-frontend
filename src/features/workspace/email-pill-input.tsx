@@ -114,6 +114,3 @@ export function EmailPillInput({
 // On submit clear emails
 // button is disabled if email is empty
 
-
-//TODO checkbox
-// |"enter email" in a very light  place holder format
