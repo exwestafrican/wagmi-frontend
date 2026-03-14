@@ -9,18 +9,15 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-export type EmailEntry = { id: string; email: string }
-
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 export function EmailPillInput({
 	emails,
 	setEmails,
 	placeholder,
 	disabled,
 }: {
-	emails: EmailEntry[]
-	setEmails: (emails: EmailEntry[]) => void
+	emails: string[]
+	setEmails: (emails: string[]) => void
 	placeholder: string
 	disabled: boolean
 }) {
@@ -31,12 +28,13 @@ export function EmailPillInput({
 	const addEmail = (email: string) => {
 		const trimmed = email.trim().toLowerCase()
 		if (!trimmed || !emailRegex.test(trimmed)) return
-		setEmails([...emails, { id: crypto.randomUUID(), email: trimmed }])
+		if (emails.includes(trimmed)) return
+		setEmails([...emails, trimmed])
 		setInputValue("")
 	}
 
-	const removeEmail = (id: string) => {
-		setEmails(emails.filter((entry) => entry.id !== id))
+	const removeEmail = (index: number) => {
+		setEmails(emails.filter((_, i) => i !== index)) //TODO find a better way to write this
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -44,7 +42,7 @@ export function EmailPillInput({
 			e.preventDefault()
 			addEmail(inputValue)
 		} else if (e.key === "Backspace" && !inputValue && emails.length > 0) {
-			removeEmail(emails[emails.length - 1].id)
+			removeEmail(emails.length - 1)
 		}
 	}
 
@@ -53,19 +51,18 @@ export function EmailPillInput({
 	}
 
 	return (
-		<label
-			htmlFor="email-pill-input"
+		<div
 			className={cn(
 				"flex flex-wrap gap-2 items-center min-h-9 max-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2",
 				"overflow-y-auto overflow-x-hidden",
 				"shadow-xs transition-colors focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
 				disabled && "pointer-events-none opacity-50",
-				"cursor-text",
 			)}
+			onClick={() => !disabled && inputRef.current?.focus()}
 		>
-			{emails.map((entry) => (
+			{emails.map((email, index) => (
 				<Badge
-					key={entry.id}
+					key={`${email}-${index}`}
 					variant="secondary"
 					className="gap-1.5 pr-1 py-1 font-normal"
 				>
@@ -76,32 +73,29 @@ export function EmailPillInput({
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<span className="truncate min-w-0 max-w-full block">
-									{entry.email}
+								<span className="truncate min-w-0 max-w-[120px] block">
+									{email}
 								</span>
 							</TooltipTrigger>
 							<TooltipContent>
-								<p>{entry.email}</p>
+								<p>{email}</p>
 							</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 					<button
 						type="button"
 						onClick={(e) => {
-							e.preventDefault()
 							e.stopPropagation()
-							removeEmail(entry.id)
+							removeEmail(index)
 						}}
 						className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer"
-						aria-label={`Remove ${entry.email}`}
+						aria-label={`Remove ${email}`}
 					>
 						<X className="size-3.5" />
 					</button>
 				</Badge>
 			))}
 			<input
-				id="email-pill-input"
-				data-testid="email-pill-input"
 				ref={inputRef}
 				type="text"
 				value={inputValue}
@@ -109,9 +103,13 @@ export function EmailPillInput({
 				onKeyDown={handleKeyDown}
 				onBlur={handleBlur}
 				disabled={disabled}
-				placeholder={emails.length === 0 ? placeholder : "Enter email"}
+				placeholder={emails.length === 0 ? placeholder : ""}
 				className="flex-1 min-w-[120px] bg-transparent border-0 outline-none text-sm placeholder:text-muted-foreground py-1"
 			/>
-		</label>
+		</div>
 	)
 }
+
+//TODO on close clear email
+// On submit clear emails
+// button is disabled if email is empty
