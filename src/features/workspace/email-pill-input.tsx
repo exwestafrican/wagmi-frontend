@@ -34,7 +34,7 @@ export function EmailPillInput({
 	}
 
 	const removeEmail = (index: number) => {
-		setEmails(emails.filter((_, i) => i !== index)) //TODO find a better way to write this
+		setEmails(emails.filter((_, i) => i !== index))
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
