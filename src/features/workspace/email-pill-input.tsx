@@ -73,7 +73,7 @@ export function EmailPillInput({
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<span className="truncate min-w-0 max-w-[120px] block">
+								<span className="truncate min-w-0 max-w-full block">
 									{email}
 								</span>
 							</TooltipTrigger>
@@ -103,7 +103,7 @@ export function EmailPillInput({
 				onKeyDown={handleKeyDown}
 				onBlur={handleBlur}
 				disabled={disabled}
-				placeholder={emails.length === 0 ? placeholder : ""}
+				placeholder={emails.length === 0 ? placeholder : "Enter email"}
 				className="flex-1 min-w-[120px] bg-transparent border-0 outline-none text-sm placeholder:text-muted-foreground py-1"
 			/>
 		</div>
@@ -113,3 +113,7 @@ export function EmailPillInput({
 //TODO on close clear email
 // On submit clear emails
 // button is disabled if email is empty
+
+
+//TODO checkbox
+// |"enter email" in a very light  place holder format
