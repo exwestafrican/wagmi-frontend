@@ -9,8 +9,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { EmailPillInput } from "@/features/workspace/email-pill-input"
-import { Switch } from "@/components/ui/switch.tsx"
 import { Label } from "@/components/ui/label.tsx"
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 export function TeammateInviteModal({
 	open,
@@ -38,18 +38,21 @@ export function TeammateInviteModal({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Invite Teammates</DialogTitle>
+					<DialogTitle className={"self-start"}>Invite Teammates</DialogTitle>
 				</DialogHeader>
-				<DialogDescription>Enter email of Teammates</DialogDescription>
-				<EmailPillInput
-					emails={emails}
-					setEmails={setEmails}
-					placeholder={"someonecool@useenvoye.co"}
-					disabled={false}
-				/>
-				<DialogFooter className="justify-between sm:justify-between align-middle flex-col">
+				<DialogDescription>
+                    Enter email of Teammate
+                    <EmailPillInput
+                        emails={emails}
+                        setEmails={setEmails}
+                        placeholder={"someonecool@useenvoye.co"}
+                        disabled={false}
+                    />
+                </DialogDescription>
+
+				<DialogFooter className="justify-between sm:justify-between align-middle flex-col sm:flex-col">
 					<div className="flex items-center space-x-2">
-						<Switch
+						<Checkbox
 							checked={inviteAsWorkspaceAdmin}
 							onClick={() =>
 								setInviteAsWorkspaceAdmin((prevState) => !prevState)
@@ -60,18 +63,30 @@ export function TeammateInviteModal({
 							className={"text-[10px] tracking-tight leading-tight"}
 							htmlFor="is-worksapce-admin"
 						>
-							Invite as Workspace Admin
+							Invite as Admin
 						</Label>
 					</div>
-					<Button
-						type="button"
-						disabled={isDisabled}
-						variant="outline"
-						onClick={handleInvite}
-						className={` hover:scale-105 transition duration-200 ease-out cursor-pointer text-white hover:text-white bg-black hover:bg-black/75`}
-					>
-						Send Invite
-					</Button>
+                    <div className="flex self-end items-center space-x-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={handleInvite}
+                            className={`cursor-pointer`}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            type="button"
+                            disabled={isDisabled}
+                            variant="outline"
+                            onClick={handleInvite}
+                            className={`hover:scale-105 transition duration-200 ease-out cursor-pointer text-white hover:text-white bg-black hover:bg-black/75`}
+                        >
+                            Send Invite
+                        </Button>
+                    </div>
+
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
