@@ -40,15 +40,25 @@ export function TeammateInviteModal({
 				<DialogHeader>
 					<DialogTitle className={"self-start"}>Invite Teammates</DialogTitle>
 				</DialogHeader>
-				<DialogDescription>
+				<DialogDescription
+					data-testid="teammate-invite-dialog-description"
+					className="sr-only"
+				>
+					{/*sr-only makes test invisible*/}
 					Enter email of Teammate
+				</DialogDescription>
+				<div>
+					<span className={"text-muted-foreground text-sm"}>
+						{" "}
+						Enter email of Teammate
+					</span>
 					<EmailPillInput
 						emails={emails}
 						setEmails={setEmails}
 						placeholder={"someonecool@useenvoye.co"}
 						disabled={false}
 					/>
-				</DialogDescription>
+				</div>
 
 				<DialogFooter className="justify-between sm:justify-between align-middle flex-col sm:flex-col">
 					<div className="flex items-center space-x-2">
@@ -71,7 +81,7 @@ export function TeammateInviteModal({
 							type="button"
 							variant="ghost"
 							onClick={handleInvite}
-							className={`cursor-pointer`}
+							className="cursor-pointer"
 						>
 							Cancel
 						</Button>
@@ -81,7 +91,7 @@ export function TeammateInviteModal({
 							disabled={isDisabled}
 							variant="outline"
 							onClick={handleInvite}
-							className={`hover:scale-105 transition duration-200 ease-out cursor-pointer text-white hover:text-white bg-black hover:bg-black/75`}
+							className="hover:scale-105 transition duration-200 ease-out cursor-pointer text-white hover:text-white bg-black hover:bg-black/75"
 						>
 							Send Invite
 						</Button>
