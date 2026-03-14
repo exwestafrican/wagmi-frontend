@@ -96,6 +96,8 @@ export function EmailPillInput({
 				</Badge>
 			))}
 			<input
+				id={"email-pill-input"}
+                data-testid="email-pill-input"
 				ref={inputRef}
 				type="text"
 				value={inputValue}
@@ -113,4 +115,3 @@ export function EmailPillInput({
 //TODO on close clear email
 // On submit clear emails
 // button is disabled if email is empty
-
