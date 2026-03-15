@@ -1,4 +1,4 @@
-import { type UserEvent } from "@testing-library/user-event"
+import type { UserEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/react"
 
 export async function enterEmailToInvite(user: UserEvent, email: string) {
