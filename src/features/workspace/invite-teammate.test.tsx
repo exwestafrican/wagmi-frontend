@@ -5,6 +5,7 @@ import renderWithQueryClient, {
 import { screen } from "@testing-library/react"
 import { TeammateInviteModal } from "@/features/workspace/invite-teammate"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
 
 describe("Invite Teammate", () => {
 	let user: UserEvent
@@ -18,12 +19,6 @@ describe("Invite Teammate", () => {
 
 	function findSendInviteButton() {
 		return screen.getAllByRole("button")[1]
-	}
-
-	async function enterEmail(user: UserEvent, email: string) {
-		const inviteEmailInput = screen.getByTestId("email-pill-input")
-		await user.type(inviteEmailInput, email)
-		await user.tab()
 	}
 
 	beforeEach(() => {
@@ -50,7 +45,7 @@ describe("Invite Teammate", () => {
 		await setupInviteTeammateModal()
 		expect(findSendInviteButton()).toBeDisabled()
 
-		await enterEmail(user, "tumise@useenvoye.io")
+		await enterEmailToInvite(user, "tumise@useenvoye.io")
 
 		expect(findSendInviteButton()).toBeEnabled()
 	})
@@ -59,15 +54,15 @@ describe("Invite Teammate", () => {
 		await setupInviteTeammateModal()
 		expect(findSendInviteButton()).toBeDisabled()
 
-		await enterEmail(user, "invalid-email")
+		await enterEmailToInvite(user, "invalid-email")
 		expect(findSendInviteButton()).toBeDisabled()
 	})
 
 	it("allows user to input multiple emails", async () => {
 		await setupInviteTeammateModal()
 
-		await enterEmail(user, "tumise@useenvoye.io")
-		await enterEmail(user, "teammate@useenvoye.io")
+		await enterEmailToInvite(user, "tumise@useenvoye.io")
+		await enterEmailToInvite(user, "teammate@useenvoye.io")
 
 		expect(screen.getByText("tumise@useenvoye.io")).toBeInTheDocument()
 		expect(screen.getByText("teammate@useenvoye.io")).toBeInTheDocument()
@@ -77,8 +72,8 @@ describe("Invite Teammate", () => {
 		await setupInviteTeammateModal()
 		const user = userEvent.setup()
 
-		await enterEmail(user, "tumise@useenvoye.io")
-		await enterEmail(user, "teammate@useenvoye.io")
+		await enterEmailToInvite(user, "tumise@useenvoye.io")
+		await enterEmailToInvite(user, "teammate@useenvoye.io")
 
 		const removeButton = screen.getByRole("button", {
 			name: /remove tumise@useenvoye.io/i,

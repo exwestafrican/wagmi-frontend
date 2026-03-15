@@ -12,3 +12,7 @@ export const ApiPaths = {
 	ROADMAP_FEATURE_REQUEST: "/roadmap/feature-request",
 	ROADMAP_FUTURE_FEATURES: "/roadmap/future-features",
 } as const
+
+export const WorkspaceCode = {
+	ENVOYE: "e8r4z7",
+}

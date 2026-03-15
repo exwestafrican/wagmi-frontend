@@ -31,6 +31,10 @@ export function TeammateInviteModal({
 		onOpenChange(false)
 	}
 
+	const handleCancel = () => {
+		onOpenChange(false)
+	}
+
 	useEffect(() => {
 		const closed = !open
 		if (closed) setTimeout(() => setEmails([]), 500) //this makes clearing look better
@@ -84,7 +88,7 @@ export function TeammateInviteModal({
 						<Button
 							type="button"
 							variant="ghost"
-							onClick={handleInvite}
+							onClick={handleCancel}
 							className="cursor-pointer"
 						>
 							Cancel
