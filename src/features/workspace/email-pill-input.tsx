@@ -115,7 +115,3 @@ export function EmailPillInput({
 		</label>
 	)
 }
-
-//TODO on close clear email
-// On submit clear emails
-// button is disabled if email is empty
