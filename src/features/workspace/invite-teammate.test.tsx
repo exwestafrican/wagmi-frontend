@@ -9,6 +9,7 @@ import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
 
 describe("Invite Teammate", () => {
 	let user: UserEvent
+
 	async function setupInviteTeammateModal() {
 		const queryClient = createTestQueryClient()
 		renderWithQueryClient(
