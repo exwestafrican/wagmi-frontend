@@ -1,6 +1,6 @@
 import { describe, expect, vi, test, beforeEach } from "vitest"
-import { navigateToTestPage } from "@/test/helpers/navaigate.tsx"
-import { WorkspaceCode } from "@/constants.ts"
+import { navigateToTestPage } from "@/test/helpers/navigate"
+import { WorkspaceCode } from "@/test/constants.ts"
 import { screen, waitFor } from "@testing-library/react"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { apiClient } from "@/lib/api-client.ts"

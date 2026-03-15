@@ -13,21 +13,17 @@ import {
 	type EmailEntry,
 } from "@/features/workspace/email-pill-input"
 import { Label } from "@/components/ui/label.tsx"
-import { Checkbox } from "@/components/ui/checkbox.tsx"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export function TeammateInviteModal({
 	open,
 	onOpenChange,
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
 	const [emails, setEmails] = useState<EmailEntry[]>([])
-	const [inviteAsWorkspaceAdmin, setInviteAsWorkspaceAdmin] = useState<
-		boolean | undefined
-	>(true)
+	const [inviteAsWorkspaceAdmin, setInviteAsWorkspaceAdmin] = useState(true)
 
 	const handleInvite = () => {
-		// TODO: API call to invite emails
-		const emailAddresses = emails.map((e) => e.email)
-		console.log("Inviting:", emailAddresses)
+		// TODO: API call to invite emails (emails.map((e) => e.email))
 		onOpenChange(false)
 	}
 
@@ -72,14 +68,12 @@ export function TeammateInviteModal({
 					<div className="flex items-center space-x-2">
 						<Checkbox
 							checked={inviteAsWorkspaceAdmin}
-							onClick={() =>
-								setInviteAsWorkspaceAdmin((prevState) => !prevState)
-							}
-							id="is-worksapce-admin"
+							onCheckedChange={() => setInviteAsWorkspaceAdmin((prev) => !prev)}
+							id="is-workspace-admin"
 						/>
 						<Label
 							className={"text-[10px] tracking-tight leading-tight"}
-							htmlFor="is-worksapce-admin"
+							htmlFor="is-workspace-admin"
 						>
 							Invite as Admin
 						</Label>

@@ -11,7 +11,7 @@ vi.mock("@/hooks/user-countdown.ts", async () => {
 
 import { useCountDown } from "@/hooks/user-countdown.ts"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { navigateToTestPage } from "@/test/helpers/navaigate.tsx"
+import { navigateToTestPage } from "@/test/helpers/navigate"
 
 describe("Existing workspace setup", () => {
 	describe("Auto redirect works as expected", () => {
