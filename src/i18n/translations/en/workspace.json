@@ -1,0 +1,10 @@
+{
+	"inviteTeammate": {
+		"title": "Invite Teammates",
+		"description": "Enter email of Teammate",
+		"placeholder": "someonecool@useenvoye.co",
+		"inviteAsAdmin": "Invite as Admin",
+		"cancel": "Cancel",
+		"sendInvite": "Send Invite"
+	}
+}
