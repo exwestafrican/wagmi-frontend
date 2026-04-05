@@ -136,6 +136,11 @@ code {
 	}
 }
 
+@utility signup-field-input {
+	@apply h-11 rounded-lg border-0 bg-[#F3F4F6] shadow-none placeholder:text-neutral-500;
+	@apply focus-visible:border-0 focus-visible:ring-[3px] focus-visible:ring-[#3B82F6]/35;
+}
+
 .archivo-narrow-font {
 	font-family: "Archivo Narrow", sans-serif;
 }
