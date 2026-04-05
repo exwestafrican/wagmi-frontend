@@ -1,6 +1,3 @@
-import { useState, useRef, type KeyboardEvent } from "react"
-import { cn } from "@/lib/utils.ts"
-import { User, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
 	Tooltip,
@@ -8,6 +5,15 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils.ts"
+import { User, X } from "lucide-react"
+import {
+	type Dispatch,
+	type KeyboardEvent,
+	type SetStateAction,
+	useRef,
+	useState,
+} from "react"
 
 export type EmailEntry = { id: string; email: string }
 
@@ -24,7 +30,7 @@ export function EmailPillInput({
 	maxEmailEntries,
 }: {
 	emailEntries: EmailEntry[]
-	setEmailEntries: (emailEntry: EmailEntry[]) => void
+	setEmailEntries: Dispatch<SetStateAction<EmailEntry[]>>
 	placeholder: string
 	disabled: boolean
 	maxEmailEntries: number
@@ -38,15 +44,15 @@ export function EmailPillInput({
 	const addEmail = (email: string) => {
 		const trimmed = email.trim().toLowerCase()
 		if (!trimmed || !emailRegex.test(trimmed)) return
-		setEmailEntries([
-			...emailEntries,
+		setEmailEntries((prev) => [
+			...prev,
 			{ id: crypto.randomUUID(), email: trimmed },
 		])
 		setInputValue("")
 	}
 
 	const removeEmail = (id: string) => {
-		setEmailEntries(emailEntries.filter((entry) => entry.id !== id))
+		setEmailEntries((prev) => prev.filter((entry) => entry.id !== id))
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
