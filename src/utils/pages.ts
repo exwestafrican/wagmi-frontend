@@ -3,4 +3,5 @@ export const Pages = {
 	WAITLIST: "/",
 	WORKSPACE: "/workspace",
 	LOGIN: "/auth/login",
+    SIGNUP: "auth/signup",
 }
