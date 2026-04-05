@@ -10,11 +10,47 @@ import {
 	RouterProvider,
 } from "@tanstack/react-router"
 import { z } from "zod"
+import LoginPage from "@/features/auth/login-page.tsx"
+import SignupPage from "@/features/auth/signup-page.tsx"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
 export function makeTestRouter() {
+function WaitlistPlaceholder() {
+	return <div data-testid="waitlist-route">Waitlist</div>
+}
+
+export function makeAuthTestRouter() {
+	const rootRoute = createRootRoute({
+		component: () => <Outlet />,
+	})
+
+	const indexRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/",
+		component: WaitlistPlaceholder,
+	})
+
+	const signupRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "signup",
+		component: SignupPage,
+	})
+
+	const loginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "login",
+		component: LoginPage,
+	})
+
+	return createRouter({
+		routeTree: rootRoute.addChildren([indexRoute, signupRoute, loginRoute]),
+		context: {},
+	})
+}
+
+function makeTestRouter() {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})

@@ -3,23 +3,15 @@ import type { SignupData } from "@/features/auth/schema/signupSchema.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
-import SignupPage from "@/features/auth/signup-page.tsx"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { screen, waitFor } from "@testing-library/react"
 import { HttpStatusCode } from "axios"
+import { RouterProvider } from "@tanstack/react-router"
 import { apiClient } from "@/lib/api-client"
 import { Pages } from "@/utils/pages.ts"
 import { mockError } from "@/test/helpers/mocks.ts"
-
-const mockNavigate = vi.fn()
-vi.mock("@tanstack/react-router", async () => {
-	const actual = await vi.importActual("@tanstack/react-router")
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	}
-})
+import { makeAuthTestRouter } from "@/test/helpers/navigate"
 
 describe("Signup page", () => {
 	let user: UserEvent
@@ -48,9 +40,12 @@ describe("Signup page", () => {
 		companyNameErrorMessage: "companyname-form-message",
 	}
 
-	function setupSignupPage() {
+	async function setupSignupPage() {
 		const queryClient = createTestQueryClient()
-		renderWithQueryClient(<SignupPage />, { queryClient })
+		const router = makeAuthTestRouter()
+		await router.navigate({ to: Pages.SIGNUP })
+		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		return { router }
 	}
 
 	function inputHelpers(user: UserEvent) {
@@ -83,7 +78,7 @@ describe("Signup page", () => {
 			test.each(["invalid-email", "tum@c", " "])(
 				"should disable submit button for email %s",
 				async (email) => {
-					setupSignupPage()
+					await setupSignupPage()
 
 					expect(
 						screen.queryByTestId(formFields.emailErrorMessage),
@@ -111,7 +106,7 @@ describe("Signup page", () => {
 			test.each([" ", "f", "d".repeat(19), "firstNameMoreThan!0Characters"])(
 				"should disable submit button for invalid first name %s",
 				async (firstName) => {
-					setupSignupPage()
+					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.firstNameErrorMessage),
 					).not.toBeInTheDocument()
@@ -136,7 +131,7 @@ describe("Signup page", () => {
 			test.each([" ", "d", "d".repeat(19), "lastNameMoreThan!0Characters"])(
 				"should disable submit button for invalid last name %s",
 				async (lastName) => {
-					setupSignupPage()
+					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.lastNameErrorMessage),
 					).not.toBeInTheDocument()
@@ -161,7 +156,7 @@ describe("Signup page", () => {
 			test.each([" ", "A".repeat(51)])(
 				"should disable submit button for invalid company name %s",
 				async (companyName) => {
-					setupSignupPage()
+					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.companyNameErrorMessage),
 					).not.toBeInTheDocument()
@@ -185,7 +180,7 @@ describe("Signup page", () => {
 
 	describe("valid input", () => {
 		test("button is enabled when input is valid", async () => {
-			setupSignupPage()
+			await setupSignupPage()
 
 			await userInput.enterSignUpDetails({})
 
@@ -203,16 +198,23 @@ describe("Signup page", () => {
 				)
 			})
 			test("when user is unauthorized we transition to waitlist page", async () => {
-				setupSignupPage()
+				const queryClient = createTestQueryClient()
+				const router = makeAuthTestRouter()
+				const navigateSpy = vi.spyOn(router, "navigate")
+				await router.navigate({ to: Pages.SIGNUP })
+				renderWithQueryClient(<RouterProvider router={router} />, {
+					queryClient,
+				})
+
 				await userInput.enterSignUpDetails({})
 
 				const submitButton = screen.getByTestId(formFields.submit)
 				await userInput.click(submitButton)
 
 				await waitFor(() => {
-					expect(mockNavigate).toHaveBeenCalledWith({
-						to: Pages.WAITLIST,
-					})
+					expect(navigateSpy).toHaveBeenCalledWith(
+						expect.objectContaining({ to: Pages.WAITLIST }),
+					)
 				})
 			})
 		})
