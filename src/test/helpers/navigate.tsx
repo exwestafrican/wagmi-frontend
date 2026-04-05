@@ -50,6 +50,40 @@ export function makeAuthTestRouter() {
 }
 
 export function makeTestRouter() {
+function WaitlistPlaceholder() {
+	return <div data-testid="waitlist-route">Waitlist</div>
+}
+
+export function makeAuthTestRouter() {
+	const rootRoute = createRootRoute({
+		component: () => <Outlet />,
+	})
+
+	const indexRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/",
+		component: WaitlistPlaceholder,
+	})
+
+	const signupRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "signup",
+		component: SignupPage,
+	})
+
+	const loginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "login",
+		component: LoginPage,
+	})
+
+	return createRouter({
+		routeTree: rootRoute.addChildren([indexRoute, signupRoute, loginRoute]),
+		context: {},
+	})
+}
+
+function makeTestRouter() {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
