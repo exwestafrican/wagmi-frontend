@@ -1,17 +1,17 @@
-import { vi, it, describe, expect, beforeEach } from "vitest"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
+import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
+import LanguageProvider from "@/i18n/LanguageProvider"
+import { apiClient } from "@/lib/api-client.ts"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { WorkspaceCode } from "@/test/constants.ts"
+import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
+import { makeTestRouter } from "@/test/helpers/navigate.tsx"
+import { RouterProvider } from "@tanstack/react-router"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
-import LanguageProvider from "@/i18n/LanguageProvider"
-import { RouterProvider } from "@tanstack/react-router"
-import { makeTestRouter } from "@/test/helpers/navigate.tsx"
-import { useAuthStore } from "@/stores/auth.store.ts"
-import { apiClient } from "@/lib/api-client.ts"
-import { WorkspaceCode } from "@/test/constants.ts"
-import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const envoyeWorkspace = {
 	code: WorkspaceCode.ENVOYE,
