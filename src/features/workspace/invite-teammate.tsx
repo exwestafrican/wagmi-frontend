@@ -20,6 +20,8 @@ import { useSearch } from "@tanstack/react-router"
 import { ROLES } from "@/constants.ts"
 import { toast } from "sonner"
 
+const MAX_INVITE_EMAIL_ENTRIES = 10
+
 export function TeammateInviteModal({
 	open,
 	onOpenChange,
@@ -36,7 +38,9 @@ export function TeammateInviteModal({
 		sendInvite(
 			{
 				code: code,
-				emails: emailEntries.map((entry) => entry.email),
+				emails: emailEntries
+					.slice(0, MAX_INVITE_EMAIL_ENTRIES)
+					.map((entry) => entry.email),
 				role: inviteAsWorkspaceAdmin
 					? ROLES.WorkspaceAdmin
 					: ROLES.SupportStaff,
@@ -59,7 +63,7 @@ export function TeammateInviteModal({
 		if (closed) setTimeout(() => setEmailEntries([]), 500) //this makes clearing look better
 	}, [open])
 
-	const isDisabled = emailEntries.length === 0
+	const isDisabled = emailEntries.length === 0 || emailEntries.length > MAX_INVITE_EMAIL_ENTRIES;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -84,8 +88,13 @@ export function TeammateInviteModal({
 					<EmailPillInput
 						emailEntries={emailEntries}
 						setEmailEntries={setEmailEntries}
-						placeholder={t("inviteTeammate.placeholder")}
+						placeholder={
+							emailEntries.length === 0
+								? t("inviteTeammate.placeholder")
+								: "Enter email"
+						}
 						disabled={false}
+						maxEmailEntries={MAX_INVITE_EMAIL_ENTRIES}
 					/>
 				</div>
 
