@@ -12,8 +12,9 @@ import {
 import { z } from "zod"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
+import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
-function makeTestRouter() {
+export function makeTestRouter() {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
@@ -54,6 +55,11 @@ export async function navigateToTestPage({
 	if (hash) {
 		window.location.hash = hash
 	}
-	renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+	renderWithQueryClient(
+		<LanguageProvider>
+			<RouterProvider router={router} />
+		</LanguageProvider>,
+		{ queryClient },
+	)
 	return { router, navigateSpy }
 }

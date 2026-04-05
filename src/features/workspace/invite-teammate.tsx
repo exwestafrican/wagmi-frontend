@@ -15,18 +15,43 @@ import {
 } from "@/features/workspace/email-pill-input"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useSendWorkspaceInvite } from "@/features/workspace/api/send-invite.ts"
+import { useSearch } from "@tanstack/react-router"
+import { ROLES } from "@/constants.ts"
+import { toast } from "sonner"
+
+export const MAX_INVITE_EMAIL_ENTRIES = 10
 
 export function TeammateInviteModal({
 	open,
 	onOpenChange,
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
 	const { t } = useTranslation("workspace")
-	const [emails, setEmails] = useState<EmailEntry[]>([])
+	const { code } = useSearch({ from: "/workspace" })
+	const { mutate: sendInvite } = useSendWorkspaceInvite()
+
+	const [emailEntries, setEmailEntries] = useState<EmailEntry[]>([])
 	const [inviteAsWorkspaceAdmin, setInviteAsWorkspaceAdmin] = useState(true)
 
 	const handleInvite = () => {
-		// TODO: API call to invite emails (emails.map((e) => e.email))
 		onOpenChange(false)
+		sendInvite(
+			{
+				code: code,
+				emails: emailEntries
+					.slice(0, MAX_INVITE_EMAIL_ENTRIES)
+					.map((entry) => entry.email),
+				role: inviteAsWorkspaceAdmin
+					? ROLES.WorkspaceAdmin
+					: ROLES.SupportStaff,
+			},
+			{
+				onError: (e) => {
+					toast.error("Unable to invite teammates to workspace")
+					console.error(e)
+				},
+			},
+		)
 	}
 
 	const handleCancel = () => {
@@ -35,14 +60,24 @@ export function TeammateInviteModal({
 
 	useEffect(() => {
 		const closed = !open
-		if (closed) setTimeout(() => setEmails([]), 500) //this makes clearing look better
+		if (closed) setEmailEntries([])
 	}, [open])
 
-	const isDisabled = emails.length === 0
+	const isDisabled =
+		emailEntries.length === 0 || emailEntries.length > MAX_INVITE_EMAIL_ENTRIES
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent
+				className="sm:max-w-md
+                data-[state=open]:animate-in
+                data-[state=closed]:animate-out
+                data-[state=open]:fade-in-10
+                data-[state=closed]:fade-out-10
+                data-[state=open]:zoom-in-95
+                data-[state=closed]:zoom-out-95
+                duration-500"
+			>
 				<DialogHeader>
 					<DialogTitle className={"self-start"}>
 						{t("inviteTeammate.title")}
@@ -61,10 +96,15 @@ export function TeammateInviteModal({
 						{t("inviteTeammate.description")}
 					</span>
 					<EmailPillInput
-						emails={emails}
-						setEmails={setEmails}
-						placeholder={t("inviteTeammate.placeholder")}
+						emailEntries={emailEntries}
+						setEmailEntries={setEmailEntries}
+						placeholder={
+							emailEntries.length === 0
+								? t("inviteTeammate.placeholder")
+								: t("inviteTeammate.enterEmail")
+						}
 						disabled={false}
+						maxEmailEntries={MAX_INVITE_EMAIL_ENTRIES}
 					/>
 				</div>
 
@@ -94,6 +134,7 @@ export function TeammateInviteModal({
 
 						<Button
 							type="button"
+							data-testid="send-workspace-invite-button"
 							disabled={isDisabled}
 							variant="outline"
 							onClick={handleInvite}

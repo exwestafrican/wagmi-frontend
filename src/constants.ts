@@ -11,4 +11,10 @@ export const ApiPaths = {
 	ROADMAP_USER_VOTES: "/roadmap/user-votes",
 	ROADMAP_FEATURE_REQUEST: "/roadmap/feature-request",
 	ROADMAP_FUTURE_FEATURES: "/roadmap/future-features",
+	INVITE_TEAMMATES: "/workspace/invite-teammates",
 } as const
+
+export const ROLES = {
+	WorkspaceAdmin: "WorkspaceAdmin",
+	SupportStaff: "SupportStaff",
+}
