@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form"
 import { useSignup } from "@/features/auth/api/signup.ts"
 import { useState } from "react"
 import { type AxiosError, HttpStatusCode } from "axios"
-import { useNavigate } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { Pages } from "@/utils/pages.ts"
 import { toast } from "sonner"
 import AuthSuccess from "@/features/auth/component/auth.success.tsx"
@@ -80,100 +80,153 @@ const SignupPage = () => {
 	}
 
 	return (
-		<div className="w-full flex flex-col items-center py-3 px-10">
-			<div className=" w-full text-center">
-				<h2 className="text-4xl font-extrabold mb-3">Envoye</h2>
-				<div>
-					<p>Create an account</p>
+		<div className="min-h-screen bg-neutral-200/80 px-4 py-8 md:px-8 md:py-12 flex items-center justify-center">
+			<div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl flex flex-col md:flex-row md:min-h-[min(36rem,calc(100vh-4rem))]">
+				<div className="relative min-h-52 shrink-0 sm:min-h-56 md:min-h-0 md:w-1/2">
+					<img
+						src="/smoot.jpeg"
+						alt=""
+						className="absolute inset-0 size-full object-cover object-top md:object-center"
+					/>
+					<div
+						className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10"
+						aria-hidden
+					/>
+					<div className="absolute inset-x-0 bottom-0 p-6 md:p-10 text-white">
+						<p className="text-2xl font-semibold tracking-tight md:text-3xl">
+							Envoye
+						</p>
+						<p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90">
+							Comfortable workflows and a clear path from idea to delivery with
+							Envoye.
+						</p>
+					</div>
+				</div>
+
+				<div className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-10 md:px-12 lg:px-14">
+					<div className="mb-8">
+						<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+							Let&apos;s sign you up
+						</h1>
+						<p className="mt-2 text-sm text-neutral-500 sm:text-base">
+							Create an account
+						</p>
+					</div>
+
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="flex w-full max-w-md flex-col gap-5"
+						>
+							<FormField
+								control={form.control}
+								name="firstName"
+								render={({ field }) => (
+									<FormItem className="gap-2">
+										<FormLabel className="font-semibold text-neutral-800">
+											First Name
+										</FormLabel>
+										<FormControl>
+											<Input
+												data-testid="first-name"
+												placeholder="John"
+												className="signup-field-input"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage data-testid="firstname-form-message" />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="lastName"
+								render={({ field }) => (
+									<FormItem className="gap-2">
+										<FormLabel className="font-semibold text-neutral-800">
+											Last Name
+										</FormLabel>
+										<FormControl>
+											<Input
+												data-testid="last-name"
+												placeholder="Doe"
+												className="signup-field-input"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage data-testid="lastname-form-message" />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem className="gap-2">
+										<FormLabel className="font-semibold text-neutral-800">
+											Work Email
+										</FormLabel>
+										<FormControl>
+											<Input
+												data-testid="email"
+												placeholder="jd@xxx.com"
+												className="signup-field-input"
+												{...field}
+											/>
+										</FormControl>
+										<FormDescription className="text-xs text-neutral-500">
+                                            No work email? We accept personal emails too.
+										</FormDescription>
+										<FormMessage data-testid="email-form-message" />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="companyName"
+								render={({ field }) => (
+									<FormItem className="gap-2">
+										<FormLabel className="font-semibold text-neutral-800">
+											Company Name
+										</FormLabel>
+										<FormControl>
+											<Input
+												data-testid="company-name"
+												placeholder="Doe.inc"
+												className="signup-field-input"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage data-testid="companyname-form-message" />
+									</FormItem>
+								)}
+							/>
+
+							<Button
+								disabled={!form.formState.isValid}
+								type="submit"
+								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
+								data-testid="submit-button"
+							>
+								Sign Up
+							</Button>
+
+							<p className="text-center text-sm text-neutral-600">
+								Already have an account?{" "}
+								<Link
+									to={Pages.LOGIN}
+									className="font-medium text-[#3B82F6] hover:underline"
+								>
+									Sign in
+								</Link>
+							</p>
+						</form>
+					</Form>
 				</div>
 			</div>
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="space-y-4 w-full max-w-175 flex flex-col gap-6"
-				>
-					<FormField
-						control={form.control}
-						name="firstName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>First Name</FormLabel>
-								<FormControl>
-									<Input
-										data-testid="first-name"
-										placeholder="John"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage data-testid="firstname-form-message" />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="lastName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Last Name</FormLabel>
-								<FormControl>
-									<Input data-testid="last-name" placeholder="Doe" {...field} />
-								</FormControl>
-								<FormMessage data-testid="lastname-form-message" />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Work Email</FormLabel>
-								<FormControl>
-									<Input
-										data-testid="email"
-										placeholder="jd@xxx.com"
-										{...field}
-									/>
-								</FormControl>
-								<FormDescription className="text-xs">
-									In the absence of work email, please provide personal email
-									address
-								</FormDescription>
-								<FormMessage data-testid="email-form-message" />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="companyName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Company Name</FormLabel>
-								<FormControl>
-									<Input
-										data-testid="company-name"
-										placeholder="Doe.inc"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage data-testid="companyname-form-message" />
-							</FormItem>
-						)}
-					/>
-
-					<Button
-						disabled={!form.formState.isValid}
-						type="submit"
-						className="w-full cursor-pointer"
-						data-testid="submit-button"
-					>
-						Sign Up
-					</Button>
-				</form>
-			</Form>
 		</div>
 	)
 }
