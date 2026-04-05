@@ -101,7 +101,7 @@ export function TeammateInviteModal({
 						placeholder={
 							emailEntries.length === 0
 								? t("inviteTeammate.placeholder")
-								: "Enter email"
+								: t("inviteTeammate.enterEmail")
 						}
 						disabled={false}
 						maxEmailEntries={MAX_INVITE_EMAIL_ENTRIES}

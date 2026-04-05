@@ -5,6 +5,7 @@
 		"placeholder": "someonecool@useenvoye.co",
 		"inviteAsAdmin": "Invite as Admin",
 		"cancel": "Cancel",
-		"sendInvite": "Send Invite"
+		"sendInvite": "Send Invite",
+        "enterEmail": "Enter email"
 	}
 }
