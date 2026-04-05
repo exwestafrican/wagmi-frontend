@@ -80,7 +80,7 @@ const SignupPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-200/80 md:px-8 md:py-12  flex  justify-center">
+		<div className="min-h-screen bg-neutral-200/80 md:px-12 md:py-12  flex  justify-center">
 			<div className="w-full overflow-hidden md:rounded-2xl  bg-white shadow-sm flex flex-col md:flex-row md:min-h-full">
 				<div className="relative min-h-52 shrink-0 sm:min-h-56 md:min-h-0 md:w-3/5">
 					<img
