@@ -24,6 +24,7 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import { z } from "zod"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 import { useAuthStore } from "@/stores/auth.store.ts"
+import { Pages } from "@/utils/pages.ts"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -44,28 +45,23 @@ const rootRoute = createRootRoute({
 	component: RootRouteComponent,
 })
 
-const authRoute = createRoute({
-	getParentRoute: () => rootRoute,
-	path: "auth",
-	component: () => <Outlet />,
-})
-
 const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
 	component: WaitListPage,
 })
 
-// auth routes
 const signupRoute = createRoute({
-	getParentRoute: () => authRoute,
+	getParentRoute: () => rootRoute,
 	path: "signup",
 	component: SignupPage,
 })
 
 const loginRoute = createRoute({
-	getParentRoute: () => authRoute,
+	getParentRoute: () => rootRoute,
 	path: "login",
+	validateSearch: (search) =>
+		z.object({ redirect: z.string().optional() }).parse(search),
 	component: LoginPage,
 })
 
@@ -99,7 +95,7 @@ const workspaceRoute = createRoute({
 	beforeLoad: ({ location }) => {
 		const token = useAuthStore.getState().token
 		if (!token) {
-			throw redirect({ to: "/auth/login", search: { redirect: location.href } })
+			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
 		}
 	},
 	component: WorkspacePage,
@@ -110,7 +106,8 @@ const routeTree = rootRoute.addChildren([
 	workspaceSetupRoute,
 	existingWorkspaceSetupRoute,
 	workspaceRoute,
-	authRoute.addChildren([signupRoute, loginRoute]),
+	signupRoute,
+	loginRoute,
 ])
 
 const router = createRouter({
