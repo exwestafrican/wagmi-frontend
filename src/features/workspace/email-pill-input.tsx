@@ -14,13 +14,13 @@ export type EmailEntry = { id: string; email: string }
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function EmailPillInput({
-	emails,
-	setEmails,
+	emailEntries,
+	setEmailEntries,
 	placeholder,
 	disabled,
 }: {
-	emails: EmailEntry[]
-	setEmails: (emails: EmailEntry[]) => void
+	emailEntries: EmailEntry[]
+	setEmailEntries: (emailEntry: EmailEntry[]) => void
 	placeholder: string
 	disabled: boolean
 }) {
@@ -31,20 +31,27 @@ export function EmailPillInput({
 	const addEmail = (email: string) => {
 		const trimmed = email.trim().toLowerCase()
 		if (!trimmed || !emailRegex.test(trimmed)) return
-		setEmails([...emails, { id: crypto.randomUUID(), email: trimmed }])
+		setEmailEntries([
+			...emailEntries,
+			{ id: crypto.randomUUID(), email: trimmed },
+		])
 		setInputValue("")
 	}
 
 	const removeEmail = (id: string) => {
-		setEmails(emails.filter((entry) => entry.id !== id))
+		setEmailEntries(emailEntries.filter((entry) => entry.id !== id))
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
 			e.preventDefault()
 			addEmail(inputValue)
-		} else if (e.key === "Backspace" && !inputValue && emails.length > 0) {
-			removeEmail(emails[emails.length - 1].id)
+		} else if (
+			e.key === "Backspace" &&
+			!inputValue &&
+			emailEntries.length > 0
+		) {
+			removeEmail(emailEntries[emailEntries.length - 1].id)
 		}
 	}
 
@@ -63,7 +70,7 @@ export function EmailPillInput({
 				"cursor-text",
 			)}
 		>
-			{emails.map((entry) => (
+			{emailEntries.map((entry) => (
 				<Badge
 					key={entry.id}
 					variant="secondary"
@@ -109,7 +116,7 @@ export function EmailPillInput({
 				onKeyDown={handleKeyDown}
 				onBlur={handleBlur}
 				disabled={disabled}
-				placeholder={emails.length === 0 ? placeholder : "Enter email"}
+				placeholder={emailEntries.length === 0 ? placeholder : "Enter email"}
 				className="flex-1 min-w-[120px] bg-transparent border-0 outline-none text-sm placeholder:text-muted-foreground py-1"
 			/>
 		</label>

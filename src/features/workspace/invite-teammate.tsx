@@ -15,18 +15,39 @@ import {
 } from "@/features/workspace/email-pill-input"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useSendWorkspaceInvite } from "@/features/workspace/api/send-invite.ts"
+import { useSearch } from "@tanstack/react-router"
+import { ROLES } from "@/constants.ts"
+import { toast } from "sonner"
 
 export function TeammateInviteModal({
 	open,
 	onOpenChange,
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
 	const { t } = useTranslation("workspace")
-	const [emails, setEmails] = useState<EmailEntry[]>([])
+	const { code } = useSearch({ from: "/workspace" })
+	const { mutate: sendInvite } = useSendWorkspaceInvite()
+
+	const [emailEntries, setEmailEntries] = useState<EmailEntry[]>([])
 	const [inviteAsWorkspaceAdmin, setInviteAsWorkspaceAdmin] = useState(true)
 
 	const handleInvite = () => {
-		// TODO: API call to invite emails (emails.map((e) => e.email))
 		onOpenChange(false)
+		sendInvite(
+			{
+				code: code,
+				emails: emailEntries.map((entry) => entry.email),
+				role: inviteAsWorkspaceAdmin
+					? ROLES.WorkspaceAdmin
+					: ROLES.SupportStaff,
+			},
+			{
+				onError: (e) => {
+					toast.error("Unable to invite teammates to workspace")
+					console.error(e)
+				},
+			},
+		)
 	}
 
 	const handleCancel = () => {
@@ -35,10 +56,10 @@ export function TeammateInviteModal({
 
 	useEffect(() => {
 		const closed = !open
-		if (closed) setTimeout(() => setEmails([]), 500) //this makes clearing look better
+		if (closed) setTimeout(() => setEmailEntries([]), 500) //this makes clearing look better
 	}, [open])
 
-	const isDisabled = emails.length === 0
+	const isDisabled = emailEntries.length === 0
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -61,8 +82,8 @@ export function TeammateInviteModal({
 						{t("inviteTeammate.description")}
 					</span>
 					<EmailPillInput
-						emails={emails}
-						setEmails={setEmails}
+						emailEntries={emailEntries}
+						setEmailEntries={setEmailEntries}
 						placeholder={t("inviteTeammate.placeholder")}
 						disabled={false}
 					/>
