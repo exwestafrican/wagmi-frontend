@@ -16,7 +16,6 @@ import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
-export function makeTestRouter() {
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
 }
@@ -50,7 +49,7 @@ export function makeAuthTestRouter() {
 	})
 }
 
-function makeTestRouter() {
+export function makeTestRouter() {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})

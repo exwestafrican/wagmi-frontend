@@ -177,7 +177,7 @@ const SignupPage = () => {
 											/>
 										</FormControl>
 										<FormDescription className="text-xs text-neutral-500">
-                                            No work email? We accept personal emails too.
+											No work email? We accept personal emails too.
 										</FormDescription>
 										<FormMessage data-testid="email-form-message" />
 									</FormItem>
