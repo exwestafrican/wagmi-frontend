@@ -60,7 +60,7 @@ export function TeammateInviteModal({
 
 	useEffect(() => {
 		const closed = !open
-		if (closed) setTimeout(() => setEmailEntries([]), 500) //this makes clearing look better
+		if (closed) setEmailEntries([])
 	}, [open])
 
 	const isDisabled =
@@ -68,7 +68,16 @@ export function TeammateInviteModal({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent
+				className="sm:max-w-md
+                data-[state=open]:animate-in
+                data-[state=closed]:animate-out
+                data-[state=open]:fade-in-10
+                data-[state=closed]:fade-out-10
+                data-[state=open]:zoom-in-95
+                data-[state=closed]:zoom-out-95
+                duration-500"
+			>
 				<DialogHeader>
 					<DialogTitle className={"self-start"}>
 						{t("inviteTeammate.title")}

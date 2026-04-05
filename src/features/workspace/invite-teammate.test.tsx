@@ -119,7 +119,7 @@ describe("Invite Teammate", () => {
 		await setupInviteTeammateModal()
 
 		for (const i of Array.from({ length: 11 }, (_, i) => i)) {
-			await enterEmailToInvite(user, `tumise${i}@useenvoye.io`)
+			await enterEmailToInvite(user, `tumise${i + 1}@useenvoye.io`)
 		}
 		await waitFor(() => {
 			expect(findSendInviteButton()).toBeDisabled()

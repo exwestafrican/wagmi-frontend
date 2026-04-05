@@ -56,7 +56,7 @@ export function EmailPillInput({
 	}
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
+		if (e.key === "Enter" || e.key === ",") {
 			e.preventDefault()
 			addEmail(inputValue)
 		} else if (
