@@ -20,7 +20,7 @@ import { useSearch } from "@tanstack/react-router"
 import { ROLES } from "@/constants.ts"
 import { toast } from "sonner"
 
-const MAX_INVITE_EMAIL_ENTRIES = 10
+export const MAX_INVITE_EMAIL_ENTRIES = 10
 
 export function TeammateInviteModal({
 	open,
@@ -63,7 +63,8 @@ export function TeammateInviteModal({
 		if (closed) setTimeout(() => setEmailEntries([]), 500) //this makes clearing look better
 	}, [open])
 
-	const isDisabled = emailEntries.length === 0 || emailEntries.length > MAX_INVITE_EMAIL_ENTRIES;
+	const isDisabled =
+		emailEntries.length === 0 || emailEntries.length > MAX_INVITE_EMAIL_ENTRIES
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,6 +125,7 @@ export function TeammateInviteModal({
 
 						<Button
 							type="button"
+							data-testid="send-workspace-invite-button"
 							disabled={isDisabled}
 							variant="outline"
 							onClick={handleInvite}
