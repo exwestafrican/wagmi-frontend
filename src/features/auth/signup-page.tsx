@@ -80,8 +80,8 @@ const SignupPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-neutral-200/80 px-4 py-8 md:px-8 md:py-12 flex items-center justify-center">
-			<div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl flex flex-col md:flex-row md:min-h-[min(36rem,calc(100vh-4rem))]">
+		<div className="min-h-screen bg-neutral-200/80  md:px-8 md:py-12 flex items-center justify-center">
+			<div className="w-full max-w-5xl h-full overflow-hidden md:rounded-2xl bg-white shadow-xl flex flex-col md:flex-row md:min-h-[min(36rem,calc(100vh-4rem))]">
 				<div className="relative min-h-52 shrink-0 sm:min-h-56 md:min-h-0 md:w-1/2">
 					<img
 						src="/smoot.jpeg"
