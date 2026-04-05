@@ -83,7 +83,7 @@ export function makeAuthTestRouter() {
 	})
 }
 
-function makeTestRouter() {
+export function makeTestRouter() {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
