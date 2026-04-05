@@ -113,7 +113,6 @@ const SignupPage = () => {
 						</p>
 					</div>
 
-
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
