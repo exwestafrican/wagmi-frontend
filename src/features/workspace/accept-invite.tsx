@@ -33,7 +33,6 @@ import WithErrorHandling from "@/common/with-error-handling.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
-import z from "zod"
 
 const LAG_MS = 2500
 
@@ -59,19 +58,20 @@ export function AcceptInvite() {
 		},
 	})
 
-	React.useEffect(() => {
-		setTimeout(() => {
-			if (inviteQuery.isSuccess) {
-				setVerificationCompleted((prev) => !prev)
-				form.setValue("email", inviteQuery.data.email)
-				console.log(inviteQuery.data.email, form)
-			} else {
-				setVerificationError((prev) => !prev)
-			}
-		}, LAG_MS)
-	}, [inviteQuery.isSuccess, inviteQuery.isError])
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            if (inviteQuery.isSuccess) {
+                setVerificationCompleted(true)
+                form.setValue("email", inviteQuery.data.email)
+            } else if (inviteQuery.isError) {
+                setVerificationError(true)
+            }
+        }, LAG_MS)
 
-	function onSubmit(values: z.infer<typeof teammateDetailSchema>) {
+        return () => clearTimeout(timer)
+    }, [inviteQuery.isSuccess, inviteQuery.isError, inviteQuery.data?.email])
+
+	function onSubmit(values: TeammateDetails) {
 		// use invite and redirect to check email
 		navigate({
 			to: Pages.CHECK_EMAIL,
