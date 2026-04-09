@@ -1,9 +1,20 @@
-import type { ReactElement } from "react"
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
-export function SplitLayout({ children }: { children: ReactElement }) {
+type SplitLayoutProps = {
+	children: ReactNode
+	className?: string
+}
+
+export function SplitLayout({ children, className }: SplitLayoutProps) {
 	return (
-		<div className="min-h-screen bg-neutral-200/80 md:px-12 md:py-12  flex  justify-center">
-			<div className="w-full overflow-hidden md:rounded-2xl  bg-white shadow-sm flex flex-col md:flex-row md:min-h-full">
+		<div
+			className={cn(
+				"flex min-h-screen bg-neutral-200/80 justify-center md:px-12 md:py-12",
+				className,
+			)}
+		>
+			<div className="flex w-full flex-col overflow-hidden bg-white shadow-sm md:flex-row md:min-h-full md:rounded-2xl">
 				<div className="relative min-h-52 shrink-0 sm:min-h-56 md:min-h-0 md:w-3/5">
 					<img
 						src="/meditation.svg"
