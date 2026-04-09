@@ -6,9 +6,11 @@ import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
-import LoginPage from "@/features/auth/login-page.tsx"
 import { screen, waitFor } from "@testing-library/react"
 import { mockError } from "@/test/helpers/mocks.ts"
+import {makeAuthTestRouter} from "@/test/helpers/navigate.tsx";
+import {Pages} from "@/utils/pages.ts";
+import {RouterProvider} from "@tanstack/react-router";
 
 describe("Login page", () => {
 	let user: UserEvent
@@ -18,9 +20,12 @@ describe("Login page", () => {
 		user = userEvent.setup()
 	})
 
-	function setupLoginPage() {
+	async function setupLoginPage() {
 		const queryClient = createTestQueryClient()
-		renderWithQueryClient(<LoginPage />, { queryClient })
+        const router = makeAuthTestRouter()
+        await router.navigate({ to: Pages.LOGIN })
+        renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+        return { router }
 	}
 
 	function assertSubmitButtonIsDisabled() {
@@ -38,7 +43,7 @@ describe("Login page", () => {
 	}
 
 	test("user can login", async () => {
-		setupLoginPage()
+		await setupLoginPage()
 		assertSubmitButtonIsDisabled()
 
 		await enterEmail("sam@useenvoye.co")
@@ -62,7 +67,7 @@ describe("Login page", () => {
 			mockError(HttpStatusCode.Unauthorized),
 		)
 
-		setupLoginPage()
+		await setupLoginPage()
 		assertSubmitButtonIsDisabled()
 
 		await enterEmail("sam@useenvoye.co")
