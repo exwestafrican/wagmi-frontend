@@ -23,4 +23,5 @@ export const ROLES = {
 export const CHECK_MAIL_REASON = {
 	LOGIN_SUCCESS: "login-success",
 	SIGNUP_SUCCESS: "signup-success",
+	INVITE_ACCEPTED_SUCCESS: "invite-accepted-success",
 }

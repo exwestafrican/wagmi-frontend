@@ -6,7 +6,7 @@ import { CHECK_MAIL_REASON } from "@/constants.ts"
 function LoginSuccessMessage({ email }: { email: string }) {
 	return (
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
-			We sent you a magic link at{" "}
+			We sent you a magic link to{" "}
 			<span className="font-semibold text-neutral-900">{email}</span> so you can
 			get into your workspace.
 		</p>
@@ -16,9 +16,19 @@ function LoginSuccessMessage({ email }: { email: string }) {
 function SignupSuccessMessage({ email }: { email: string }) {
 	return (
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
-			We sent you a confirmation email at{" "}
+			We sent you a confirmation email to{" "}
 			<span className="font-semibold text-neutral-900">{email}</span>. Follow
 			the link inside to get started.
+		</p>
+	)
+}
+
+function InviteSuccessMessage({ email }: { email: string }) {
+	return (
+		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
+			We sent you a confirmation email to{" "}
+			<span className="font-semibold text-neutral-900">{email}</span>. Follow
+			the link to join the conversation.
 		</p>
 	)
 }
@@ -30,10 +40,10 @@ export function CheckEmail() {
 		switch (type) {
 			case CHECK_MAIL_REASON.LOGIN_SUCCESS:
 				return <LoginSuccessMessage email={email} />
-
 			case CHECK_MAIL_REASON.SIGNUP_SUCCESS:
 				return <SignupSuccessMessage email={email} />
-
+			case CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS:
+				return <InviteSuccessMessage email={email} />
 			default:
 				return null
 		}
