@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useLogin } from "@/features/auth/api/login.ts"
 import { toast } from "sonner"
 import { SplitLayout } from "@/common/components/split-layout.tsx"
-import { useNavigate } from "@tanstack/react-router"
+import {Link, useNavigate} from "@tanstack/react-router"
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 
@@ -89,6 +89,16 @@ const LoginPage = () => {
 						>
 							Login
 						</Button>
+
+                        <p className="text-center text-sm text-neutral-600">
+                            No account yet?{" "}
+                            <Link
+                                to={Pages.SIGNUP}
+                                className="font-medium text-[#3B82F6] hover:underline"
+                            >
+                                Sign up
+                            </Link>
+                        </p>
 					</form>
 				</Form>
 			</div>
