@@ -12,9 +12,16 @@ export const ApiPaths = {
 	ROADMAP_FEATURE_REQUEST: "/roadmap/feature-request",
 	ROADMAP_FUTURE_FEATURES: "/roadmap/future-features",
 	INVITE_TEAMMATES: "/workspace/invite-teammates",
+	VERIFY_INVITE: "/workspace/verify-invite",
 } as const
 
 export const ROLES = {
 	WorkspaceAdmin: "WorkspaceAdmin",
 	SupportStaff: "SupportStaff",
+}
+
+export const CHECK_MAIL_REASON = {
+	LOGIN_SUCCESS: "login-success",
+	SIGNUP_SUCCESS: "signup-success",
+	INVITE_ACCEPTED_SUCCESS: "invite-accepted-success",
 }

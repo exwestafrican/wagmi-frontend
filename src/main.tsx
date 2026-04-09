@@ -25,6 +25,8 @@ import { z } from "zod"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
+import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
+import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -82,6 +84,25 @@ const existingWorkspaceSetupRoute = createRoute({
 	component: ExistingWorkspaceSetup,
 })
 
+const acceptInviteRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/workspace-invite",
+	validateSearch: z.object({
+		inviteCode: z.string(),
+	}),
+	component: AcceptInvite,
+})
+
+const checkEmailRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/check-email",
+	validateSearch: z.object({
+		email: z.email(),
+		type: z.string(),
+	}),
+	component: CheckEmail,
+})
+
 // workspace route
 const workspaceRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -108,6 +129,8 @@ const routeTree = rootRoute.addChildren([
 	workspaceRoute,
 	signupRoute,
 	loginRoute,
+	acceptInviteRoute,
+	checkEmailRoute,
 ])
 
 const router = createRouter({

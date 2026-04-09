@@ -4,4 +4,6 @@ export const Pages = {
 	WORKSPACE: "/workspace",
 	LOGIN: "/login",
 	SIGNUP: "/signup",
+	ACCEPT_INVITE: "/workspace-invite",
+	CHECK_EMAIL: "/check-email",
 }
