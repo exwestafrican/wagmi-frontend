@@ -17,12 +17,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useLogin } from "@/features/auth/api/login.ts"
 import { toast } from "sonner"
-import { useState } from "react"
-import AuthSuccess from "@/features/auth/component/auth.success.tsx"
+import { SplitLayout } from "@/common/components/split-layout.tsx"
+import { useNavigate } from "@tanstack/react-router"
+import { Pages } from "@/utils/pages.ts"
+import { CHECK_MAIL_REASON } from "@/constants.ts"
 
 const LoginPage = () => {
+	const navigate = useNavigate()
 	const { mutate: loginUser } = useLogin()
-	const [loginSuccessful, setloginSuccessful] = useState(false)
 	const form = useForm<LoginData>({
 		resolver: zodResolver(loginSchema),
 		mode: "onChange",
@@ -34,7 +36,10 @@ const LoginPage = () => {
 		loginUser(data, {
 			onSuccess: () => {
 				form.reset()
-				setloginSuccessful(true)
+				navigate({
+					to: Pages.CHECK_EMAIL,
+					search: { email: data.email, type: CHECK_MAIL_REASON.LOGIN_SUCCESS },
+				})
 			},
 			onError: async () => {
 				form.reset()
@@ -45,43 +50,49 @@ const LoginPage = () => {
 		})
 	}
 
-	if (loginSuccessful) {
-		return <AuthSuccess message={"Magic Link sent to Email 🍾🍾"} />
-	}
-
 	return (
-		<div className="flex flex-row min-h-screen justify-center items-center">
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="w-full md:max-w-125 lg:max-w-175 flex flex-col gap-4"
-				>
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Email</FormLabel>
-								<FormControl>
-									<Input placeholder="jd@xxx.com" {...field} />
-								</FormControl>
-								<FormDescription className="text-xs">
-									Please enter your registered email address
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-					<Button
-						disabled={!form.formState.isValid}
-						className="cursor-pointer"
-						type="submit"
+		<SplitLayout>
+			<div className="flex flex-1 flex-col justify-center  px-6 py-10 sm:px-10 md:px-12 lg:px-14">
+				<div className="mb-8 w-full max-w-md">
+					<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+						Welcome back
+					</h1>
+					<p className="mt-2 text-sm text-neutral-500 sm:text-base">
+						Ready to kick some but?!
+					</p>
+				</div>
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="w-full md:max-w-125 lg:max-w-175 flex flex-col gap-4 "
 					>
-						Login
-					</Button>
-				</form>
-			</Form>
-		</div>
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Email</FormLabel>
+									<FormControl>
+										<Input placeholder="jd@xxx.com" {...field} />
+									</FormControl>
+									<FormDescription className="text-xs">
+										Please enter your registered email address
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<Button
+							disabled={!form.formState.isValid}
+							className="cursor-pointer"
+							type="submit"
+						>
+							Login
+						</Button>
+					</form>
+				</Form>
+			</div>
+		</SplitLayout>
 	)
 }
 

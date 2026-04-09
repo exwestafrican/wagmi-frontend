@@ -16,16 +16,15 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useSignup } from "@/features/auth/api/signup.ts"
-import { useState } from "react"
 import { type AxiosError, HttpStatusCode } from "axios"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Pages } from "@/utils/pages.ts"
 import { toast } from "sonner"
-import AuthSuccess from "@/features/auth/component/auth.success.tsx"
+import { SplitLayout } from "@/common/components/split-layout.tsx"
+import { CHECK_MAIL_REASON } from "@/constants.ts"
 
 const SignupPage = () => {
 	const { mutate: signupUser } = useSignup()
-	const [signupSuccessful, setSignupSuccessful] = useState(false)
 	const navigate = useNavigate()
 
 	const form = useForm<SignupData>({
@@ -47,7 +46,13 @@ const SignupPage = () => {
 		signupUser(signUpdata, {
 			onSuccess: () => {
 				form.reset()
-				setSignupSuccessful(true)
+				navigate({
+					to: Pages.CHECK_EMAIL,
+					search: {
+						email: signUpdata.email,
+						type: CHECK_MAIL_REASON.SIGNUP_SUCCESS,
+					},
+				})
 			},
 			onError: async (error: unknown) => {
 				form.reset()
@@ -75,159 +80,132 @@ const SignupPage = () => {
 		})
 	}
 
-	if (signupSuccessful) {
-		return <AuthSuccess message={"Signup successful"} />
-	}
-
 	return (
-		<div className="min-h-screen bg-neutral-200/80 md:px-12 md:py-12  flex  justify-center">
-			<div className="w-full overflow-hidden md:rounded-2xl  bg-white shadow-sm flex flex-col md:flex-row md:min-h-full">
-				<div className="relative min-h-52 shrink-0 sm:min-h-56 md:min-h-0 md:w-3/5">
-					<img
-						src="/smoot.jpeg"
-						alt=""
-						className="absolute inset-0 size-full object-cover object-top"
-					/>
-					<div
-						className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10"
-						aria-hidden
-					/>
-					<div className="absolute inset-x-0 bottom-0 p-6 md:p-10 text-white">
-						<p className="text-2xl font-semibold tracking-tight md:text-3xl">
-							Envoye
-						</p>
-						<p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90">
-							Comfortable workflows and a clear path from idea to delivery with
-							Envoye.
-						</p>
-					</div>
+		<SplitLayout>
+			<div className="flex flex-1 flex-col justify-center items-center  px-6 py-10 sm:px-10 md:px-12 lg:px-14">
+				<div className="mb-8 w-full max-w-md">
+					<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+						Let&apos;s sign you up
+					</h1>
+					<p className="mt-2 text-sm text-neutral-500 sm:text-base">
+						Create an account
+					</p>
 				</div>
 
-				<div className="flex flex-1 flex-col justify-center items-center  px-6 py-10 sm:px-10 md:px-12 lg:px-14">
-					<div className="mb-8 w-full max-w-md">
-						<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-							Let&apos;s sign you up
-						</h1>
-						<p className="mt-2 text-sm text-neutral-500 sm:text-base">
-							Create an account
-						</p>
-					</div>
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="flex w-full max-w-md flex-col gap-5 "
+					>
+						<FormField
+							control={form.control}
+							name="firstName"
+							render={({ field }) => (
+								<FormItem className="gap-2">
+									<FormLabel className="font-semibold text-neutral-800">
+										First Name
+									</FormLabel>
+									<FormControl>
+										<Input
+											data-testid="first-name"
+											placeholder="John"
+											className="signup-field-input"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage data-testid="firstname-form-message" />
+								</FormItem>
+							)}
+						/>
 
-					<Form {...form}>
-						<form
-							onSubmit={form.handleSubmit(onSubmit)}
-							className="flex w-full max-w-md flex-col gap-5 "
+						<FormField
+							control={form.control}
+							name="lastName"
+							render={({ field }) => (
+								<FormItem className="gap-2">
+									<FormLabel className="font-semibold text-neutral-800">
+										Last Name
+									</FormLabel>
+									<FormControl>
+										<Input
+											data-testid="last-name"
+											placeholder="Doe"
+											className="signup-field-input"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage data-testid="lastname-form-message" />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem className="gap-2">
+									<FormLabel className="font-semibold text-neutral-800">
+										Work Email
+									</FormLabel>
+									<FormControl>
+										<Input
+											data-testid="email"
+											placeholder="jd@xxx.com"
+											className="signup-field-input"
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription className="text-xs text-neutral-500">
+										No work email? We accept personal emails too.
+									</FormDescription>
+									<FormMessage data-testid="email-form-message" />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="companyName"
+							render={({ field }) => (
+								<FormItem className="gap-2">
+									<FormLabel className="font-semibold text-neutral-800">
+										Company Name
+									</FormLabel>
+									<FormControl>
+										<Input
+											data-testid="company-name"
+											placeholder="Doe.inc"
+											className="signup-field-input"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage data-testid="companyname-form-message" />
+								</FormItem>
+							)}
+						/>
+
+						<Button
+							disabled={!form.formState.isValid}
+							type="submit"
+							className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
+							data-testid="submit-button"
 						>
-							<FormField
-								control={form.control}
-								name="firstName"
-								render={({ field }) => (
-									<FormItem className="gap-2">
-										<FormLabel className="font-semibold text-neutral-800">
-											First Name
-										</FormLabel>
-										<FormControl>
-											<Input
-												data-testid="first-name"
-												placeholder="John"
-												className="signup-field-input"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage data-testid="firstname-form-message" />
-									</FormItem>
-								)}
-							/>
+							Sign Up
+						</Button>
 
-							<FormField
-								control={form.control}
-								name="lastName"
-								render={({ field }) => (
-									<FormItem className="gap-2">
-										<FormLabel className="font-semibold text-neutral-800">
-											Last Name
-										</FormLabel>
-										<FormControl>
-											<Input
-												data-testid="last-name"
-												placeholder="Doe"
-												className="signup-field-input"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage data-testid="lastname-form-message" />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="email"
-								render={({ field }) => (
-									<FormItem className="gap-2">
-										<FormLabel className="font-semibold text-neutral-800">
-											Work Email
-										</FormLabel>
-										<FormControl>
-											<Input
-												data-testid="email"
-												placeholder="jd@xxx.com"
-												className="signup-field-input"
-												{...field}
-											/>
-										</FormControl>
-										<FormDescription className="text-xs text-neutral-500">
-											No work email? We accept personal emails too.
-										</FormDescription>
-										<FormMessage data-testid="email-form-message" />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="companyName"
-								render={({ field }) => (
-									<FormItem className="gap-2">
-										<FormLabel className="font-semibold text-neutral-800">
-											Company Name
-										</FormLabel>
-										<FormControl>
-											<Input
-												data-testid="company-name"
-												placeholder="Doe.inc"
-												className="signup-field-input"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage data-testid="companyname-form-message" />
-									</FormItem>
-								)}
-							/>
-
-							<Button
-								disabled={!form.formState.isValid}
-								type="submit"
-								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
-								data-testid="submit-button"
+						<p className="text-center text-sm text-neutral-600">
+							Already have an account?{" "}
+							<Link
+								to={Pages.LOGIN}
+								className="font-medium text-[#3B82F6] hover:underline"
 							>
-								Sign Up
-							</Button>
-
-							<p className="text-center text-sm text-neutral-600">
-								Already have an account?{" "}
-								<Link
-									to={Pages.LOGIN}
-									className="font-medium text-[#3B82F6] hover:underline"
-								>
-									Sign in
-								</Link>
-							</p>
-						</form>
-					</Form>
-				</div>
+								Sign in
+							</Link>
+						</p>
+					</form>
+				</Form>
 			</div>
-		</div>
+		</SplitLayout>
 	)
 }
 
