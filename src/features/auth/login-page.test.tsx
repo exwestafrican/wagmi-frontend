@@ -8,9 +8,9 @@ import renderWithQueryClient, {
 } from "@/common/renderWithQueryClient.tsx"
 import { screen, waitFor } from "@testing-library/react"
 import { mockError } from "@/test/helpers/mocks.ts"
-import {makeAuthTestRouter} from "@/test/helpers/navigate.tsx";
-import {Pages} from "@/utils/pages.ts";
-import {RouterProvider} from "@tanstack/react-router";
+import { makeAuthTestRouter } from "@/test/helpers/navigate.tsx"
+import { Pages } from "@/utils/pages.ts"
+import { RouterProvider } from "@tanstack/react-router"
 
 describe("Login page", () => {
 	let user: UserEvent
@@ -22,10 +22,10 @@ describe("Login page", () => {
 
 	async function setupLoginPage() {
 		const queryClient = createTestQueryClient()
-        const router = makeAuthTestRouter()
-        await router.navigate({ to: Pages.LOGIN })
-        renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
-        return { router }
+		const router = makeAuthTestRouter()
+		await router.navigate({ to: Pages.LOGIN })
+		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		return { router }
 	}
 
 	function assertSubmitButtonIsDisabled() {
