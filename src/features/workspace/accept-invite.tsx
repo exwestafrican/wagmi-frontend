@@ -58,18 +58,23 @@ export function AcceptInvite() {
 		},
 	})
 
-    React.useEffect(() => {
-        const timer = setTimeout(() => {
-            if (inviteQuery.isSuccess) {
-                setVerificationCompleted(true)
-                form.setValue("email", inviteQuery.data.email)
-            } else if (inviteQuery.isError) {
-                setVerificationError(true)
-            }
-        }, LAG_MS)
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			if (inviteQuery.isSuccess) {
+				setVerificationCompleted(true)
+				form.setValue("email", inviteQuery.data.email)
+			} else if (inviteQuery.isError) {
+				setVerificationError(true)
+			}
+		}, LAG_MS)
 
-        return () => clearTimeout(timer)
-    }, [inviteQuery.isSuccess, inviteQuery.isError, inviteQuery.data?.email])
+		return () => clearTimeout(timer)
+	}, [
+		inviteQuery.isSuccess,
+		inviteQuery.isError,
+		inviteQuery.data?.email,
+		form.setValue,
+	])
 
 	function onSubmit(values: TeammateDetails) {
 		// use invite and redirect to check email
@@ -91,7 +96,7 @@ export function AcceptInvite() {
 							Welcome to the Team 🎉
 						</h1>
 						<p className="mt-2 text-sm text-neutral-500 sm:text-base">
-							{`A couple more details to help you join the conversation`}
+							{"A couple more details to help you join the conversation"}
 						</p>
 					</div>
 

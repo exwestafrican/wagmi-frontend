@@ -2,6 +2,7 @@ import { Pages } from "@/utils/pages.ts"
 import { ChevronLeft } from "lucide-react"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
+import {Button} from "@/components/ui/button.tsx";
 
 function LoginSuccessMessage({ email }: { email: string }) {
 	return (
@@ -65,7 +66,8 @@ export function CheckEmail() {
 				{renderMessage()}
 			</div>
 			<div>
-				<div
+				<Button
+                    variant="ghost"
 					onClick={() =>
 						navigate({
 							to: Pages.LOGIN,
@@ -78,7 +80,7 @@ export function CheckEmail() {
 						{" "}
 						Resend Email
 					</p>
-				</div>
+				</Button>
 			</div>
 		</div>
 	)
