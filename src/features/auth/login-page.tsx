@@ -51,8 +51,8 @@ const LoginPage = () => {
 	}
 
 	return (
-		<SplitLayout>
-			<div className="flex flex-1 flex-col justify-center  px-6 py-10 sm:px-10 md:px-12 lg:px-14">
+		<SplitLayout className="justify-center md:justify-start">
+			<div className="flex flex-1 flex-col md:justify-center justify-start  px-6 py-10 sm:px-10 md:px-12 lg:px-14  md:w-3/5">
 				<div className="mb-8 w-full max-w-md">
 					<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
 						Welcome back
