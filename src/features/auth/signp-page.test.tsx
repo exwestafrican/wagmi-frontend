@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/api-client"
 import { Pages } from "@/utils/pages.ts"
 import { mockError } from "@/test/helpers/mocks.ts"
 import { makeAuthTestRouter } from "@/test/helpers/navigate"
+import { ApiPaths, CHECK_MAIL_REASON } from "@/constants.ts"
 
 describe("Signup page", () => {
 	let user: UserEvent
@@ -188,6 +189,45 @@ describe("Signup page", () => {
 
 			await waitFor(() => {
 				expect(submitButton).toBeEnabled()
+			})
+		})
+
+		test("successful signup navigates to check email page", async () => {
+			mockApiClientPost.mockResolvedValueOnce({} as never)
+
+			const queryClient = createTestQueryClient()
+			const router = makeAuthTestRouter()
+			const navigateSpy = vi.spyOn(router, "navigate")
+			await router.navigate({ to: Pages.SIGNUP })
+			renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+
+			const signupDetails = makeSignupDetails({
+				firstName: "john",
+				lastName: "doe",
+			})
+			await userInput.enterSignUpDetails(signupDetails)
+
+			const submitButton = screen.getByTestId(formFields.submit)
+			await userInput.click(submitButton)
+
+			await waitFor(() => {
+				expect(mockApiClientPost).toHaveBeenCalledWith(
+					ApiPaths.SIGNUP_EMAIL_ONLY,
+					{
+						...signupDetails,
+						timezone: expect.any(String),
+					},
+				)
+
+				expect(navigateSpy).toHaveBeenCalledWith(
+					expect.objectContaining({
+						to: Pages.CHECK_EMAIL,
+						search: {
+							email: signupDetails.email,
+							type: CHECK_MAIL_REASON.SIGNUP_SUCCESS,
+						},
+					}),
+				)
 			})
 		})
 

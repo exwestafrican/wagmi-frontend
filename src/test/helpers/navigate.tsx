@@ -12,7 +12,9 @@ import {
 import { z } from "zod"
 import LoginPage from "@/features/auth/login-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
+import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
+import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
@@ -43,8 +45,23 @@ export function makeAuthTestRouter() {
 		component: LoginPage,
 	})
 
+	const checkEmailRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/check-email",
+		validateSearch: z.object({
+			email: z.email(),
+			type: z.string(),
+		}),
+		component: CheckEmail,
+	})
+
 	return createRouter({
-		routeTree: rootRoute.addChildren([indexRoute, signupRoute, loginRoute]),
+		routeTree: rootRoute.addChildren([
+			indexRoute,
+			signupRoute,
+			loginRoute,
+			checkEmailRoute,
+		]),
 		context: {},
 	})
 }
@@ -67,8 +84,30 @@ export function makeTestRouter() {
 		component: WorkspacePage,
 	})
 
+	const acceptInviteRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/workspace-invite",
+		validateSearch: z.object({ inviteCode: z.string() }),
+		component: AcceptInvite,
+	})
+
+	const checkEmailRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/check-email",
+		validateSearch: z.object({
+			email: z.email(),
+			type: z.string(),
+		}),
+		component: CheckEmail,
+	})
+
 	return createRouter({
-		routeTree: rootRoute.addChildren([setupRoute, workspaceRoute]),
+		routeTree: rootRoute.addChildren([
+			setupRoute,
+			workspaceRoute,
+			acceptInviteRoute,
+			checkEmailRoute,
+		]),
 		context: {},
 	})
 }
