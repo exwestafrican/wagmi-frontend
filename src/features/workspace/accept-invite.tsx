@@ -72,7 +72,7 @@ export function AcceptInvite() {
 	}, [inviteQuery.isSuccess, inviteQuery.isError])
 
 	function onSubmit(values: z.infer<typeof teammateDetailSchema>) {
-		// redirect to login flow /
+		// use invite and redirect to check email
 		navigate({
 			to: Pages.CHECK_EMAIL,
 			search: {
