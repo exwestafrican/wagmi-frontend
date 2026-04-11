@@ -86,16 +86,14 @@ export function AcceptInvite() {
 			return
 		}
 
-        console.log("accept invite",
-            {
-                workspaceCode: decodedData.workspaceCode,
-                inviteCode: decodedData.inviteCode,
-                teammateEmail: decodedData.recipientEmail,
-                firstName: values.firstName,
-                lastName: values.lastName,
-                username: values.username,
-            }
-            )
+		console.log("accept invite", {
+			workspaceCode: decodedData.workspaceCode,
+			inviteCode: decodedData.inviteCode,
+			teammateEmail: decodedData.recipientEmail,
+			firstName: values.firstName,
+			lastName: values.lastName,
+			username: values.username,
+		})
 
 		acceptInvite(
 			{
