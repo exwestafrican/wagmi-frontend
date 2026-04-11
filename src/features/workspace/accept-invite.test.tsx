@@ -66,4 +66,34 @@ describe("AcceptInvite", () => {
 		},
 		{ timeout: 15000 },
 	)
+
+	it(
+		"shows invalid invitation screen when verify invite fails",
+		async () => {
+			vi.mocked(apiClient.get).mockRejectedValueOnce(
+				new Error("invalid invite"),
+			)
+
+			await navigateToTestPage({
+				to: "/workspace-invite",
+				search: { inviteCode: "bad-code" },
+			})
+
+			await waitFor(() => {
+				expect(apiClient.get).toHaveBeenCalledWith(ApiPaths.VERIFY_INVITE, {
+					params: { inviteCode: "bad-code" },
+				})
+			})
+
+			await act(async () => {
+				await new Promise((r) => setTimeout(r, 2600))
+			})
+
+			expect(
+				screen.getByRole("heading", { name: /Ooops/i }),
+			).toBeInTheDocument()
+			expect(screen.getByTestId("invalid-invite-continue")).toBeInTheDocument()
+		},
+		{ timeout: 15000 },
+	)
 })

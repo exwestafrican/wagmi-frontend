@@ -13,6 +13,7 @@ export const ApiPaths = {
 	ROADMAP_FUTURE_FEATURES: "/roadmap/future-features",
 	INVITE_TEAMMATES: "/workspace/invite-teammates",
 	VERIFY_INVITE: "/workspace/verify-invite",
+	ACCEPT_INVITE: "workspace/accept-invite",
 } as const
 
 export const ROLES = {

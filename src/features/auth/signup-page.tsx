@@ -81,7 +81,7 @@ const SignupPage = () => {
 	}
 
 	return (
-		<SplitLayout>
+		<SplitLayout className="justify-center md:justify-start">
 			<div className="flex flex-1 flex-col justify-center items-center  px-6 py-10 sm:px-10 md:px-12 lg:px-14">
 				<div className="mb-8 w-full max-w-md">
 					<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">

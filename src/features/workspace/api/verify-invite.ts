@@ -5,8 +5,9 @@ import { ApiPaths } from "@/constants.ts"
 const VERIFY_INVITE = "verify-invite"
 
 interface DecodedInvite {
-	email: string
-	workspace: string
+	recipientEmail: string
+	workspaceCode: string
+	inviteCode: string
 }
 
 export function useVerifyInvite(inviteCode: string) {
@@ -17,8 +18,9 @@ export function useVerifyInvite(inviteCode: string) {
 				params: { inviteCode },
 			})
 			return {
-				email: res.data.recipientEmail,
-				workspace: res.data.workspace,
+				recipientEmail: res.data.recipientEmail,
+				workspaceCode: res.data.workspaceCode,
+				inviteCode: res.data.inviteCode,
 			}
 		},
 		staleTime: Number.POSITIVE_INFINITY,
