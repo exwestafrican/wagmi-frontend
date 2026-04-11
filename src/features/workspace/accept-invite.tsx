@@ -85,7 +85,7 @@ export function AcceptInvite() {
 		acceptInvite(
 			{
 				workspaceCode: decodedData.workspaceCode,
-				inviteCode: "",
+				inviteCode: decodedData.inviteCode,
 				teammateEmail: decodedData.recipientEmail,
 				firstName: values.firstName,
 				lastName: values.lastName,

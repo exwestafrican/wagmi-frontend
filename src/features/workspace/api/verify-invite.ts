@@ -7,6 +7,7 @@ const VERIFY_INVITE = "verify-invite"
 interface DecodedInvite {
 	recipientEmail: string
 	workspaceCode: string
+    inviteCode: string
 }
 
 export function useVerifyInvite(inviteCode: string) {
@@ -19,6 +20,7 @@ export function useVerifyInvite(inviteCode: string) {
 			return {
 				recipientEmail: res.data.recipientEmail,
 				workspaceCode: res.data.workspaceCode,
+                inviteCode: res.data.inviteCode,
 			}
 		},
 		staleTime: Number.POSITIVE_INFINITY,
