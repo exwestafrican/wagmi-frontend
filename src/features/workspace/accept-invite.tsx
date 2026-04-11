@@ -29,8 +29,8 @@ import { Progress } from "@/components/ui/progress.tsx"
 import React from "react"
 import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 import { useVerifyInvite } from "@/features/workspace/api/verify-invite.ts"
-import WithErrorHandling from "@/common/with-error-handling.tsx"
 import { Button } from "@/components/ui/button.tsx"
+import { InvalidInviteScreen } from "@/features/workspace/invalid-invite-screen.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 
@@ -85,6 +85,10 @@ export function AcceptInvite() {
 				type: CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS,
 			},
 		})
+	}
+
+	if (verificationError) {
+		return <InvalidInviteScreen />
 	}
 
 	if (verificationCompleted) {
@@ -212,21 +216,19 @@ export function AcceptInvite() {
 	}
 
 	return (
-		<WithErrorHandling hasError={() => verificationError}>
-			<Empty className="w-full min-h-screen justify-center items-center">
-				<EmptyHeader>
-					<EmptyMedia variant="icon">
-						<Spinner />
-					</EmptyMedia>
-					<EmptyTitle>Doing Some Cool Stuff</EmptyTitle>
-					<EmptyDescription>
-						Please wait while we verify your invite...
-					</EmptyDescription>
-				</EmptyHeader>
-				<EmptyContent>
-					<Progress value={progress} />
-				</EmptyContent>
-			</Empty>
-		</WithErrorHandling>
+		<Empty className="w-full min-h-screen justify-center items-center border-0">
+			<EmptyHeader>
+				<EmptyMedia variant="icon">
+					<Spinner />
+				</EmptyMedia>
+				<EmptyTitle>Doing Some Cool Stuff</EmptyTitle>
+				<EmptyDescription>
+					Please wait while we verify your invite...
+				</EmptyDescription>
+			</EmptyHeader>
+			<EmptyContent>
+				<Progress value={progress} />
+			</EmptyContent>
+		</Empty>
 	)
 }
