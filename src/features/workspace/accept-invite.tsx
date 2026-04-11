@@ -63,9 +63,8 @@ export function AcceptInvite() {
 	React.useEffect(() => {
 		const timer = setTimeout(() => {
 			if (inviteQuery.isSuccess) {
-				const decodedData = inviteQuery.data
 				setVerificationCompleted(true)
-				form.setValue("email", decodedData.recipientEmail)
+				form.setValue("email", inviteQuery.data.recipientEmail)
 			} else if (inviteQuery.isError) {
 				setVerificationError(true)
 			}
@@ -80,7 +79,12 @@ export function AcceptInvite() {
 	])
 
 	function onSubmit(values: TeammateDetails) {
-		const decodedData = inviteQuery.data!
+		const decodedData = inviteQuery.data
+
+		if (!decodedData) {
+			setVerificationError(true)
+			return
+		}
 
 		acceptInvite(
 			{
