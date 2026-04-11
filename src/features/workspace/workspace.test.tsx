@@ -11,11 +11,29 @@ import {
 	type Workspace,
 	WorkspaceStatus,
 } from "@/features/workspace/interface/workspace.interface.ts"
+import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
+import { ApiPaths } from "@/constants.ts"
+import { teammateFactory } from "@/test/factory/teammate.ts"
 
 const envoyeWorkspace = {
 	code: WorkspaceCode.ENVOYE,
 	name: "Envoye",
 	status: WorkspaceStatus.ACTIVE,
+}
+
+function mockWorkspaceAndCurrentTeammate(
+	workspace: Workspace,
+	teammate: Teammate = teammateFactory.build(),
+) {
+	vi.mocked(apiClient.get).mockImplementation((url: string) => {
+		if (url === ApiPaths.WORKSPACE) {
+			return Promise.resolve({ data: workspace })
+		}
+		if (url === ApiPaths.CURRENT_TEAMMATE) {
+			return Promise.resolve({ data: teammate })
+		}
+		return Promise.reject(new Error(`Unexpected GET ${url}`))
+	})
 }
 
 describe("Workspace Test", () => {
@@ -25,9 +43,12 @@ describe("Workspace Test", () => {
 		user = userEvent.setup()
 	})
 
-	async function navigateToWorkspacePage(workspace: Workspace) {
+	async function navigateToWorkspacePage(
+		workspace: Workspace,
+		teammate: Teammate = teammateFactory.build(),
+	) {
 		useAuthStore.getState().setAuthToken("fake-token")
-		vi.mocked(apiClient.get).mockResolvedValue({ data: workspace })
+		mockWorkspaceAndCurrentTeammate(workspace, teammate)
 		return await navigateToTestPage({
 			to: "/workspace",
 			search: { code: workspace.code },
@@ -39,6 +60,21 @@ describe("Workspace Test", () => {
 		await user.click(menuTrigger)
 		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
 	}
+
+	test("renders current teammate email in sidebar", async () => {
+		const sidebarEmail = "sidebar.user@useenvoye.com"
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			teammateFactory.build({ email: sidebarEmail }),
+		)
+		expect(await screen.findByText(sidebarEmail)).toBeInTheDocument()
+		expect(apiClient.get).toHaveBeenCalledWith(
+			ApiPaths.CURRENT_TEAMMATE,
+			expect.objectContaining({
+				params: { workspaceCode: envoyeWorkspace.code },
+			}),
+		)
+	})
 
 	describe("workspace invite", () => {
 		test("on click cancel we close modal and clear all emails typed in by user", async () => {

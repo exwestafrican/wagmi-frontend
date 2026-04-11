@@ -13,6 +13,7 @@ import {
 
 import { MoreVertical } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
+import { useCurrentTeammate } from "@/features/workspace/api/current-teammate.ts"
 import { useWorkspace } from "@/features/workspace/api/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useIsMobile } from "@/hooks/use-mobile.ts"
@@ -23,6 +24,7 @@ export default function WorkspacePage() {
 	const [openTeammateInviteModal, setOpenTeammateInviteModal] = useState(false)
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
+	const { data: teammate } = useCurrentTeammate(code)
 	const isMobile = useIsMobile()
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
@@ -38,7 +40,7 @@ export default function WorkspacePage() {
 					<SidebarHeader>
 						<div className="flex items-center justify-between">
 							<span className="text-gray-800 text-sm truncate">
-								tumise.alade@useenvoye.com
+								{teammate?.email ?? ""}
 							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
