@@ -90,7 +90,7 @@ describe("AcceptInvite", () => {
 			})
 
 			expect(
-				screen.getByRole("heading", { name: /invalid invitation/i }),
+				screen.getByRole("heading", { name: /Ooops/i }),
 			).toBeInTheDocument()
 			expect(screen.getByTestId("invalid-invite-continue")).toBeInTheDocument()
 		},

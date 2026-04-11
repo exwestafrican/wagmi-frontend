@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { InvalidInviteScreen } from "@/features/workspace/invalid-invite-screen.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
+import { useAcceptInvite } from "@/features/workspace/api/accept-invite.ts"
 
 const LAG_MS = 2500
 
@@ -44,6 +45,7 @@ export function AcceptInvite() {
 	const [verificationError, setVerificationError] = React.useState(false)
 
 	const inviteQuery = useVerifyInvite(inviteCode)
+	const { mutate: acceptInvite, isPending } = useAcceptInvite()
 	const progress = useFakeProgress(verificationCompleted)
 	const navigate = useNavigate()
 
@@ -61,8 +63,9 @@ export function AcceptInvite() {
 	React.useEffect(() => {
 		const timer = setTimeout(() => {
 			if (inviteQuery.isSuccess) {
+				const decodedData = inviteQuery.data
 				setVerificationCompleted(true)
-				form.setValue("email", inviteQuery.data.email)
+				form.setValue("email", decodedData.recipientEmail)
 			} else if (inviteQuery.isError) {
 				setVerificationError(true)
 			}
@@ -72,19 +75,37 @@ export function AcceptInvite() {
 	}, [
 		inviteQuery.isSuccess,
 		inviteQuery.isError,
-		inviteQuery.data?.email,
+		inviteQuery.data?.recipientEmail,
 		form.setValue,
 	])
 
 	function onSubmit(values: TeammateDetails) {
-		// use invite and redirect to check email
-		navigate({
-			to: Pages.CHECK_EMAIL,
-			search: {
-				email: values.email,
-				type: CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS,
+		const decodedData = inviteQuery.data!
+
+		acceptInvite(
+			{
+				workspaceCode: decodedData.workspaceCode,
+				inviteCode: "",
+				teammateEmail: decodedData.recipientEmail,
+				firstName: values.firstName,
+				lastName: values.lastName,
+				username: values.username,
 			},
-		})
+			{
+				onSuccess: () => {
+					navigate({
+						to: Pages.CHECK_EMAIL,
+						search: {
+							email: values.email,
+							type: CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS,
+						},
+					})
+				},
+				onError: () => {
+					setVerificationError(true)
+				},
+			},
+		)
 	}
 
 	if (verificationError) {
@@ -201,12 +222,12 @@ export function AcceptInvite() {
 							/>
 
 							<Button
-								disabled={!form.formState.isValid}
+								disabled={!form.formState.isValid || isPending}
 								type="submit"
 								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
 								data-testid="submit-button"
 							>
-								Join Workspace
+								{isPending ? "Setting up...." : "Join Workspace"}
 							</Button>
 						</form>
 					</Form>
