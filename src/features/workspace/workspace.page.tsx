@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton"
 import {
 	SidebarHeader,
 	SidebarProvider,
@@ -13,6 +14,7 @@ import {
 
 import { MoreVertical } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
+import { useCurrentTeammate } from "@/features/workspace/api/current-teammate.ts"
 import { useWorkspace } from "@/features/workspace/api/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useIsMobile } from "@/hooks/use-mobile.ts"
@@ -23,6 +25,8 @@ export default function WorkspacePage() {
 	const [openTeammateInviteModal, setOpenTeammateInviteModal] = useState(false)
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
+	const { data: teammate, isPending: isTeammateLoading } =
+		useCurrentTeammate(code)
 	const isMobile = useIsMobile()
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
@@ -36,10 +40,14 @@ export default function WorkspacePage() {
 			<SidebarProvider>
 				<Sidebar>
 					<SidebarHeader>
-						<div className="flex items-center justify-between">
-							<span className="text-gray-800 text-sm truncate">
-								tumise.alade@useenvoye.com
-							</span>
+						<div className="flex items-center justify-between gap-2 min-w-0">
+							<div className="text-gray-800 text-sm truncate min-w-0 flex-1">
+								{isTeammateLoading ? (
+									<Skeleton className="h-4 w-44 max-w-full" />
+								) : (
+									(teammate?.email ?? "")
+								)}
+							</div>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<button

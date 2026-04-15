@@ -116,6 +116,10 @@ export function AcceptInvite() {
 		return <InvalidInviteScreen />
 	}
 
+	if (verificationError) {
+		return <InvalidInviteScreen />
+	}
+
 	if (verificationCompleted) {
 		return (
 			<SplitLayout>
