@@ -24,7 +24,7 @@ import { SplitLayout } from "@/common/components/split-layout.tsx"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 
 const SignupPage = () => {
-	const { mutate: signupUser } = useSignup()
+	const { mutate: signupUser, isPending } = useSignup()
 	const navigate = useNavigate()
 
 	const form = useForm<SignupData>({
@@ -185,12 +185,12 @@ const SignupPage = () => {
 						/>
 
 						<Button
-							disabled={!form.formState.isValid}
+							disabled={!form.formState.isValid || isPending}
 							type="submit"
 							className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
 							data-testid="submit-button"
 						>
-							Sign Up
+							{isPending ? "Doodling.." : "Sign Up"}
 						</Button>
 
 						<p className="text-center text-sm text-neutral-600">
