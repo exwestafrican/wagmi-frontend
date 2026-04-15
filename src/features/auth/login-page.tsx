@@ -24,7 +24,7 @@ import { CHECK_MAIL_REASON } from "@/constants.ts"
 
 const LoginPage = () => {
 	const navigate = useNavigate()
-	const { mutate: loginUser } = useLogin()
+	const { mutate: loginUser, isPending } = useLogin()
 	const form = useForm<LoginData>({
 		resolver: zodResolver(loginSchema),
 		mode: "onChange",
@@ -83,11 +83,11 @@ const LoginPage = () => {
 							)}
 						/>
 						<Button
-							disabled={!form.formState.isValid}
+							disabled={!form.formState.isValid || isPending}
 							className="cursor-pointer"
 							type="submit"
 						>
-							Login
+							{isPending ? "Frolicking..." : "Login"}
 						</Button>
 
 						<p className="text-center text-sm text-neutral-600">
