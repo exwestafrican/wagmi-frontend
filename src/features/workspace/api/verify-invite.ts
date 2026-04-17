@@ -4,7 +4,7 @@ import { ApiPaths } from "@/constants.ts"
 
 const VERIFY_INVITE = "verify-invite"
 
-interface DecodedInvite {
+export interface DecodedInvite {
 	recipientEmail: string
 	workspaceCode: string
 	inviteCode: string
