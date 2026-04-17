@@ -29,7 +29,6 @@ describe("AcceptInvite", () => {
 		return { navigateSpy }
 	}
 
-
 	it(
 		"navigates to check email after user enters details",
 		{ timeout: 15000 },
