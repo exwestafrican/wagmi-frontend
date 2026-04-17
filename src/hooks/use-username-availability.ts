@@ -16,8 +16,8 @@ export function useUsernameAvailability(
 	)
 
 	useEffect(() => {
-		form.clearErrors("username")
-	}, [debouncedUsername, form.clearErrors])
+		if (username !== undefined) form.clearErrors("username")
+	}, [username, form])
 
 	useEffect(() => {
 		if (isError && error?.response?.status === 409) {
