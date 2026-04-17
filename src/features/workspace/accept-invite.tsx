@@ -34,6 +34,7 @@ import { InvalidInviteScreen } from "@/features/workspace/invalid-invite-screen.
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 import { useAcceptInvite } from "@/features/workspace/api/accept-invite.ts"
+import { useUsernameAvailability } from "@/hooks/use-username-availability.ts"
 
 const LAG_MS = 2500
 
@@ -78,6 +79,9 @@ export function AcceptInvite() {
 		form.setValue,
 	])
 
+	const workspaceCode = inviteQuery.data?.workspaceCode ?? ""
+	const usernameAvailability = useUsernameAvailability(form, workspaceCode)
+
 	function onSubmit(values: TeammateDetails) {
 		const decodedData = inviteQuery.data
 
@@ -110,10 +114,6 @@ export function AcceptInvite() {
 				},
 			},
 		)
-	}
-
-	if (verificationError) {
-		return <InvalidInviteScreen />
 	}
 
 	if (verificationError) {
@@ -217,12 +217,26 @@ export function AcceptInvite() {
 											/>
 										</FormControl>
 										<FormDescription className="text-xs text-neutral-500">
-											This is how your teammates will see you. Keep it simple
-											and easy to find, something like{" "}
-											<code className="bg-gray-100 px-1 rounded">
-												first.lastname
-											</code>{" "}
-											works great!{" "}
+											{usernameAvailability.isFetching && (
+												<span className="text-neutral-400">
+													Checking availability...
+												</span>
+											)}
+											{usernameAvailability.isAvailable && (
+												<span className="text-green-600">
+													Username is available
+												</span>
+											)}
+											{usernameAvailability.showHint && (
+												<>
+													This is how teammates will see you. Keep it simple and
+													easy to find, something like{" "}
+													<code className="bg-gray-100 px-1 rounded">
+														first.lastname
+													</code>{" "}
+													works great!
+												</>
+											)}
 										</FormDescription>
 										<FormMessage data-testid="teammate-username-form-message" />
 									</FormItem>
