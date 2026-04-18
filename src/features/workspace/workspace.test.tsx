@@ -62,12 +62,12 @@ describe("Workspace Test", () => {
 	}
 
 	test("renders current teammate email in sidebar", async () => {
-		const sidebarEmail = "sidebar.user@useenvoye.com"
+		const sidebarUsername = "tboy"
 		await navigateToWorkspacePage(
 			envoyeWorkspace,
-			teammateFactory.build({ email: sidebarEmail }),
+			teammateFactory.build({ username: sidebarUsername }),
 		)
-		expect(await screen.findByText(sidebarEmail)).toBeInTheDocument()
+		expect(await screen.findByText(sidebarUsername)).toBeInTheDocument()
 		expect(apiClient.get).toHaveBeenCalledWith(
 			ApiPaths.CURRENT_TEAMMATE,
 			expect.objectContaining({

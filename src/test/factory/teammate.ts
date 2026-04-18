@@ -6,5 +6,6 @@ export const teammateFactory = Factory.define<Teammate>(() => ({
 	id: faker.string.uuid(),
 	email: faker.internet.email(),
 	firstName: faker.person.firstName(),
+	username: faker.internet.username(),
 	lastName: faker.person.lastName(),
 }))
