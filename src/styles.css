@@ -58,7 +58,7 @@ code {
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-muted-brown: #6b6760;
 	--color-chestnut-brown: #8b5a3c;
-    --color-sidebar-active: #9d9a8e';
+	--color-sidebar-active: #9d9a8e;
 }
 
 :root {
@@ -151,8 +151,5 @@ code {
 @layer utilities {
 	.sidebar-group-layout {
 		@apply font-semibold uppercase tracking-wide;
-	}
-	.sidebar-menu-item {
-		@apply w-full flex items-center gap-2 cursor-pointer hover:bg-gray-200 text-muted-brown px-2 py-1 rounded-md;
 	}
 }

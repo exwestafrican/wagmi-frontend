@@ -7,6 +7,7 @@ import {
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuBadge,
+	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarProvider,
 	SidebarTrigger,
@@ -111,10 +112,9 @@ export default function WorkspacePage() {
 		},
 	]
 
-
-    const isActiveTab = (tabId: string): boolean => {
-        return selectedTab === tabId
-    }
+	const isActiveTab = (tabId: string): boolean => {
+		return selectedTab === tabId
+	}
 
 	return (
 		<div>
@@ -169,15 +169,23 @@ export default function WorkspacePage() {
 						<SideNavGroupWithTopSeparator>
 							<SidebarMenu className="px-3">
 								{mainMenuItems.map((item) => (
-									<SidebarMenuItem
-										onClick={() => setSelectedTab(item.id)}
-										key={item.id}
-										className={`sidebar-menu-item ${isActiveTab(item.id) && 'bg-sidebar-active'}`}
-									>
-										<item.icon className="h-4 w-4 " />
-										<span className="text-left font-normal text-xs ">
-											{item.label}
-										</span>
+									<SidebarMenuItem key={item.id}>
+										<SidebarMenuButton
+											className="cursor-pointer"
+											size="sm"
+											asChild
+											onClick={() => setSelectedTab(item.id)}
+											isActive={isActiveTab(item.id)}
+										>
+											<div>
+												<div className="flex gap-2 items-center text-muted-brown">
+													<item.icon className="h-4 w-4" />
+													<span className="text-left font-normal text-xs ">
+														{item.label}
+													</span>
+												</div>
+											</div>
+										</SidebarMenuButton>
 									</SidebarMenuItem>
 								))}
 							</SidebarMenu>
@@ -188,23 +196,28 @@ export default function WorkspacePage() {
 							</SidebarGroupLabel>
 							<SidebarMenu className="px-3">
 								{supportMenuItems.map((item) => (
-									<SidebarMenuItem
-										onClick={() => setSelectedTab(item.id)}
-										key={item.id}
-										className={"sidebar-menu-item"}
-									>
-										<item.icon className="h-4 w-4 " />
-										<span className="text-left font-normal text-xs ">
-											{item.label}
-										</span>
-
-										{item.count && (
-											<SidebarMenuBadge>
-												<span className="text-xs px-1.5 py-0.5 rounded-full bg-chestnut-brown text-stone-100">
-													{item.count}
-												</span>
-											</SidebarMenuBadge>
-										)}
+									<SidebarMenuItem key={item.id}>
+										<SidebarMenuButton
+											className="cursor-pointer"
+											size="sm"
+											asChild
+											onClick={() => setSelectedTab(item.id)}
+											isActive={isActiveTab(item.id)}
+										>
+											<div>
+												<div className="flex gap-2 items-center text-muted-brown">
+													<item.icon className="h-4 w-4" />
+													<span>{item.label}</span>
+												</div>
+												{item.count && (
+													<SidebarMenuBadge>
+														<span className="text-xs px-1.5 py-0.5 rounded-full bg-chestnut-brown text-stone-100">
+															{item.count}
+														</span>
+													</SidebarMenuBadge>
+												)}
+											</div>
+										</SidebarMenuButton>
 									</SidebarMenuItem>
 								))}
 							</SidebarMenu>
