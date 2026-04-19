@@ -15,6 +15,7 @@ export const ApiPaths = {
 	CURRENT_TEAMMATE: "/teammates/me",
 	VERIFY_INVITE: "/workspace/verify-invite",
 	ACCEPT_INVITE: "workspace/accept-invite",
+	CHECK_USERNAME: "/teammates/check-username",
 } as const
 
 export const ROLES = {

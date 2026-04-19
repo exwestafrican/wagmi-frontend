@@ -4,13 +4,20 @@ import { faker } from "@faker-js/faker"
 export function mockError(statusCode: HttpStatusCode) {
 	const code = "ERR_BAD_REQUEST"
 	const axiosError = new AxiosError(
-		"request failed with status code 401",
+		`request failed with status code ${statusCode}`,
 		code,
 		undefined,
 		{},
 		undefined,
 	)
 	axiosError.status = statusCode
+	axiosError.response = {
+		status: statusCode,
+		data: null,
+		headers: {},
+		config: {} as never,
+		statusText: "",
+	}
 	return axiosError
 }
 

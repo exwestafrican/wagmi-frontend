@@ -34,8 +34,53 @@ import { InvalidInviteScreen } from "@/features/workspace/invalid-invite-screen.
 import { Pages } from "@/utils/pages.ts"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 import { useAcceptInvite } from "@/features/workspace/api/accept-invite.ts"
+import { useDebounce } from "@/hooks/use-debounce.ts"
+import { useCheckUsername } from "./api/check-username.ts"
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@/components/ui/input-group"
+import { CircleCheckBig, CircleX, Loader2 } from "lucide-react"
+import { type AxiosError, HttpStatusCode } from "axios"
+import type { UseQueryResult } from "@tanstack/react-query"
 
 const LAG_MS = 2500
+
+function UsernameStateIcon({
+	query,
+}: {
+	query: UseQueryResult<null, AxiosError<unknown, Error>>
+}) {
+	const icon = () => {
+		if (query.isSuccess) {
+			return (
+				<CircleCheckBig
+					data-testid="username-available"
+					className="size-4 text-green-600"
+				/>
+			)
+		}
+		if (
+			query.isError &&
+			query.error?.response?.status === HttpStatusCode.Conflict
+		) {
+			return (
+				<CircleX
+					data-testid="username-taken"
+					className="size-4 text-destructive"
+				/>
+			)
+		}
+		return (
+			<Loader2
+				data-testid="username-checking"
+				className="size-4 animate-spin text-neutral-400"
+			/>
+		)
+	}
+	return icon()
+}
 
 export function AcceptInvite() {
 	const { inviteCode } = useSearch({ from: "/workspace-invite" })
@@ -78,6 +123,19 @@ export function AcceptInvite() {
 		form.setValue,
 	])
 
+	const username = form.watch("username")
+	const debouncedUsername = useDebounce(username, 300)
+	const workspaceCode = inviteQuery.data?.workspaceCode ?? ""
+	const usernameQuery = useCheckUsername(debouncedUsername, workspaceCode)
+
+	function onUsernameChange(
+		e: React.ChangeEvent<HTMLInputElement>,
+		fieldOnChange: (...args: unknown[]) => void,
+	) {
+		form.clearErrors("username")
+		fieldOnChange(e)
+	}
+
 	function onSubmit(values: TeammateDetails) {
 		const decodedData = inviteQuery.data
 
@@ -110,10 +168,6 @@ export function AcceptInvite() {
 				},
 			},
 		)
-	}
-
-	if (verificationError) {
-		return <InvalidInviteScreen />
 	}
 
 	if (verificationError) {
@@ -209,20 +263,28 @@ export function AcceptInvite() {
 											Username
 										</FormLabel>
 										<FormControl>
-											<Input
-												data-testid="teammate-username"
-												placeholder="john.doe"
-												className="signup-field-input"
-												{...field}
-											/>
+											<InputGroup>
+												<InputGroupInput
+													data-testid="teammate-username"
+													placeholder="john.doe"
+													className="signup-field-input"
+													{...field}
+													onChange={(e) => onUsernameChange(e, field.onChange)}
+												/>
+												<InputGroupAddon align="inline-end">
+													{username && (
+														<UsernameStateIcon query={usernameQuery} />
+													)}
+												</InputGroupAddon>
+											</InputGroup>
 										</FormControl>
 										<FormDescription className="text-xs text-neutral-500">
-											This is how your teammates will see you. Keep it simple
-											and easy to find, something like{" "}
+											This is how teammates will see you. Keep it simple and
+											easy to find, something like{" "}
 											<code className="bg-gray-100 px-1 rounded">
 												first.lastname
 											</code>{" "}
-											works great!{" "}
+											works great!
 										</FormDescription>
 										<FormMessage data-testid="teammate-username-form-message" />
 									</FormItem>
@@ -230,7 +292,9 @@ export function AcceptInvite() {
 							/>
 
 							<Button
-								disabled={!form.formState.isValid || isPending}
+								disabled={
+									!form.formState.isValid || isPending || usernameQuery.isError
+								}
 								type="submit"
 								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
 								data-testid="submit-button"
