@@ -287,11 +287,6 @@ export default function WorkspacePage() {
 						</SideNavGroupWithTopSeparator>
 					</SidebarContent>
 				</Sidebar>
-				{/*<div className="relative flex min-h-svh w-full">*/}
-				{/*	{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}*/}
-				{/*	<Outlet />*/}
-				{/*</div>*/}
-
 				<div className="relative  min-h-svh w-full">
 					{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}
 					<Outlet />
