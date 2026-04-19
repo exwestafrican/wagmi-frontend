@@ -19,7 +19,7 @@ export interface Role {
 const ROLES: Record<string, Role> = {
 	WorkspaceAdmin: {
 		name: "Workspace Owner",
-		emoji: "💪🏾",
+		emoji: "👀",
 		backgroundColor: "#fff8bb",
 		colorCode: "#5a5854",
 	},
@@ -31,6 +31,13 @@ const ROLES: Record<string, Role> = {
 	},
 }
 
+const fallBackRole = {
+    name: "Unkonwn Role",
+    emoji: "💪🏾",
+    backgroundColor: "#fff8bb",
+    colorCode: "#5a5854",
+}
+
 export function fullName(teammate: Teammate) {
 	return [teammate.firstName, teammate.lastName]
 		.map((n) => sentenceCase(n))
@@ -38,7 +45,10 @@ export function fullName(teammate: Teammate) {
 }
 
 export function buildTeammateRole(teammate: Teammate) {
-	return ROLES[teammate.role]
+    if (ROLES[teammate.id].name) {
+        return ROLES[teammate.role]
+    }
+    return fallBackRole
 }
 
 export function formatRole(role: Role) {
