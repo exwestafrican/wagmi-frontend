@@ -1,7 +1,7 @@
 import sentenceCase from "@/utils/sentence-case.ts"
 
 export interface Teammate {
-	id: string
+	id: number
 	email: string
 	username: string
 	firstName: string

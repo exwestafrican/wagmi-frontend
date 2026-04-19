@@ -222,7 +222,7 @@ export default function WorkspacePage() {
 											asChild
 											onClick={() =>
 												navigate({
-													from: `/workspace`,
+													from: "/workspace",
 													to: item.path,
 													search: { code: code },
 												})
@@ -255,7 +255,7 @@ export default function WorkspacePage() {
 											asChild
 											onClick={() =>
 												navigate({
-													from: `/workspace`,
+													from: "/workspace",
 													to: item.path,
 													search: { code: code },
 												})

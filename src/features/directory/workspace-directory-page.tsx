@@ -20,7 +20,7 @@ export default function WorkspaceDirectoryPage() {
 				<WithErrorHandling hasError={isError}>
 					<div className="flex justify-stretch gap-5 flex-wrap">
 						{teammates?.map((teammate) => (
-							<TeamMemberCard teammate={teammate} />
+							<TeamMemberCard key={teammate.id} teammate={teammate} />
 						))}
 					</div>
 				</WithErrorHandling>
