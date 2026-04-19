@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { act, screen, waitFor } from "@testing-library/react"
-import { AxiosError } from "axios"
+import { HttpStatusCode } from "axios"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths, CHECK_MAIL_REASON } from "@/constants.ts"
 import { Pages } from "@/utils/pages.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate.tsx"
 import { decodedInviteFactory } from "@/test/factory/invite.ts"
+import { mockError } from "@/test/helpers/mocks.ts"
 
 vi.mock("@/hooks/use-debounce", () => ({
 	useDebounce: (value: unknown) => value,
@@ -104,24 +105,18 @@ describe("AcceptInvite", () => {
 	)
 
 	describe("username availability check", () => {
-		const FAKE_WORKSPACE_CODE = "9Jk076"
-		const FAKE_RECIPIENT_EMAIL = "laura@useenvoye.co"
-		const FAKE_INVITE_CODE = "fake-invite-code"
+		const fakeInvite = decodedInviteFactory.build()
 
 		function mockVerifyInvite() {
 			return Promise.resolve({
-				data: {
-					recipientEmail: FAKE_RECIPIENT_EMAIL,
-					workspaceCode: FAKE_WORKSPACE_CODE,
-					inviteCode: FAKE_INVITE_CODE,
-				},
+				data: fakeInvite,
 			})
 		}
 
 		async function renderAndWaitForForm() {
 			await navigateToTestPage({
 				to: "/workspace-invite",
-				search: { inviteCode: FAKE_INVITE_CODE },
+				search: { inviteCode: fakeInvite.inviteCode },
 			})
 
 			await act(async () => {
@@ -134,7 +129,7 @@ describe("AcceptInvite", () => {
 		}
 
 		it(
-			"shows 'Username is available' when the username is free (200)",
+			"shows username available icon when the username is free (200)",
 			{ timeout: 15000 },
 			async () => {
 				vi.mocked(apiClient.get).mockImplementation((url) => {
@@ -147,28 +142,19 @@ describe("AcceptInvite", () => {
 				await user.type(screen.getByTestId("teammate-username"), "jo")
 
 				await waitFor(() => {
-					expect(screen.getByText("Username is available")).toBeInTheDocument()
+					expect(screen.getByTestId("username-available")).toBeInTheDocument()
 				})
 			},
 		)
 
 		it(
-			"shows 'Username is taken' error and disables submit when username is taken (409)",
+			"shows username taken icon and disables submit when username is taken (409)",
 			{ timeout: 15000 },
 			async () => {
-				const conflictError = new AxiosError("Conflict", "ERR_BAD_REQUEST")
-				conflictError.response = {
-					status: 409,
-					data: null,
-					headers: {},
-					config: {} as never,
-					statusText: "Conflict",
-				}
-
 				vi.mocked(apiClient.get).mockImplementation((url) => {
 					if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
 					if (url === ApiPaths.CHECK_USERNAME)
-						return Promise.reject(conflictError)
+						return Promise.reject(mockError(HttpStatusCode.Conflict))
 					return Promise.reject(new Error(`unexpected: ${url}`))
 				})
 
@@ -178,31 +164,20 @@ describe("AcceptInvite", () => {
 				await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
 				await waitFor(() => {
-					expect(
-						screen.getByTestId("teammate-username-form-message"),
-					).toHaveTextContent("Username is taken")
+					expect(screen.getByTestId("username-taken")).toBeInTheDocument()
 				})
 				expect(screen.getByTestId("submit-button")).toBeDisabled()
 			},
 		)
 
 		it(
-			"clears the 'Username is taken' error when the user changes the username",
+			"clears the username taken icon when the user changes the username",
 			{ timeout: 15000 },
 			async () => {
-				const conflictError = new AxiosError("Conflict", "ERR_BAD_REQUEST")
-				conflictError.response = {
-					status: 409,
-					data: null,
-					headers: {},
-					config: {} as never,
-					statusText: "Conflict",
-				}
-
 				vi.mocked(apiClient.get).mockImplementation((url) => {
 					if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
 					if (url === ApiPaths.CHECK_USERNAME)
-						return Promise.reject(conflictError)
+						return Promise.reject(mockError(HttpStatusCode.Conflict))
 					return Promise.reject(new Error(`unexpected: ${url}`))
 				})
 
@@ -210,17 +185,13 @@ describe("AcceptInvite", () => {
 				await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
 				await waitFor(() => {
-					expect(
-						screen.getByTestId("teammate-username-form-message"),
-					).toHaveTextContent("Username is taken")
+					expect(screen.getByTestId("username-taken")).toBeInTheDocument()
 				})
 
 				await user.clear(screen.getByTestId("teammate-username"))
 
 				await waitFor(() => {
-					expect(
-						screen.queryByText("Username is taken"),
-					).not.toBeInTheDocument()
+					expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
 				})
 			},
 		)
