@@ -10,7 +10,6 @@ export default function WorkspaceDirectoryPage() {
 	const { data: teammates, isPending, isError } = useTeammates(code)
 	const progress = useFakeProgress(isPending)
 
-
 	return (
 		<div className="p-8 flex justify-start flex-col">
 			<h1 className="text-2xl font-semibold mb-6">Directory</h1>

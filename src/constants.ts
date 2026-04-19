@@ -16,7 +16,7 @@ export const ApiPaths = {
 	VERIFY_INVITE: "/workspace/verify-invite",
 	ACCEPT_INVITE: "workspace/accept-invite",
 	CHECK_USERNAME: "/teammates/check-username",
-    ACTIVE_TEAMMATES: "/teammates",
+	ACTIVE_TEAMMATES: "/teammates",
 } as const
 
 export const ROLES = {
