@@ -35,74 +35,66 @@ describe("AcceptInvite", () => {
 		return { navigateSpy }
 	}
 
-	it(
-		"navigates to check email after user enters details",
-		{ timeout: 15000 },
-		async () => {
-			const decodedInvite = decodedInviteFactory.build({
-				recipientEmail: "dan@useenvoye.co",
-			})
-			vi.mocked(apiClient.get).mockResolvedValueOnce({
-				data: decodedInvite,
-			})
+	it("navigates to check email after user enters details", async () => {
+		const decodedInvite = decodedInviteFactory.build({
+			recipientEmail: "dan@useenvoye.co",
+		})
 
-			const { navigateSpy } = await navigateToAcceptInvite({
-				to: "/workspace-invite",
-				search: { inviteCode: "fake-invite-code" },
-			})
+		vi.mocked(apiClient.get).mockImplementation((url) => {
+			if (url === ApiPaths.VERIFY_INVITE)
+				return Promise.resolve({ data: decodedInvite })
+			if (url === ApiPaths.CHECK_USERNAME) return Promise.resolve({})
+			return Promise.reject(new Error(`unexpected: ${url}`))
+		})
 
-			expect(screen.getByTestId("email")).toHaveValue(
-				decodedInvite.recipientEmail,
+		const { navigateSpy } = await navigateToAcceptInvite({
+			to: "/workspace-invite",
+			search: { inviteCode: "fake-invite-code" },
+		})
+
+		expect(screen.getByTestId("email")).toHaveValue(
+			decodedInvite.recipientEmail,
+		)
+
+		await user.type(screen.getByTestId("teammate-first-name"), "john")
+		await user.tab()
+		await user.type(screen.getByTestId("teammate-last-name"), "doe")
+		await user.tab()
+		await user.type(screen.getByTestId("teammate-username"), "john.doe")
+		await user.tab()
+
+		const submitButton = screen.getByTestId("submit-button")
+		await waitFor(() => expect(submitButton).toBeEnabled())
+		await user.click(submitButton)
+
+		await waitFor(() => {
+			expect(navigateSpy).toHaveBeenCalledWith(
+				expect.objectContaining({
+					to: Pages.CHECK_EMAIL,
+					search: {
+						email: decodedInvite.recipientEmail,
+						type: CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS,
+					},
+				}),
 			)
+		})
+	})
 
-			await user.type(screen.getByTestId("teammate-first-name"), "john")
-			await user.tab()
-			await user.type(screen.getByTestId("teammate-last-name"), "doe")
-			await user.tab()
-			await user.type(screen.getByTestId("teammate-username"), "john.doe")
-			await user.tab()
+	it("shows invalid invitation screen when verify invite fails", async () => {
+		vi.mocked(apiClient.get).mockRejectedValueOnce(new Error("invalid invite"))
 
-			const submitButton = screen.getByTestId("submit-button")
-			await waitFor(() => expect(submitButton).toBeEnabled())
-			await user.click(submitButton)
+		await navigateToAcceptInvite({
+			to: "/workspace-invite",
+			search: { inviteCode: "bad-code" },
+		})
 
-			await waitFor(() => {
-				expect(navigateSpy).toHaveBeenCalledWith(
-					expect.objectContaining({
-						to: Pages.CHECK_EMAIL,
-						search: {
-							email: decodedInvite.recipientEmail,
-							type: CHECK_MAIL_REASON.INVITE_ACCEPTED_SUCCESS,
-						},
-					}),
-				)
-			})
-		},
-	)
+		expect(apiClient.get).toHaveBeenCalledWith(ApiPaths.VERIFY_INVITE, {
+			params: { inviteCode: "bad-code" },
+		})
 
-	it(
-		"shows invalid invitation screen when verify invite fails",
-		{ timeout: 15000 },
-		async () => {
-			vi.mocked(apiClient.get).mockRejectedValueOnce(
-				new Error("invalid invite"),
-			)
-
-			await navigateToAcceptInvite({
-				to: "/workspace-invite",
-				search: { inviteCode: "bad-code" },
-			})
-
-			expect(apiClient.get).toHaveBeenCalledWith(ApiPaths.VERIFY_INVITE, {
-				params: { inviteCode: "bad-code" },
-			})
-
-			expect(
-				screen.getByRole("heading", { name: /Ooops/i }),
-			).toBeInTheDocument()
-			expect(screen.getByTestId("invalid-invite-continue")).toBeInTheDocument()
-		},
-	)
+		expect(screen.getByRole("heading", { name: /Ooops/i })).toBeInTheDocument()
+		expect(screen.getByTestId("invalid-invite-continue")).toBeInTheDocument()
+	})
 
 	describe("username availability check", () => {
 		const fakeInvite = decodedInviteFactory.build()
@@ -114,13 +106,9 @@ describe("AcceptInvite", () => {
 		}
 
 		async function renderAndWaitForForm() {
-			await navigateToTestPage({
+			await navigateToAcceptInvite({
 				to: "/workspace-invite",
 				search: { inviteCode: fakeInvite.inviteCode },
-			})
-
-			await act(async () => {
-				await new Promise((r) => setTimeout(r, 2600))
 			})
 
 			await waitFor(() => {
@@ -128,72 +116,60 @@ describe("AcceptInvite", () => {
 			})
 		}
 
-		it(
-			"shows username available icon when the username is free (200)",
-			{ timeout: 15000 },
-			async () => {
-				vi.mocked(apiClient.get).mockImplementation((url) => {
-					if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
-					if (url === ApiPaths.CHECK_USERNAME) return Promise.resolve({})
-					return Promise.reject(new Error(`unexpected: ${url}`))
-				})
+		it("shows username available icon when the username is free (200)", async () => {
+			vi.mocked(apiClient.get).mockImplementation((url) => {
+				if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
+				if (url === ApiPaths.CHECK_USERNAME) return Promise.resolve({})
+				return Promise.reject(new Error(`unexpected: ${url}`))
+			})
 
-				await renderAndWaitForForm()
-				await user.type(screen.getByTestId("teammate-username"), "jo")
+			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-username"), "jo")
 
-				await waitFor(() => {
-					expect(screen.getByTestId("username-available")).toBeInTheDocument()
-				})
-			},
-		)
+			await waitFor(() => {
+				expect(screen.getByTestId("username-available")).toBeInTheDocument()
+			})
+		})
 
-		it(
-			"shows username taken icon and disables submit when username is taken (409)",
-			{ timeout: 15000 },
-			async () => {
-				vi.mocked(apiClient.get).mockImplementation((url) => {
-					if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
-					if (url === ApiPaths.CHECK_USERNAME)
-						return Promise.reject(mockError(HttpStatusCode.Conflict))
-					return Promise.reject(new Error(`unexpected: ${url}`))
-				})
+		it("shows username taken icon and disables submit when username is taken (409)", async () => {
+			vi.mocked(apiClient.get).mockImplementation((url) => {
+				if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
+				if (url === ApiPaths.CHECK_USERNAME)
+					return Promise.reject(mockError(HttpStatusCode.Conflict))
+				return Promise.reject(new Error(`unexpected: ${url}`))
+			})
 
-				await renderAndWaitForForm()
-				await user.type(screen.getByTestId("teammate-first-name"), "John")
-				await user.type(screen.getByTestId("teammate-last-name"), "Doe")
-				await user.type(screen.getByTestId("teammate-username"), "john.doe")
+			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-first-name"), "John")
+			await user.type(screen.getByTestId("teammate-last-name"), "Doe")
+			await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
-				await waitFor(() => {
-					expect(screen.getByTestId("username-taken")).toBeInTheDocument()
-				})
-				expect(screen.getByTestId("submit-button")).toBeDisabled()
-			},
-		)
+			await waitFor(() => {
+				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
+			})
+			expect(screen.getByTestId("submit-button")).toBeDisabled()
+		})
 
-		it(
-			"clears the username taken icon when the user changes the username",
-			{ timeout: 15000 },
-			async () => {
-				vi.mocked(apiClient.get).mockImplementation((url) => {
-					if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
-					if (url === ApiPaths.CHECK_USERNAME)
-						return Promise.reject(mockError(HttpStatusCode.Conflict))
-					return Promise.reject(new Error(`unexpected: ${url}`))
-				})
+		it("clears the username taken icon when the user changes the username", async () => {
+			vi.mocked(apiClient.get).mockImplementation((url) => {
+				if (url === ApiPaths.VERIFY_INVITE) return mockVerifyInvite()
+				if (url === ApiPaths.CHECK_USERNAME)
+					return Promise.reject(mockError(HttpStatusCode.Conflict))
+				return Promise.reject(new Error(`unexpected: ${url}`))
+			})
 
-				await renderAndWaitForForm()
-				await user.type(screen.getByTestId("teammate-username"), "john.doe")
+			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
-				await waitFor(() => {
-					expect(screen.getByTestId("username-taken")).toBeInTheDocument()
-				})
+			await waitFor(() => {
+				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
+			})
 
-				await user.clear(screen.getByTestId("teammate-username"))
+			await user.clear(screen.getByTestId("teammate-username"))
 
-				await waitFor(() => {
-					expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
-				})
-			},
-		)
+			await waitFor(() => {
+				expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
+			})
+		})
 	})
 })
