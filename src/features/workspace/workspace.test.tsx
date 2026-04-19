@@ -81,17 +81,30 @@ describe("Workspace Test", () => {
 		)
 	})
 
-	test("when user clicks Directory we load teammates and show a teammate", async () => {
-		const teammateOnCard = teammateFactory.build({
-			firstName: "tumise",
-			lastName: "ojo",
-			username: "tboy",
-		})
+	test.each([
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+			}),
+			expectedRole: "Workspace Owner",
+		},
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+				role: "SomeNewRoleFromBackend",
+			}),
 
+			expectedRole: "Unknown Role",
+		},
+	])("we set correct teammate details", async ({ teammate, expectedRole }) => {
 		await navigateToWorkspacePage(
 			envoyeWorkspace,
 			teammateFactory.build({ username: "sidebar-user" }),
-			[teammateOnCard],
+			[teammate],
 		)
 
 		await user.click(await screen.findByText(/directory/i))
@@ -105,8 +118,11 @@ describe("Workspace Test", () => {
 			)
 		})
 
-		expect(await screen.findByText("Tumise Ojo")).toBeInTheDocument()
-		expect(screen.getByText("@tboy")).toBeInTheDocument()
+		expect(await screen.findByText("Derick Omari")).toBeInTheDocument()
+		expect(screen.getByText("@derick.omari")).toBeInTheDocument()
+		expect(
+			await screen.findByText(new RegExp(expectedRole, "i")),
+		).toBeInTheDocument()
 	})
 
 	describe("workspace invite", () => {

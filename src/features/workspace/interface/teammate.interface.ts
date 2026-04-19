@@ -31,7 +31,7 @@ const ROLES: Record<string, Role> = {
 	},
 }
 
-const fallBackRole = {
+const fallBackRole: Role = {
 	name: "Unknown Role",
 	emoji: "💪🏾",
 	backgroundColor: "#fff8bb",
