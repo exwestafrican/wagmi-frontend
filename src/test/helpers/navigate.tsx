@@ -16,6 +16,7 @@ import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
 import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
+import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
 function WaitlistPlaceholder() {
@@ -84,6 +85,13 @@ export function makeTestRouter() {
 		component: WorkspacePage,
 	})
 
+	const workspaceDirectoryRoute = createRoute({
+		getParentRoute: () => workspaceRoute,
+		path: "directory",
+		validateSearch: z.object({ code: z.string() }),
+		component: WorkspaceDirectoryPage,
+	})
+
 	const acceptInviteRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/workspace-invite",
@@ -104,7 +112,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
-			workspaceRoute,
+			workspaceRoute.addChildren([workspaceDirectoryRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),
