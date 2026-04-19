@@ -1,14 +1,12 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
-import { Outlet, RouterProvider, createRouter } from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
+import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import LanguageProvider from "./i18n/LanguageProvider.tsx"
 
 import "./styles.css"
 import reportWebVitals from "./reportWebVitals.ts"
 
-import { Toaster } from "sonner"
 import {
 	acceptInviteRoute,
 	checkEmailRoute,
@@ -24,17 +22,7 @@ import { workspaceRouteTree } from "@/routing/workspace.ts"
 // Create a client
 const queryClient = new QueryClient({})
 
-export function RootRouteComponent() {
-	return (
-		<>
-			<Outlet />
-			<div data-testid="toaster">
-				<Toaster richColors position="top-right" />
-			</div>
-			<TanStackRouterDevtools />
-		</>
-	)
-}
+
 
 const routeTree = rootRoute.addChildren([
 	indexRoute,

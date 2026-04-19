@@ -6,7 +6,7 @@ import {
 	createRoute,
 	createRouter,
 } from "@tanstack/react-router"
-import { RootRouteComponent } from "./main.tsx"
+import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 
 // Mock components that might cause issues in tests
 vi.mock("@tanstack/react-router-devtools", () => ({
