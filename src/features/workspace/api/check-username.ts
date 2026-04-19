@@ -18,7 +18,8 @@ export function useCheckUsername(username: string, workspaceCode: string) {
 					},
 				})
 				.then(() => null),
-		enabled: username.length >= MIN_USERNAME_LENGTH,
+		enabled:
+			username.length >= MIN_USERNAME_LENGTH && workspaceCode.length !== 0, // workspace might not have loaded why we added the check
 		retry: false,
 		staleTime: 1000 * 60,
 	})
