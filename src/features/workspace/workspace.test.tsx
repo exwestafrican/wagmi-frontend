@@ -24,6 +24,7 @@ const envoyeWorkspace = {
 function mockWorkspaceAndCurrentTeammate(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
+	workspaceTeammates: Teammate[] = [teammateFactory.build()],
 ) {
 	vi.mocked(apiClient.get).mockImplementation((url: string) => {
 		if (url === ApiPaths.WORKSPACE) {
@@ -31,6 +32,9 @@ function mockWorkspaceAndCurrentTeammate(
 		}
 		if (url === ApiPaths.CURRENT_TEAMMATE) {
 			return Promise.resolve({ data: teammate })
+		}
+		if (url === ApiPaths.ACTIVE_TEAMMATES) {
+			return Promise.resolve({ data: workspaceTeammates })
 		}
 		return Promise.reject(new Error(`Unexpected GET ${url}`))
 	})
@@ -46,9 +50,10 @@ describe("Workspace Test", () => {
 	async function navigateToWorkspacePage(
 		workspace: Workspace,
 		teammate: Teammate = teammateFactory.build(),
+		workspaceTeammates: Teammate[] = [teammateFactory.build()],
 	) {
 		useAuthStore.getState().setAuthToken("fake-token")
-		mockWorkspaceAndCurrentTeammate(workspace, teammate)
+		mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
 		return await navigateToTestPage({
 			to: "/workspace",
 			search: { code: workspace.code },
@@ -74,6 +79,50 @@ describe("Workspace Test", () => {
 				params: { workspaceCode: envoyeWorkspace.code },
 			}),
 		)
+	})
+
+	test.each([
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+			}),
+			expectedRole: "Workspace Owner",
+		},
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+				role: "SomeNewRoleFromBackend",
+			}),
+
+			expectedRole: "Unknown Role",
+		},
+	])("we set correct teammate details", async ({ teammate, expectedRole }) => {
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			teammateFactory.build({ username: "sidebar-user" }),
+			[teammate],
+		)
+
+		await user.click(await screen.findByText(/directory/i))
+
+		await waitFor(() => {
+			expect(apiClient.get).toHaveBeenCalledWith(
+				ApiPaths.ACTIVE_TEAMMATES,
+				expect.objectContaining({
+					params: { workspaceCode: envoyeWorkspace.code },
+				}),
+			)
+		})
+
+		expect(await screen.findByText("Derick Omari")).toBeInTheDocument()
+		expect(screen.getByText("@derick.omari")).toBeInTheDocument()
+		expect(
+			await screen.findByText(new RegExp(expectedRole, "i")),
+		).toBeInTheDocument()
 	})
 
 	describe("workspace invite", () => {
