@@ -30,8 +30,13 @@ import {
 	UserCheck,
 	Users,
 } from "lucide-react"
-import { useSearch } from "@tanstack/react-router"
-import { useCurrentTeammate } from "@/features/workspace/api/current-teammate.ts"
+import {
+	Outlet,
+	useMatchRoute,
+	useNavigate,
+	useSearch,
+} from "@tanstack/react-router"
+import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import { useWorkspace } from "@/features/workspace/api/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import { useIsMobile } from "@/hooks/use-mobile.ts"
@@ -40,7 +45,6 @@ import { type ReactNode, useState } from "react"
 import { modifyCasing } from "@/utils/sentence-case.ts"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
-import { Empty, EmptyContent } from "@/components/ui/empty.tsx"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -86,34 +90,76 @@ function WorkspaceAvatar({ workspace }: { workspace: Workspace }) {
 
 export default function WorkspacePage() {
 	const [openTeammateInviteModal, setOpenTeammateInviteModal] = useState(false)
-	const [selectedTab, setSelectedTab] = useState("directory")
+
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
-	const { data: teammate } = useCurrentTeammate(code)
+	const { data: teammate } = useCurrentWorkspaceTeammate(code)
+
 	const isMobile = useIsMobile()
+	const navigate = useNavigate()
+	const matchRoute = useMatchRoute()
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
 
 	const mainMenuItems = [
-		{ id: "directory", icon: Users, label: "Directory" },
-		{ id: "activity", icon: Bell, label: "Activity" },
-		{ id: "conversation", icon: MessageCircle, label: "Conversation" },
+		{
+			id: "directory",
+			path: "/workspace/directory",
+			icon: Users,
+			label: "Directory",
+		},
+		{
+			id: "activity",
+			path: "/workspace/activity",
+			icon: Bell,
+			label: "Activity",
+		},
+		{
+			id: "conversation",
+			path: "/workspace/conversation",
+			icon: MessageCircle,
+			label: "Conversation",
+		},
 	]
 
 	const supportMenuItems = [
-		{ id: "dms", icon: BellDot, label: "DMs", count: "10+" },
-		{ id: "assigned", icon: UserCheck, label: "Assigned", count: "5" },
-		{ id: "mentioned", icon: AtSign, label: "Mentioned", count: "1" },
+		{
+			id: "dms",
+			path: "/workspace/dms",
+			icon: BellDot,
+			label: "DMs",
+			count: "10+",
+		},
+		{
+			id: "assigned",
+			path: "/workspace/assigned",
+			icon: UserCheck,
+			label: "Assigned",
+			count: "5",
+		},
+		{
+			id: "mentioned",
+			path: "/workspace/mentioned",
+			icon: AtSign,
+			label: "Mentioned",
+			count: "1",
+		},
 		{
 			id: "discussion",
+			path: "/workspace/discussion",
 			icon: MessageSquare,
 			label: "Discussions",
 			count: undefined,
 		},
 	]
 
-	const isActiveTab = (tabId: string): boolean => {
-		return selectedTab === tabId
+	const isActivePath = (currentPath: string): boolean => {
+		return Boolean(
+			matchRoute({
+				to: currentPath,
+				fuzzy: true, // child routes still count as “under” this match; tune per docs
+			}),
+		)
 	}
 
 	return (
@@ -174,8 +220,14 @@ export default function WorkspacePage() {
 											className="cursor-pointer"
 											size="sm"
 											asChild
-											onClick={() => setSelectedTab(item.id)}
-											isActive={isActiveTab(item.id)}
+											onClick={() =>
+												navigate({
+													from: `/workspace`,
+													to: item.path,
+													search: { code: code },
+												})
+											}
+											isActive={isActivePath(item.path)}
 										>
 											<div>
 												<div className="flex gap-2 items-center text-muted-brown">
@@ -201,8 +253,14 @@ export default function WorkspacePage() {
 											className="cursor-pointer"
 											size="sm"
 											asChild
-											onClick={() => setSelectedTab(item.id)}
-											isActive={isActiveTab(item.id)}
+											onClick={() =>
+												navigate({
+													from: `/workspace`,
+													to: item.path,
+													search: { code: code },
+												})
+											}
+											isActive={isActivePath(item.path)}
 										>
 											<div>
 												<div className="flex gap-2 items-center text-muted-brown">
@@ -229,17 +287,14 @@ export default function WorkspacePage() {
 						</SideNavGroupWithTopSeparator>
 					</SidebarContent>
 				</Sidebar>
-				<div className="relative flex min-h-svh w-full">
+				{/*<div className="relative flex min-h-svh w-full">*/}
+				{/*	{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}*/}
+				{/*	<Outlet />*/}
+				{/*</div>*/}
+
+				<div className="relative  min-h-svh w-full">
 					{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}
-					<Empty className="w-full min-h-screen justify-center items-center gap-0">
-						<img
-							src="/empty-page.svg"
-							alt="mail sent"
-							className="mx-auto h-40% w-40% sm:h-140 sm:w-140 object-cover select-none"
-							loading="eager"
-						/>
-						<EmptyContent>Nothing to see here</EmptyContent>
-					</Empty>
+					<Outlet />
 				</div>
 			</SidebarProvider>
 		</div>

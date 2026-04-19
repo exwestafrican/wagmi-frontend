@@ -73,7 +73,7 @@ export default function NewWorkspaceSetup() {
 	}, [accessToken, setAuthToken])
 
 	return (
-		<WithErrorHandling hasError={() => accessToken == null || hasSetupError}>
+		<WithErrorHandling hasError={accessToken == null || hasSetupError}>
 			<Empty className="w-full min-h-screen justify-center items-center">
 				<EmptyHeader>
 					<EmptyMedia variant="icon">

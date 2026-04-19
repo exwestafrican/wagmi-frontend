@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-export function useFakeProgress(isCompleted: boolean) {
+export function useFakeProgress(isCompleted: boolean, delay: number = 300) {
 	const [progress, setProgress] = useState(0)
 
 	useEffect(() => {
@@ -15,7 +15,7 @@ export function useFakeProgress(isCompleted: boolean) {
 
 				return prev
 			})
-		}, 300)
+		}, delay)
 
 		return () => clearInterval(interval)
 	}, [isCompleted])

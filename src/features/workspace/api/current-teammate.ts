@@ -5,7 +5,7 @@ import type { Teammate } from "@/features/workspace/interface/teammate.interface
 
 export const CURRENT_TEAMMATE_QUERY_KEY = "current-teammate"
 
-export function useCurrentTeammate(workspaceCode: string) {
+export function useCurrentWorkspaceTeammate(workspaceCode: string) {
 	return useQuery<Teammate>({
 		queryKey: [CURRENT_TEAMMATE_QUERY_KEY, workspaceCode],
 		queryFn: async () => {
