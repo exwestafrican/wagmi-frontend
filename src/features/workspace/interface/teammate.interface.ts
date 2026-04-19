@@ -32,10 +32,10 @@ const ROLES: Record<string, Role> = {
 }
 
 const fallBackRole = {
-    name: "Unkonwn Role",
-    emoji: "💪🏾",
-    backgroundColor: "#fff8bb",
-    colorCode: "#5a5854",
+	name: "Unkonwn Role",
+	emoji: "💪🏾",
+	backgroundColor: "#fff8bb",
+	colorCode: "#5a5854",
 }
 
 export function fullName(teammate: Teammate) {
@@ -45,10 +45,10 @@ export function fullName(teammate: Teammate) {
 }
 
 export function buildTeammateRole(teammate: Teammate) {
-    if (ROLES[teammate.id].name) {
-        return ROLES[teammate.role]
-    }
-    return fallBackRole
+	if (ROLES[teammate.id].name) {
+		return ROLES[teammate.role]
+	}
+	return fallBackRole
 }
 
 export function formatRole(role: Role) {

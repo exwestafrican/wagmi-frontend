@@ -22,8 +22,6 @@ import { workspaceRouteTree } from "@/routing/workspace.ts"
 // Create a client
 const queryClient = new QueryClient({})
 
-
-
 const routeTree = rootRoute.addChildren([
 	indexRoute,
 	workspaceSetupRoute,
