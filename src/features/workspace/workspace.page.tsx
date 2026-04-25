@@ -21,14 +21,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import {
-	AtSign,
-	Bell,
-	BellDot,
-	MessageCircle,
-	MessageSquare,
-	MoreVertical,
-	UserCheck,
-	Users,
+    AtSign,
+    Bell,
+    BellDot,
+    MessageSquare,
+    MoreVertical,
+    UserCheck,
+    Users,
+    MessagesSquare, MonitorCog,
 } from "lucide-react"
 import {
 	Outlet,
@@ -45,6 +45,7 @@ import { type ReactNode, useState } from "react"
 import { modifyCasing } from "@/utils/sentence-case.ts"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
+import { useEnabledFeature } from "@/features/feature-flag/hooks/use-enabled-feature.ts"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -94,6 +95,10 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
+	const { isEnabled: isAdministrativeWorkspace } = useEnabledFeature(
+		code,
+		"administrative_workspace",
+	)
 
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
@@ -107,18 +112,29 @@ export default function WorkspacePage() {
 			path: "/workspace/directory",
 			icon: Users,
 			label: "Directory",
+			canView: true,
 		},
 		{
 			id: "activity",
 			path: "/workspace/activity",
 			icon: Bell,
 			label: "Activity",
+			canView: true,
 		},
 		{
 			id: "conversation",
 			path: "/workspace/conversation",
-			icon: MessageCircle,
-			label: "Conversation",
+			icon: MessagesSquare,
+			label: "Conversations",
+			canView: true,
+		},
+		{
+			id: "internal",
+			path: "/workspace/internal",
+			icon: MonitorCog,
+			label: "Control Panel",
+			canView: !isAdministrativeWorkspace,
+			//TODO add should display or feature flag check
 		},
 	]
 
@@ -214,32 +230,35 @@ export default function WorkspacePage() {
 					<SidebarContent>
 						<SideNavGroupWithTopSeparator>
 							<SidebarMenu className="px-3">
-								{mainMenuItems.map((item) => (
-									<SidebarMenuItem key={item.id}>
-										<SidebarMenuButton
-											className="cursor-pointer"
-											size="sm"
-											asChild
-											onClick={() =>
-												navigate({
-													from: "/workspace",
-													to: item.path,
-													search: { code: code },
-												})
-											}
-											isActive={isActivePath(item.path)}
-										>
-											<div>
-												<div className="flex gap-2 items-center text-muted-brown">
-													<item.icon className="h-4 w-4" />
-													<span className="text-left font-normal text-xs ">
-														{item.label}
-													</span>
-												</div>
-											</div>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								))}
+								{mainMenuItems.map(
+									(item) =>
+										item.canView && (
+											<SidebarMenuItem key={item.id}>
+												<SidebarMenuButton
+													className="cursor-pointer"
+													size="sm"
+													asChild
+													onClick={() =>
+														navigate({
+															from: "/workspace",
+															to: item.path,
+															search: { code: code },
+														})
+													}
+													isActive={isActivePath(item.path)}
+												>
+													<div>
+														<div className="flex gap-2 items-center text-muted-brown">
+															<item.icon className="h-4 w-4" />
+															<span className="text-left font-normal text-xs ">
+																{item.label}
+															</span>
+														</div>
+													</div>
+												</SidebarMenuButton>
+											</SidebarMenuItem>
+										),
+								)}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
 						<SideNavGroupWithTopSeparator>
