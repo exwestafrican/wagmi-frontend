@@ -24,7 +24,7 @@ export function BackfillJobsPage() {
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
-			<div className="size-7/12">
+			<div className="md:size-7/12">
 				<h1 className="text-2xl font-semibold mb-6">Backfill</h1>
 				<Table>
 					<TableHeader>
