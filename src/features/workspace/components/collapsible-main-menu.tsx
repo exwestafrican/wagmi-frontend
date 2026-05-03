@@ -44,7 +44,7 @@ export default function CollapsibleMainMenuItem({
 				<CollapsibleContent>
 					<SidebarMenuSub>
 						{item.subMenuItems.map((subMenuItem) => (
-							<SidebarMenuSubItem>
+							<SidebarMenuSubItem key={subMenuItem.id}>
 								<SidebarMenuSubButton
 									size="sm"
 									className="cursor-pointer capitalize"
