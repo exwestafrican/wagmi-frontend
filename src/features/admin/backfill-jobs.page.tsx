@@ -29,8 +29,13 @@ export function BackfillJobsPage() {
 				<Table>
 					<TableHeader>
 						<TableRow>
-							{["Name", "Job ID", "Description", "Actions"].map((header) => (
-								<TableHead className="text-xs">{header}</TableHead>
+							{["name", "job id", "description", "actions"].map((header) => (
+								<TableHead
+									key={header}
+									className="text-xs capitalize text-left"
+								>
+									{header}
+								</TableHead>
 							))}
 						</TableRow>
 					</TableHeader>
@@ -40,7 +45,7 @@ export function BackfillJobsPage() {
 								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 									{task.name}
 								</TableCell>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">
+								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
 									<Badge
 										variant="outline"
 										className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
@@ -51,7 +56,7 @@ export function BackfillJobsPage() {
 								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 									{task.description}
 								</TableCell>
-								<TableCell className="text-right whitespace-normal break-words min-w-0 max-w-md">
+								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button
