@@ -29,8 +29,8 @@ export function BackfillJobsPage() {
 				<Table>
 					<TableHeader>
 						<TableRow>
+                            <TableHead>Name</TableHead>
 							<TableHead>Job ID</TableHead>
-							<TableHead>Name</TableHead>
 							<TableHead>Description</TableHead>
 							<TableHead>Actions</TableHead>
 						</TableRow>
