@@ -41,7 +41,7 @@ const workspaceDirectoryRoute = createRoute({
 
 const internalRoute = createRoute({
 	getParentRoute: () => workspaceLayoutRoute,
-	path: "internal",
+	path: "admin/backfill",
 	component: BackfillJobsPage,
 })
 
