@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router"
-import { useTasks } from "@/features/jobs/api/list-tasks.ts"
+import { useTasks } from "@/features/admin/api/list-tasks.ts"
 import {
 	Table,
 	TableBody,

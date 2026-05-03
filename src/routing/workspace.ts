@@ -6,7 +6,7 @@ import { z } from "zod"
 import { rootRoute } from "@/routing/root.ts"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import NotFound from "@/features/not-found.tsx"
-import { BackfillJobsPage } from "@/features/jobs/backfill-jobs-page.tsx"
+import { BackfillJobsPage } from "@/features/admin/backfill-jobs.page.tsx"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
