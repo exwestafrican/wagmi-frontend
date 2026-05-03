@@ -17,50 +17,54 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
 
+
 export function BackfillJobsPage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: tasks } = useTasks(code)
 
 	return (
-		<div className="p-8 size-9/12">
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Job ID</TableHead>
-						<TableHead>Name</TableHead>
-						<TableHead>Description</TableHead>
-						<TableHead>Actions</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{tasks?.map((task) => (
-						<TableRow key={task.jobId}>
-							<TableCell>{task.jobId}</TableCell>
-							<TableCell>{task.name}</TableCell>
-							<TableCell>{task.description}</TableCell>
-							<TableCell className="text-right">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="size-8 cursor-pointer"
-										>
-											<MoreHorizontalIcon />
-											<span className="sr-only">Open menu</span>
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem className="cursor-pointer">
-											Run
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</TableCell>
+		<div className="p-8 flex justify-start flex-col">
+			<div className="size-8/12">
+				<h1 className="text-2xl font-semibold mb-6">Backfill</h1>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Job ID</TableHead>
+							<TableHead>Name</TableHead>
+							<TableHead>Description</TableHead>
+							<TableHead>Actions</TableHead>
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{tasks?.map((task) => (
+							<TableRow key={task.jobId}>
+								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.name}</TableCell>
+                                <TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.jobId}</TableCell>
+								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.description}</TableCell>
+								<TableCell className="text-right whitespace-normal break-words min-w-0 max-w-md">
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="size-8 cursor-pointer"
+											>
+												<MoreHorizontalIcon />
+												<span className="sr-only">Open menu</span>
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem className="cursor-pointer">
+												Run
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	)
 }
