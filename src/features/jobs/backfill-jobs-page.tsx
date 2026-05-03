@@ -16,7 +16,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
-
+import { Badge } from "@/components/ui/badge.tsx"
 
 export function BackfillJobsPage() {
 	const { code } = useSearch({ from: "/workspace" })
@@ -24,23 +24,33 @@ export function BackfillJobsPage() {
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
-			<div className="size-8/12">
+			<div className="size-7/12">
 				<h1 className="text-2xl font-semibold mb-6">Backfill</h1>
 				<Table>
 					<TableHeader>
 						<TableRow>
-                            <TableHead>Name</TableHead>
-							<TableHead>Job ID</TableHead>
-							<TableHead>Description</TableHead>
-							<TableHead>Actions</TableHead>
+							{["Name", "Job ID", "Description", "Actions"].map((header) => (
+								<TableHead className="text-xs">{header}</TableHead>
+							))}
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{tasks?.map((task) => (
 							<TableRow key={task.jobId}>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.name}</TableCell>
-                                <TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.jobId}</TableCell>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">{task.description}</TableCell>
+								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+									{task.name}
+								</TableCell>
+								<TableCell className="whitespace-normal break-words min-w-0 max-w-md">
+									<Badge
+										variant="outline"
+										className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+									>
+										{task.jobId}
+									</Badge>
+								</TableCell>
+								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+									{task.description}
+								</TableCell>
 								<TableCell className="text-right whitespace-normal break-words min-w-0 max-w-md">
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
@@ -54,8 +64,8 @@ export function BackfillJobsPage() {
 											</Button>
 										</DropdownMenuTrigger>
 										<DropdownMenuContent align="end">
-											<DropdownMenuItem className="cursor-pointer">
-												Run
+											<DropdownMenuItem className="cursor-pointer text-xs capitalize">
+												run job
 											</DropdownMenuItem>
 										</DropdownMenuContent>
 									</DropdownMenu>
