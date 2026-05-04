@@ -33,6 +33,7 @@ import {
 	FeatureFlagStatus,
 	type FeatureFlag,
 } from "@/features/admin/interface/feature-flag.ts"
+import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 
 function FeatureStatus({ status }: { status: string }) {
 	switch (status) {
@@ -178,6 +179,7 @@ function FeatureFlagDetail({
 export function FeatureFlagPage() {
 	const { data: featureFlags } = useFeatureFlags()
 	const [selectedRow, setSelectedRow] = useState(0)
+	const [createModalOpen, setCreateModalOpen] = useState(false)
 
 	function onSubmit(value: z.infer<typeof formSchema>) {
 		console.log(value)
@@ -191,12 +193,18 @@ export function FeatureFlagPage() {
 		<div className="p-8 flex justify-start flex-col">
 			<div className="mb-6 flex items-center justify-between">
 				<h1 className="text-2xl font-semibold">Feature Flag</h1>
-				<div
-					data-testid="feature-request-button"
+				<button
+					type="button"
+					data-testid="create-feature-flag-button"
+					onClick={() => setCreateModalOpen(true)}
 					className="group rounded-full bg-muted p-1 cursor-pointer shadow-[0_0_8px_rgba(0,0,0,0.12)] transition-colors hover:bg-muted/90 dark:bg-muted/60 dark:shadow-[0_0_10px_rgba(255,255,255,0.06)]"
 				>
 					<Plus className="h-5 w-5 text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300" />
-				</div>
+				</button>
+				<CreateFeatureFlagModal
+					open={createModalOpen}
+					onOpenChange={setCreateModalOpen}
+				/>
 			</div>
 			<div className="flex md:flex-row gap-16 flex-col">
 				<div className="md:w-3/5">

@@ -1,7 +1,9 @@
 import { describe, expect, test, beforeEach } from "vitest"
 import { navigateToTestPage } from "@/test/helpers/navigate"
 
-import { screen, waitFor } from "@testing-library/react"
+import {  screen, waitFor, within } from "@testing-library/react"
+import { apiClient } from "@/lib/api-client.ts"
+import { vi } from "vitest"
 
 import userEvent from "@testing-library/user-event"
 import type { UserEvent } from "@testing-library/user-event"
@@ -13,6 +15,7 @@ import { teammateFactory } from "@/test/factory/teammate.ts"
 import { featureFlagFactory } from "@/test/factory/feature-flag.ts"
 import { FEATURE } from "@/features/feature-flag/const.ts"
 import { workspaceFactory } from "@/test/factory/workspace.ts"
+import { repeat } from "@/utils/repeat.ts"
 
 describe("Admin / Control Panel", () => {
 	let user: UserEvent
@@ -96,6 +99,85 @@ describe("Admin / Control Panel", () => {
 			})
 			await user.click(await screen.findByText(flags[2].name))
 			expect(await screen.findByDisplayValue(flags[2].name)).toBeInTheDocument()
+		})
+
+		describe("Create feature flag modal", () => {
+			beforeEach(() => {
+				vi.mocked(apiClient.post).mockResolvedValue({ data: {} })
+				baseSetup
+					.url(ApiPaths.FEATURE_FLAGS_ENABLED)
+					.respond([FEATURE.ADMINISTRATIVE_WORKSPACE])
+					.url(AdminApiPaths.FEATURE_FLAGS)
+					.respond(flags)
+					.apply()
+			})
+
+			test("opens create modal when Plus is clicked", async () => {
+				await navigateToTestPage({
+					to: "/workspace/admin/feature-flag",
+					search: { code: workspace.code },
+				})
+				await screen.findByDisplayValue(flags[0].name)
+				await user.click(screen.getByTestId("create-feature-flag-button"))
+				expect(
+					await screen.findByTestId("create-feature-flag-modal"),
+				).toBeInTheDocument()
+			})
+
+			test("submits create feature flag with POST body", async () => {
+				await navigateToTestPage({
+					to: "/workspace/admin/feature-flag",
+					search: { code: workspace.code },
+				})
+				await screen.findByDisplayValue(flags[0].name)
+				await user.click(screen.getByTestId("create-feature-flag-button"))
+				const modal = await screen.findByTestId("create-feature-flag-modal")
+				await user.type(within(modal).getByLabelText(/^name$/i), "New Flag")
+				await user.type(within(modal).getByLabelText(/^key$/i), "new_flag")
+				await user.type(
+					within(modal).getByLabelText(/^description$/i),
+					"A short description.",
+				)
+				await user.click(
+					within(modal).getByRole("button", { name: /^create$/i }),
+				)
+				await waitFor(() => {
+					expect(vi.mocked(apiClient.post)).toHaveBeenCalledWith(
+						AdminApiPaths.FEATURE_FLAGS,
+						{
+							name: "New Flag",
+							key: "new_flag",
+							description: "A short description.",
+						},
+					)
+				})
+			})
+
+			test("rejects description longer than 200 words", async () => {
+				await navigateToTestPage({
+					to: "/workspace/admin/feature-flag",
+					search: { code: workspace.code },
+				})
+				await screen.findByDisplayValue(flags[0].name)
+				await user.click(screen.getByTestId("create-feature-flag-button"))
+				const modal = await screen.findByTestId("create-feature-flag-modal")
+				await user.type(
+					within(modal).getByLabelText(/^name$/i),
+					"New Navigation Ui",
+				)
+				await user.type(
+					within(modal).getByLabelText(/^key$/i),
+					"new_navigation_ui",
+				)
+				repeat(201, async () => {
+					await user.type(within(modal).getByLabelText(/^description$/i), "I")
+				})
+				await waitFor(() => {
+					expect(
+						within(modal).getByRole("button", { name: /^create$/i }),
+					).toBeDisabled()
+				})
+			})
 		})
 	})
 })
