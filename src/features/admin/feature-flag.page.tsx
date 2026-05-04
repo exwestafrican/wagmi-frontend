@@ -193,7 +193,7 @@ export function FeatureFlagPage() {
 				<h1 className="text-2xl font-semibold">Feature Flag</h1>
 				<div
 					data-testid="feature-request-button"
-					className="text-foreground/40 hover:text-foreground/60 transition-colors shadow-[0_0_6px_rgba(0,0,0,0.3)] rounded-full p-1 cursor-pointer"
+					className="text-supabase-green hover:brightness-110 dark:hover:brightness-90 transition-colors shadow-[0_0_8px_rgba(112,225,172,0.45)] rounded-full p-1 cursor-pointer"
 				>
 					<Plus className="w-5 h-5 " />
 				</div>
