@@ -193,9 +193,9 @@ export function FeatureFlagPage() {
 				<h1 className="text-2xl font-semibold">Feature Flag</h1>
 				<div
 					data-testid="feature-request-button"
-					className="text-supabase-green hover:brightness-110 dark:hover:brightness-90 transition-colors shadow-[0_0_8px_rgba(112,225,172,0.45)] rounded-full p-1 cursor-pointer"
+					className="group rounded-full bg-muted p-1 cursor-pointer shadow-[0_0_8px_rgba(0,0,0,0.12)] transition-colors hover:bg-muted/90 dark:bg-muted/60 dark:shadow-[0_0_10px_rgba(255,255,255,0.06)]"
 				>
-					<Plus className="w-5 h-5 " />
+					<Plus className="h-5 w-5 text-green-600 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300" />
 				</div>
 			</div>
 			<div className="flex md:flex-row gap-16 flex-col">
