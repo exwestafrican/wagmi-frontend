@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeEach } from "vitest"
 import { navigateToTestPage } from "@/test/helpers/navigate"
 
-import { screen } from "@testing-library/react"
+import { screen, waitFor } from "@testing-library/react"
 
 import userEvent from "@testing-library/user-event"
 import type { UserEvent } from "@testing-library/user-event"
@@ -42,7 +42,10 @@ describe("Admin / Control Panel", () => {
 				to: "/workspace",
 				search: { code: workspace.code },
 			})
-			expect(screen.queryByText(/control panel/i)).not.toBeInTheDocument()
+			await screen.findByText(/directory/i)
+			await waitFor(() => {
+				expect(screen.queryByText(/control panel/i)).not.toBeInTheDocument()
+			})
 		})
 
 		test("visible when feature_administrative_workspace flag is ON", async () => {
