@@ -19,23 +19,18 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
 import {
 	AtSign,
 	Bell,
 	BellDot,
-	MessageCircle,
 	MessageSquare,
 	MoreVertical,
 	UserCheck,
 	Users,
+	MessagesSquare,
+	MonitorCog,
 } from "lucide-react"
-import {
-	Outlet,
-	useMatchRoute,
-	useNavigate,
-	useSearch,
-} from "@tanstack/react-router"
+import { Outlet, useNavigate, useSearch } from "@tanstack/react-router"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import { useWorkspace } from "@/features/workspace/api/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
@@ -45,6 +40,12 @@ import { type ReactNode, useState } from "react"
 import { modifyCasing } from "@/utils/sentence-case.ts"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
+import { useEnabledFeature } from "@/features/feature-flag/hooks/use-enabled-feature.ts"
+import { FEATURE } from "@/features/feature-flag/const.ts"
+import type { SubMenuItem } from "@/features/workspace/interface/menu.ts"
+import useActivePath from "@/hooks/use-active-path.ts"
+import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
+import CollapsibleMainMenuItem from "@/features/workspace/components/collapsible-main-menu.tsx"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -94,10 +95,14 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
+	const { isEnabled: isAdministrativeWorkspace } = useEnabledFeature(
+		code,
+		FEATURE.ADMINISTRATIVE_WORKSPACE,
+	)
 
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
-	const matchRoute = useMatchRoute()
+	const isActivePath = useActivePath()
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
 
@@ -107,18 +112,42 @@ export default function WorkspacePage() {
 			path: "/workspace/directory",
 			icon: Users,
 			label: "Directory",
+			canView: true,
+			subMenuItems: [],
 		},
 		{
 			id: "activity",
 			path: "/workspace/activity",
 			icon: Bell,
 			label: "Activity",
+			canView: true,
+			subMenuItems: [],
 		},
 		{
 			id: "conversation",
 			path: "/workspace/conversation",
-			icon: MessageCircle,
-			label: "Conversation",
+			icon: MessagesSquare,
+			label: "Conversations",
+			canView: true,
+			subMenuItems: [],
+		},
+		{
+			id: "internal",
+			icon: MonitorCog,
+			label: "Control Panel",
+			canView: isAdministrativeWorkspace,
+			subMenuItems: [
+				{
+					id: "backfill",
+					path: "/workspace/admin/backfill",
+					label: "Backfill",
+				},
+				{
+					id: "feature-flag",
+					path: "/workspace/admin/feature-flag",
+					label: "feature flag",
+				},
+			],
 		},
 	]
 
@@ -128,39 +157,32 @@ export default function WorkspacePage() {
 			path: "/workspace/dms",
 			icon: BellDot,
 			label: "DMs",
-			count: "10+",
+			count: 11,
 		},
 		{
 			id: "assigned",
 			path: "/workspace/assigned",
 			icon: UserCheck,
 			label: "Assigned",
-			count: "5",
+			count: 5,
 		},
 		{
 			id: "mentioned",
 			path: "/workspace/mentioned",
 			icon: AtSign,
 			label: "Mentioned",
-			count: "1",
+			count: 1,
 		},
 		{
 			id: "discussion",
 			path: "/workspace/discussion",
 			icon: MessageSquare,
 			label: "Discussions",
-			count: undefined,
+			count: 0,
 		},
 	]
 
-	const isActivePath = (currentPath: string): boolean => {
-		return Boolean(
-			matchRoute({
-				to: currentPath,
-				fuzzy: true, // child routes still count as “under” this match; tune per docs
-			}),
-		)
-	}
+	const badgeText = (count: number) => (count > 10 ? "10+" : count)
 
 	return (
 		<div>
@@ -214,12 +236,12 @@ export default function WorkspacePage() {
 					<SidebarContent>
 						<SideNavGroupWithTopSeparator>
 							<SidebarMenu className="px-3">
-								{mainMenuItems.map((item) => (
-									<SidebarMenuItem key={item.id}>
-										<SidebarMenuButton
-											className="cursor-pointer"
-											size="sm"
-											asChild
+								{mainMenuItems.map((item) => {
+									if (!item.canView) return null
+									return item.subMenuItems.length === 0 ? (
+										<MainMenuItem
+											key={item.id}
+											item={item}
 											onClick={() =>
 												navigate({
 													from: "/workspace",
@@ -227,19 +249,21 @@ export default function WorkspacePage() {
 													search: { code: code },
 												})
 											}
-											isActive={isActivePath(item.path)}
-										>
-											<div>
-												<div className="flex gap-2 items-center text-muted-brown">
-													<item.icon className="h-4 w-4" />
-													<span className="text-left font-normal text-xs ">
-														{item.label}
-													</span>
-												</div>
-											</div>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								))}
+										/>
+									) : (
+										<CollapsibleMainMenuItem
+											key={item.id}
+											item={item}
+											onClick={(submenu: SubMenuItem) =>
+												navigate({
+													from: "/workspace",
+													to: submenu.path,
+													search: { code: code },
+												})
+											}
+										/>
+									)
+								})}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
 						<SideNavGroupWithTopSeparator>
@@ -267,10 +291,10 @@ export default function WorkspacePage() {
 													<item.icon className="h-4 w-4" />
 													<span>{item.label}</span>
 												</div>
-												{item.count && (
+												{item.count > 0 && (
 													<SidebarMenuBadge>
 														<span className="text-xs px-1.5 py-0.5 rounded-full bg-chestnut-brown text-stone-100">
-															{item.count}
+															{badgeText(item.count)}
 														</span>
 													</SidebarMenuBadge>
 												)}
