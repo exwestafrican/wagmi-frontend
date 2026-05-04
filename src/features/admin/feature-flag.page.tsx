@@ -16,16 +16,57 @@ import {
 	FormItem,
 	FormLabel,
 } from "@/components/ui/form"
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.tsx"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input.tsx"
+import { Button } from "@/components/ui/button.tsx"
+import { ChevronsUpDown, CircleSlash2, Globe, Split } from "lucide-react"
 import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+
+function FeatureStatus({
+	status,
+}: {
+	status: string
+}) {
+	if (status === "global") {
+		return (
+			<span className="flex items-center gap-2">
+				<Globe className="h-4 w-4" />
+				<span className="capitalize">{status}</span>
+			</span>
+		)
+	}
+
+	if (status === "partial") {
+		return (
+			<span className="flex items-center gap-2">
+				<Split className="h-4 w-4" />
+				<span className="capitalize">{status}</span>
+			</span>
+		)
+	}
+
+	return (
+		<span className="flex items-center gap-2">
+			<CircleSlash2 className="h-4 w-4" />
+			<span className="capitalize">{status}</span>
+		</span>
+	)
+}
 
 const formSchema = z.object({
 	name: z.string().trim(),
 	key: z.string().trim(),
 	description: z.string().trim(),
+	status: z.enum(["global", "partial", "disabled"]),
 })
 
 function FeatureFlagDetail({
@@ -41,6 +82,7 @@ function FeatureFlagDetail({
 			name: featureFlag.name,
 			key: featureFlag.key,
 			description: featureFlag.description,
+			status: featureFlag.status,
 		},
 	})
 
@@ -57,11 +99,7 @@ function FeatureFlagDetail({
 						<FormItem>
 							<FormLabel>Name</FormLabel>
 							<FormControl>
-								<Input
-									className="signup-field-input"
-									disabled
-									{...field}
-								/>
+								<Input className="signup-field-input" disabled {...field} />
 							</FormControl>
 						</FormItem>
 					)}
@@ -73,11 +111,7 @@ function FeatureFlagDetail({
 						<FormItem>
 							<FormLabel>Key</FormLabel>
 							<FormControl>
-								<Input
-									className="signup-field-input"
-									disabled
-									{...field}
-								/>
+								<Input className="signup-field-input" disabled {...field} />
 							</FormControl>
 						</FormItem>
 					)}
@@ -89,11 +123,43 @@ function FeatureFlagDetail({
 						<FormItem>
 							<FormLabel>Description</FormLabel>
 							<FormControl>
-								<Input
-									className="signup-field-input"
-									disabled
-									{...field}
-								/>
+								<Input className="signup-field-input" disabled {...field} />
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="status"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Status</FormLabel>
+							<FormControl>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild disabled>
+										<Button
+											type="button"
+											variant="outline"
+											className="w-full justify-between"
+											disabled
+										>
+											<FeatureStatus status={featureFlag.status} />
+											<ChevronsUpDown className="h-4 w-4 opacity-60" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="start">
+										<DropdownMenuRadioGroup
+											value={field.value}
+											onValueChange={field.onChange}
+										>
+											{["global", "partial", "disabled"].map((status) => (
+												<DropdownMenuRadioItem key={status} value={status}>
+													<FeatureStatus status={status} />
+												</DropdownMenuRadioItem>
+											))}
+										</DropdownMenuRadioGroup>
+									</DropdownMenuContent>
+								</DropdownMenu>
 							</FormControl>
 						</FormItem>
 					)}
@@ -108,8 +174,8 @@ export function FeatureFlagPage() {
 	const [selectedRow, setSelectedRow] = useState(0)
 
 	function onSubmit(value: z.infer<typeof formSchema>) {
-        console.log(value)
-    }
+		console.log(value)
+	}
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
@@ -134,7 +200,7 @@ export function FeatureFlagPage() {
 								<TableRow
 									key={ff.key}
 									data-state={selectedRow === rowIdx ? "selected" : undefined}
-                                    onClick={() => setSelectedRow(rowIdx)}
+									onClick={() => setSelectedRow(rowIdx)}
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										{ff.name}
