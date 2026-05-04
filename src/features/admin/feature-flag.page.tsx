@@ -128,26 +128,25 @@ export function FeatureFlagPage() {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{featureFlags &&
-								featureFlags.map((ff, rowIdx) => (
-									<TableRow
-										key={ff.key}
-										data-state={selectedRow === rowIdx ? "selected" : undefined}
-									>
-										<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-											{ff.name}
-										</TableCell>
+							{featureFlags?.map((ff, rowIdx) => (
+								<TableRow
+									key={ff.key}
+									data-state={selectedRow === rowIdx ? "selected" : undefined}
+								>
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										{ff.name}
+									</TableCell>
 
-										<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-											<Badge
-												variant="outline"
-												className="bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300"
-											>
-												{ff.key}
-											</Badge>
-										</TableCell>
-									</TableRow>
-								))}
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										<Badge
+											variant="outline"
+											className="bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300"
+										>
+											{ff.key}
+										</Badge>
+									</TableCell>
+								</TableRow>
+							))}
 						</TableBody>
 					</Table>
 				</div>
