@@ -29,44 +29,47 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { ChevronsUpDown, CircleSlash2, Globe, Plus, Split } from "lucide-react"
-import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+import {
+	FeatureFlagStatus,
+	type FeatureFlag,
+} from "@/features/admin/interface/feature-flag.ts"
 
-function FeatureStatus({
-	status,
-}: {
-	status: string
-}) {
-	if (status === "global") {
-		return (
-			<span className="flex items-center gap-2">
-				<Globe className="h-4 w-4" />
-				<span className="capitalize">{status}</span>
-			</span>
-		)
+function FeatureStatus({ status }: { status: string }) {
+	switch (status) {
+		case FeatureFlagStatus.GLOBAL:
+			return (
+				<span className="flex items-center gap-2">
+					<Globe className="h-4 w-4" />
+					<span className="capitalize">{status}</span>
+				</span>
+			)
+		case FeatureFlagStatus.PARTIAL:
+			return (
+				<span className="flex items-center gap-2">
+					<Split className="h-4 w-4" />
+					<span className="capitalize">{status}</span>
+				</span>
+			)
+		case FeatureFlagStatus.DISABLED:
+		default:
+			return (
+				<span className="flex items-center gap-2">
+					<CircleSlash2 className="h-4 w-4" />
+					<span className="capitalize">{status}</span>
+				</span>
+			)
 	}
-
-	if (status === "partial") {
-		return (
-			<span className="flex items-center gap-2">
-				<Split className="h-4 w-4" />
-				<span className="capitalize">{status}</span>
-			</span>
-		)
-	}
-
-	return (
-		<span className="flex items-center gap-2">
-			<CircleSlash2 className="h-4 w-4" />
-			<span className="capitalize">{status}</span>
-		</span>
-	)
 }
 
 const formSchema = z.object({
 	name: z.string().trim(),
 	key: z.string().trim(),
 	description: z.string().trim(),
-	status: z.enum(["global", "partial", "disabled"]),
+	status: z.enum([
+		FeatureFlagStatus.GLOBAL,
+		FeatureFlagStatus.PARTIAL,
+		FeatureFlagStatus.DISABLED,
+	]),
 })
 
 function FeatureFlagDetail({
@@ -152,7 +155,11 @@ function FeatureFlagDetail({
 											value={field.value}
 											onValueChange={field.onChange}
 										>
-											{["global", "partial", "disabled"].map((status) => (
+											{[
+												FeatureFlagStatus.GLOBAL,
+												FeatureFlagStatus.PARTIAL,
+												FeatureFlagStatus.DISABLED,
+											].map((status) => (
 												<DropdownMenuRadioItem key={status} value={status}>
 													<FeatureStatus status={status} />
 												</DropdownMenuRadioItem>
@@ -175,6 +182,10 @@ export function FeatureFlagPage() {
 
 	function onSubmit(value: z.infer<typeof formSchema>) {
 		console.log(value)
+	}
+
+	const selectedFeature = (features: FeatureFlag[], rowIdx: number) => {
+		return features[rowIdx]
 	}
 
 	return (
@@ -232,7 +243,7 @@ export function FeatureFlagPage() {
 						<div className="flex flex-col gap-6">
 							<h3 className="text-lg font-semibold">Details</h3>
 							<FeatureFlagDetail
-								featureFlag={featureFlags[selectedRow]}
+								featureFlag={selectedFeature(featureFlags, selectedRow)}
 								onSubmit={onSubmit}
 							/>
 						</div>

@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
-import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+import {
+	FeatureFlagStatus,
+	type FeatureFlag,
+} from "@/features/admin/interface/feature-flag.ts"
 import { apiClient } from "@/lib/api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
 
@@ -10,15 +13,15 @@ function normalizeFeatureFlagStatus(status: string): FeatureFlag["status"] {
 		.trim()
 		.toLowerCase()
 	switch (s) {
-		case "global":
-			return "global"
-		case "partial":
-			return "partial"
-		case "disabled":
-			return "disabled"
+		case FeatureFlagStatus.GLOBAL:
+			return FeatureFlagStatus.GLOBAL
+		case FeatureFlagStatus.PARTIAL:
+			return FeatureFlagStatus.PARTIAL
+		case FeatureFlagStatus.DISABLED:
+			return FeatureFlagStatus.DISABLED
 		default:
 			// default to safest behavior if backend sends unexpected value
-			return "disabled"
+			return FeatureFlagStatus.DISABLED
 	}
 }
 
