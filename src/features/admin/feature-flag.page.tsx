@@ -243,6 +243,7 @@ export function FeatureFlagPage() {
 						<div className="flex flex-col gap-6">
 							<h3 className="text-lg font-semibold">Details</h3>
 							<FeatureFlagDetail
+								key={selectedFeature(featureFlags, selectedRow).key}
 								featureFlag={selectedFeature(featureFlags, selectedRow)}
 								onSubmit={onSubmit}
 							/>
