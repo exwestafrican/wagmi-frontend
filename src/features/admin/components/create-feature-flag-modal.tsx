@@ -47,11 +47,11 @@ export function CreateFeatureFlagModal({
 	})
 	const { isValid } = useFormState({ control: form.control })
 
-	function handleOpenChange(next: boolean) {
-		if (!next) {
+	function handleOpenChange(open: boolean) {
+		if (!open) {
 			form.reset(defaultValues)
 		}
-		onOpenChange(next)
+		onOpenChange(open)
 	}
 
 	function onSubmit(values: CreateFeatureFlagFormValues) {
@@ -147,7 +147,7 @@ export function CreateFeatureFlagModal({
 								Cancel
 							</Button>
 							<Button type="submit" disabled={isPending || !isValid}>
-								{isPending ? "Creating…" : "Create"}
+								{isPending ? "Vrooming…" : "Create"}
 							</Button>
 						</DialogFooter>
 					</form>

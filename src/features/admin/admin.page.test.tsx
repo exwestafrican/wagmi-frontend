@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeEach } from "vitest"
 import { navigateToTestPage } from "@/test/helpers/navigate"
 
-import {  screen, waitFor, within } from "@testing-library/react"
+import { screen, waitFor, within } from "@testing-library/react"
 import { apiClient } from "@/lib/api-client.ts"
 import { vi } from "vitest"
 

@@ -10,7 +10,11 @@ type FeatureBadgeProps = {
 	children: ReactNode
 } & Omit<ComponentProps<typeof Badge>, "variant" | "children">
 
-export function FeatureBadge({ status, children, ...props }: FeatureBadgeProps) {
+export function FeatureBadge({
+	status,
+	children,
+	...props
+}: FeatureBadgeProps) {
 	switch (status) {
 		case FeatureFlagStatus.PARTIAL:
 			return (

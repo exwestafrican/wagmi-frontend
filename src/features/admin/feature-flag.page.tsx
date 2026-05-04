@@ -227,7 +227,7 @@ export function FeatureFlagPage() {
 									key={ff.key}
 									data-state={selectedRow === rowIdx ? "selected" : undefined}
 									onClick={() => setSelectedRow(rowIdx)}
-                                    className="cursor-pointer"
+									className="cursor-pointer"
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										{ff.name}
