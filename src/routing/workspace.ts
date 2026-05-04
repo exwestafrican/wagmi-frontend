@@ -7,6 +7,7 @@ import { rootRoute } from "@/routing/root.ts"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { BackfillJobsPage } from "@/features/admin/backfill-jobs.page.tsx"
+import { FeatureFlagPage } from "@/features/admin/feature-flag.page.tsx"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -45,8 +46,15 @@ const internalRoute = createRoute({
 	component: BackfillJobsPage,
 })
 
+const featureFlagRoute = createRoute({
+	getParentRoute: () => workspaceLayoutRoute,
+	path: "admin/feature-flag",
+	component: FeatureFlagPage,
+})
+
 export const workspaceRouteTree = workspaceLayoutRoute.addChildren([
 	workspaceIndexRoute,
 	workspaceDirectoryRoute,
 	internalRoute,
+	featureFlagRoute,
 ])

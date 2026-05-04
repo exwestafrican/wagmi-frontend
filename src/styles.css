@@ -57,6 +57,7 @@ code {
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-muted-brown: #6b6760;
+	--color-supabase-green: #70e1ac;
 	--color-chestnut-brown: #8b5a3c;
 	--color-sidebar-active: #9d9a8e;
 }

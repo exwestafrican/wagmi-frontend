@@ -20,6 +20,10 @@ export const ApiPaths = {
 	TASKS: "/backfill/tasks",
 } as const
 
+export const AdminApiPaths = {
+	FEATURE_FLAGS: "admin/feature-flag",
+} as const
+
 export const ROLES = {
 	WorkspaceAdmin: "WorkspaceAdmin",
 	SupportStaff: "SupportStaff",
