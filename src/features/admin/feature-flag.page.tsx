@@ -7,7 +7,6 @@ import {
 	TableRow,
 } from "@/components/ui/table.tsx"
 import { useFeatureFlags } from "@/features/admin/api/list-feature-flags.ts"
-import { Badge } from "@/components/ui/badge.tsx"
 import { useState } from "react"
 import {
 	Form,
@@ -34,6 +33,7 @@ import {
 	type FeatureFlag,
 } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
+import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
 
 function FeatureStatus({ status }: { status: string }) {
 	switch (status) {
@@ -227,18 +227,14 @@ export function FeatureFlagPage() {
 									key={ff.key}
 									data-state={selectedRow === rowIdx ? "selected" : undefined}
 									onClick={() => setSelectedRow(rowIdx)}
+                                    className="cursor-pointer"
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										{ff.name}
 									</TableCell>
 
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-										<Badge
-											variant="outline"
-											className="bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300"
-										>
-											{ff.key}
-										</Badge>
+										<FeatureBadge status={ff.status}>{ff.key}</FeatureBadge>
 									</TableCell>
 								</TableRow>
 							))}
