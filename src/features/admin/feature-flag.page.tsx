@@ -58,7 +58,7 @@ function FeatureFlagDetail({
 							<FormLabel>Name</FormLabel>
 							<FormControl>
 								<Input
-									// className="signup-field-input"
+									className="signup-field-input"
 									disabled
 									{...field}
 								/>
@@ -74,7 +74,7 @@ function FeatureFlagDetail({
 							<FormLabel>Key</FormLabel>
 							<FormControl>
 								<Input
-									// className="signup-field-input"
+									className="signup-field-input"
 									disabled
 									{...field}
 								/>
@@ -90,7 +90,7 @@ function FeatureFlagDetail({
 							<FormLabel>Description</FormLabel>
 							<FormControl>
 								<Input
-									// className="signup-field-input"
+									className="signup-field-input"
 									disabled
 									{...field}
 								/>
@@ -107,7 +107,9 @@ export function FeatureFlagPage() {
 	const { data: featureFlags } = useFeatureFlags()
 	const [selectedRow, setSelectedRow] = useState(0)
 
-	function onSubmit(value: z.infer<typeof formSchema>) {}
+	function onSubmit(value: z.infer<typeof formSchema>) {
+        console.log(value)
+    }
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
@@ -132,6 +134,7 @@ export function FeatureFlagPage() {
 								<TableRow
 									key={ff.key}
 									data-state={selectedRow === rowIdx ? "selected" : undefined}
+                                    onClick={() => setSelectedRow(rowIdx)}
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										{ff.name}
