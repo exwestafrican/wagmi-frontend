@@ -50,7 +50,6 @@ function FeatureStatus({ status }: { status: string }) {
 					<span className="capitalize">{status}</span>
 				</span>
 			)
-		case FeatureFlagStatus.DISABLED:
 		default:
 			return (
 				<span className="flex items-center gap-2">
