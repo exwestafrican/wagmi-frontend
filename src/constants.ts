@@ -17,12 +17,12 @@ export const ApiPaths = {
 	ACCEPT_INVITE: "workspace/accept-invite",
 	CHECK_USERNAME: "/teammates/check-username",
 	ACTIVE_TEAMMATES: "/teammates",
-	TASKS: "/backfill/tasks",
 } as const
 
 export const AdminApiPaths = {
 	FEATURE_FLAGS: "admin/feature-flag",
 	LOGIN: "auth/admin/login",
+	LIST_TASKS: "/backfill/tasks",
 } as const
 
 export const ROLES = {
