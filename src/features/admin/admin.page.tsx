@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useMemo } from "react"
+import { type KeyboardEvent, useEffect, useMemo } from "react"
 import { getHashParams } from "@/lib/get-hash-params.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
 
@@ -12,7 +12,7 @@ export function AdminPage() {
 		if (accessToken != null) {
 			setAuthToken(accessToken)
 		}
-	}, [accessToken])
+	}, [accessToken, setAuthToken])
 
 	const options = [
 		{
@@ -24,6 +24,7 @@ export function AdminPage() {
 			path: "/admin/backfill",
 		},
 	]
+
 	return (
 		<div className="m-8">
 			<ul className="list-disc pl-6 space-y-1">
@@ -35,6 +36,10 @@ export function AdminPage() {
 								to: option.path,
 							})
 						}
+						onKeyDown={(e: KeyboardEvent<HTMLLIElement>) => {
+							// this does nothing for now, maybe we can use this to navigate
+							e.preventDefault()
+						}}
 						className="capitalize cursor-pointer hover:text-blue-500 hover:underline"
 					>
 						{option.name}
