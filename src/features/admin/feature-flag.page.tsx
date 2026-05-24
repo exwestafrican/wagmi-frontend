@@ -8,180 +8,24 @@ import {
 } from "@/components/ui/table.tsx"
 import { useFeatureFlags } from "@/features/admin/api/list-feature-flags.ts"
 import { useState } from "react"
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-} from "@/components/ui/form"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.tsx"
+
 import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Input } from "@/components/ui/input.tsx"
-import { Button } from "@/components/ui/button.tsx"
-import { ChevronsUpDown, CircleSlash2, Globe, Plus, Split } from "lucide-react"
+
+import { Plus } from "lucide-react"
 import {
-	FeatureFlagStatus,
 	type FeatureFlag,
+	featureFormSchema,
 } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
-
-function FeatureStatus({ status }: { status: string }) {
-	switch (status) {
-		case FeatureFlagStatus.GLOBAL:
-			return (
-				<span className="flex items-center gap-2">
-					<Globe className="h-4 w-4" />
-					<span className="capitalize">{status}</span>
-				</span>
-			)
-		case FeatureFlagStatus.PARTIAL:
-			return (
-				<span className="flex items-center gap-2">
-					<Split className="h-4 w-4" />
-					<span className="capitalize">{status}</span>
-				</span>
-			)
-		default:
-			return (
-				<span className="flex items-center gap-2">
-					<CircleSlash2 className="h-4 w-4" />
-					<span className="capitalize">{status}</span>
-				</span>
-			)
-	}
-}
-
-const formSchema = z.object({
-	name: z.string().trim(),
-	key: z.string().trim(),
-	description: z.string().trim(),
-	status: z.enum([
-		FeatureFlagStatus.GLOBAL,
-		FeatureFlagStatus.PARTIAL,
-		FeatureFlagStatus.DISABLED,
-	]),
-})
-
-function FeatureFlagDetail({
-	featureFlag,
-	onSubmit,
-}: {
-	featureFlag: FeatureFlag
-	onSubmit: (value: z.infer<typeof formSchema>) => void
-}) {
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			name: featureFlag.name,
-			key: featureFlag.key,
-			description: featureFlag.description,
-			status: featureFlag.status,
-		},
-	})
-
-	return (
-		<Form {...form}>
-			<form
-				className="flex max-w-md flex-col gap-5"
-				onSubmit={form.handleSubmit(onSubmit)}
-			>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Name</FormLabel>
-							<FormControl>
-								<Input className="signup-field-input" disabled {...field} />
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="key"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Key</FormLabel>
-							<FormControl>
-								<Input className="signup-field-input" disabled {...field} />
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl>
-								<Input className="signup-field-input" disabled {...field} />
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="status"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Status</FormLabel>
-							<FormControl>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild disabled>
-										<Button
-											type="button"
-											variant="outline"
-											className="w-full justify-between"
-											disabled
-										>
-											<FeatureStatus status={featureFlag.status} />
-											<ChevronsUpDown className="h-4 w-4 opacity-60" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="start">
-										<DropdownMenuRadioGroup
-											value={field.value}
-											onValueChange={field.onChange}
-										>
-											{[
-												FeatureFlagStatus.GLOBAL,
-												FeatureFlagStatus.PARTIAL,
-												FeatureFlagStatus.DISABLED,
-											].map((status) => (
-												<DropdownMenuRadioItem key={status} value={status}>
-													<FeatureStatus status={status} />
-												</DropdownMenuRadioItem>
-											))}
-										</DropdownMenuRadioGroup>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-			</form>
-		</Form>
-	)
-}
+import FeatureFlagDetail from "@/features/admin/components/feature-flag-detail.tsx"
 
 export function FeatureFlagPage() {
 	const { data: featureFlags } = useFeatureFlags()
 	const [selectedRow, setSelectedRow] = useState(0)
 	const [createModalOpen, setCreateModalOpen] = useState(false)
 
-	function onSubmit(value: z.infer<typeof formSchema>) {
+	function onSubmit(value: z.infer<typeof featureFormSchema>) {
 		console.log(value)
 	}
 

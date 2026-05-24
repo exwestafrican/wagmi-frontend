@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export const FeatureFlagStatus = {
 	GLOBAL: "global",
 	PARTIAL: "partial",
@@ -10,3 +12,14 @@ export interface FeatureFlag {
 	description: string
 	status: (typeof FeatureFlagStatus)[keyof typeof FeatureFlagStatus]
 }
+
+export const featureFormSchema = z.object({
+	name: z.string().trim(),
+	key: z.string().trim(),
+	description: z.string().trim(),
+	status: z.enum([
+		FeatureFlagStatus.GLOBAL,
+		FeatureFlagStatus.PARTIAL,
+		FeatureFlagStatus.DISABLED,
+	]),
+})
