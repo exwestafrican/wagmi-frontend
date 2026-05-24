@@ -17,7 +17,6 @@ import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-
 import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
 import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
-import { FeatureFlagPage } from "@/features/admin/feature-flag.page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 
 function WaitlistPlaceholder() {
@@ -93,13 +92,6 @@ export function makeTestRouter() {
 		component: WorkspaceDirectoryPage,
 	})
 
-	const featureFlagRoute = createRoute({
-		getParentRoute: () => workspaceRoute,
-		path: "admin/feature-flag",
-		validateSearch: z.object({ code: z.string() }),
-		component: FeatureFlagPage,
-	})
-
 	const acceptInviteRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/workspace-invite",
@@ -120,7 +112,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
-			workspaceRoute.addChildren([workspaceDirectoryRoute, featureFlagRoute]),
+			workspaceRoute.addChildren([workspaceDirectoryRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),
