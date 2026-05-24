@@ -28,7 +28,6 @@ import {
 	UserCheck,
 	Users,
 	MessagesSquare,
-	MonitorCog,
 } from "lucide-react"
 import { Outlet, useNavigate, useSearch } from "@tanstack/react-router"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
@@ -40,12 +39,8 @@ import { type ReactNode, useState } from "react"
 import { modifyCasing } from "@/utils/sentence-case.ts"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
-import { useEnabledFeature } from "@/features/feature-flag/hooks/use-enabled-feature.ts"
-import { FEATURE } from "@/features/feature-flag/const.ts"
-import type { SubMenuItem } from "@/features/workspace/interface/menu.ts"
 import useActivePath from "@/hooks/use-active-path.ts"
 import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
-import CollapsibleMainMenuItem from "@/features/workspace/components/collapsible-main-menu.tsx"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -95,10 +90,6 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
-	const { isEnabled: isAdministrativeWorkspace } = useEnabledFeature(
-		code,
-		FEATURE.ADMINISTRATIVE_WORKSPACE,
-	)
 
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
@@ -112,42 +103,18 @@ export default function WorkspacePage() {
 			path: "/workspace/directory",
 			icon: Users,
 			label: "Directory",
-			canView: true,
-			subMenuItems: [],
 		},
 		{
 			id: "activity",
 			path: "/workspace/activity",
 			icon: Bell,
 			label: "Activity",
-			canView: true,
-			subMenuItems: [],
 		},
 		{
 			id: "conversation",
 			path: "/workspace/conversation",
 			icon: MessagesSquare,
 			label: "Conversations",
-			canView: true,
-			subMenuItems: [],
-		},
-		{
-			id: "internal",
-			icon: MonitorCog,
-			label: "Control Panel",
-			canView: isAdministrativeWorkspace,
-			subMenuItems: [
-				{
-					id: "backfill",
-					path: "/workspace/admin/backfill",
-					label: "Backfill",
-				},
-				{
-					id: "feature-flag",
-					path: "/workspace/admin/feature-flag",
-					label: "feature flag",
-				},
-			],
 		},
 	]
 
@@ -236,34 +203,19 @@ export default function WorkspacePage() {
 					<SidebarContent>
 						<SideNavGroupWithTopSeparator>
 							<SidebarMenu className="px-3">
-								{mainMenuItems.map((item) => {
-									if (!item.canView) return null
-									return item.subMenuItems.length === 0 ? (
-										<MainMenuItem
-											key={item.id}
-											item={item}
-											onClick={() =>
-												navigate({
-													from: "/workspace",
-													to: item.path,
-													search: { code: code },
-												})
-											}
-										/>
-									) : (
-										<CollapsibleMainMenuItem
-											key={item.id}
-											item={item}
-											onClick={(submenu: SubMenuItem) =>
-												navigate({
-													from: "/workspace",
-													to: submenu.path,
-													search: { code: code },
-												})
-											}
-										/>
-									)
-								})}
+								{mainMenuItems.map((item) => (
+									<MainMenuItem
+										key={item.id}
+										item={item}
+										onClick={() =>
+											navigate({
+												from: "/workspace",
+												to: item.path,
+												search: { code: code },
+											})
+										}
+									/>
+								))}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
 						<SideNavGroupWithTopSeparator>
