@@ -32,7 +32,6 @@ const LoginPage = () => {
 	})
 
 	const onSubmit = (data: LoginData) => {
-		console.log(`Login Data: ${data}`)
 		loginUser(data, {
 			onSuccess: () => {
 				form.reset()

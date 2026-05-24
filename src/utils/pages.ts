@@ -7,3 +7,7 @@ export const Pages = {
 	ACCEPT_INVITE: "/workspace-invite",
 	CHECK_EMAIL: "/check-email",
 }
+
+export const AdminPages = {
+	LOGIN: "/admin/login",
+}

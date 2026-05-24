@@ -22,6 +22,7 @@ export const ApiPaths = {
 
 export const AdminApiPaths = {
 	FEATURE_FLAGS: "admin/feature-flag",
+	LOGIN: "auth/admin/login",
 } as const
 
 export const ROLES = {

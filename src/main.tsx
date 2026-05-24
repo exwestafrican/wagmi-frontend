@@ -18,6 +18,7 @@ import {
 	workspaceSetupRoute,
 } from "@/routing/root.ts"
 import { workspaceRouteTree } from "@/routing/workspace.ts"
+import { adminRouteTree } from "@/routing/admin.ts"
 
 // Create a client
 const queryClient = new QueryClient({})
@@ -31,6 +32,7 @@ const routeTree = rootRoute.addChildren([
 	acceptInviteRoute,
 	checkEmailRoute,
 	workspaceRouteTree,
+	adminRouteTree,
 ])
 
 const router = createRouter({
