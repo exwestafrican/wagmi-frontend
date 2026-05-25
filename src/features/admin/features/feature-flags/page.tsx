@@ -176,7 +176,7 @@ function FeatureFlagDetail({
 	)
 }
 
-export function FeatureFlagPage() {
+export default function AdminFeatureFlagPage() {
 	const { data: featureFlags } = useFeatureFlags()
 	const [selectedRow, setSelectedRow] = useState(0)
 	const [createModalOpen, setCreateModalOpen] = useState(false)

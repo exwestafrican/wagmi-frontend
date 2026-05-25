@@ -5,8 +5,6 @@ export type MenuItem = {
 	path?: string
 	icon: LucideIcon
 	label: string
-	canView: boolean
-	subMenuItems: SubMenuItem[]
 }
 
 export type SubMenuItem = {

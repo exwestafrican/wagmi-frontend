@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api-client.ts"
-import { ApiPaths } from "@/constants.ts"
+import { AdminApiPaths } from "@/constants.ts"
 
 export type Task = {
 	jobId: string
@@ -10,13 +10,11 @@ export type Task = {
 
 export const TASKS = "tasks"
 
-export function useTasks(workspaceCode: string) {
+export function useTasks() {
 	return useQuery<Task[]>({
-		queryKey: [TASKS, workspaceCode],
+		queryKey: [TASKS],
 		queryFn: async () => {
-			const res = await apiClient.get<Task[]>(ApiPaths.TASKS, {
-				params: { workspaceCode },
-			})
+			const res = await apiClient.get<Task[]>(AdminApiPaths.LIST_TASKS)
 			return res.data
 		},
 		staleTime: Number.POSITIVE_INFINITY,

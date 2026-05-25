@@ -1,4 +1,3 @@
-import { useSearch } from "@tanstack/react-router"
 import { useTasks } from "@/features/admin/api/list-tasks.ts"
 import {
 	Table,
@@ -18,9 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu.tsx"
 import { Badge } from "@/components/ui/badge.tsx"
 
-export function BackfillJobsPage() {
-	const { code } = useSearch({ from: "/workspace" })
-	const { data: tasks } = useTasks(code)
+export default function AdminBackfillPage() {
+	const { data: tasks } = useTasks()
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
