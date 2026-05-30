@@ -26,8 +26,7 @@ export function createApiClient(loginPath: string): AxiosInstance {
 			if (
 				(status === HttpStatusCode.Forbidden ||
 					status === HttpStatusCode.Unauthorized) &&
-				hadAuthHeader &&
-				window.location.pathname !== loginPath
+				hadAuthHeader
 			) {
 				useAuthStore.getState().clearAuthToken()
 				const redirectUrl = encodeURIComponent(window.location.href)
