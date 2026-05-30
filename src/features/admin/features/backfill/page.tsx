@@ -1,4 +1,5 @@
-import { useTasks } from "@/features/admin/api/list-tasks.ts"
+import { Badge } from "@/components/ui/badge.tsx"
+import { Button } from "@/components/ui/button"
 import {
 	Table,
 	TableBody,
@@ -7,20 +8,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import { Loader2, MoreHorizontalIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.tsx"
-import { Badge } from "@/components/ui/badge.tsx"
+import { useTasks } from "@/features/admin/api/list-tasks.ts"
 import {
 	type RunTaskSummary,
 	useRunTask,
 } from "@/features/admin/api/run-task.ts"
 import { isAxiosError } from "axios"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 function notifyRunResult(summary: RunTaskSummary) {
@@ -102,31 +96,22 @@ export default function AdminBackfillPage() {
 										{task.description}
 									</TableCell>
 									<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="size-8 cursor-pointer"
-												>
-													{isRunning ? (
-														<Loader2 className="animate-spin" />
-													) : (
-														<MoreHorizontalIcon />
-													)}
-													<span className="sr-only">Open menu</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem
-													className="cursor-pointer text-xs capitalize"
-													disabled={isPending}
-													onSelect={() => handleRun(task.jobId)}
-												>
-													{isRunning ? "Running…" : "Run job"}
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
+										<Button
+											variant="outline"
+											size="sm"
+											className="min-w-28 cursor-pointer text-xs"
+											disabled={isPending}
+											onClick={() => handleRun(task.jobId)}
+										>
+											{isRunning ? (
+												<>
+													<Loader2 className="animate-spin" />
+													Running…
+												</>
+											) : (
+												"Run job"
+											)}
+										</Button>
 									</TableCell>
 								</TableRow>
 							)

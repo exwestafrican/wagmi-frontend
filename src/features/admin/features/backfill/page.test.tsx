@@ -42,8 +42,7 @@ describe("AdminBackfillPage", () => {
 
 	async function clickRunJob() {
 		await screen.findByText(task.name)
-		await user.click(screen.getByRole("button", { name: /open menu/i }))
-		await user.click(screen.getByRole("menuitem", { name: /run job/i }))
+		await user.click(screen.getByRole("button", { name: /run job/i }))
 	}
 
 	it("calls the run endpoint with the job id and shows a success toast", async () => {
