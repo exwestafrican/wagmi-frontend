@@ -26,8 +26,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
 import { z } from "zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFormState } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import {
@@ -46,26 +47,27 @@ import { CreateFeatureFlagModal } from "@/features/admin/components/create-featu
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDeleteFeatureFlag } from "@/features/admin/features/feature-flags/api/delete-feature-flag.ts"
+import { useUpdateFeatureFlagStatus } from "@/features/admin/features/feature-flags/api/update-feature-flag-status.ts"
 
 function FeatureStatus({ status }: { status: string }) {
 	switch (status) {
 		case FeatureFlagStatus.GLOBAL:
 			return (
-				<span className="flex items-center gap-2">
+				<span className="flex items-center gap-2 cursor-pointer">
 					<Globe className="h-4 w-4" />
 					<span className="capitalize">{status}</span>
 				</span>
 			)
 		case FeatureFlagStatus.PARTIAL:
 			return (
-				<span className="flex items-center gap-2">
+				<span className="flex items-center gap-2 cursor-pointer">
 					<Split className="h-4 w-4" />
 					<span className="capitalize">{status}</span>
 				</span>
 			)
 		default:
 			return (
-				<span className="flex items-center gap-2">
+				<span className="flex items-center gap-2 cursor-pointer">
 					<CircleSlash2 className="h-4 w-4" />
 					<span className="capitalize">{status}</span>
 				</span>
@@ -84,13 +86,9 @@ const formSchema = z.object({
 	]),
 })
 
-function FeatureFlagDetail({
-	featureFlag,
-	onSubmit,
-}: {
-	featureFlag: FeatureFlag
-	onSubmit: (value: z.infer<typeof formSchema>) => void
-}) {
+function FeatureFlagDetail({ featureFlag }: { featureFlag: FeatureFlag }) {
+	const { mutate: updateFeatureFlagStatus, isPending } =
+		useUpdateFeatureFlagStatus()
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -100,12 +98,28 @@ function FeatureFlagDetail({
 			status: featureFlag.status,
 		},
 	})
+	const { isDirty } = useFormState({ control: form.control })
+
+	function handleSubmit(value: z.infer<typeof formSchema>) {
+		updateFeatureFlagStatus(
+			{ key: featureFlag.key, status: value.status },
+			{
+				onSuccess: () => {
+					toast.success("Feature flag updated")
+					form.reset(value)
+				},
+				onError: () => {
+					toast.error("Could not update feature flag")
+				},
+			},
+		)
+	}
 
 	return (
 		<Form {...form}>
 			<form
 				className="flex max-w-md flex-col gap-5"
-				onSubmit={form.handleSubmit(onSubmit)}
+				onSubmit={form.handleSubmit(handleSubmit)}
 			>
 				<FormField
 					control={form.control}
@@ -151,14 +165,13 @@ function FeatureFlagDetail({
 							<FormLabel>Status</FormLabel>
 							<FormControl>
 								<DropdownMenu>
-									<DropdownMenuTrigger asChild disabled>
+									<DropdownMenuTrigger asChild>
 										<Button
 											type="button"
 											variant="outline"
-											className="w-full justify-between"
-											disabled
+											className="w-full justify-between cursor-pointer"
 										>
-											<FeatureStatus status={featureFlag.status} />
+											<FeatureStatus status={field.value} />
 											<ChevronsUpDown className="h-4 w-4 opacity-60" />
 										</Button>
 									</DropdownMenuTrigger>
@@ -183,6 +196,9 @@ function FeatureFlagDetail({
 						</FormItem>
 					)}
 				/>
+				<Button type="submit" disabled={!isDirty || isPending}>
+					{isPending ? "Saving…" : "Save"}
+				</Button>
 			</form>
 		</Form>
 	)
@@ -198,10 +214,6 @@ export default function AdminFeatureFlagPage() {
 		FeatureFlag | undefined
 	>(undefined)
 	const [createModalOpen, setCreateModalOpen] = useState(false)
-
-	function onSubmit(value: z.infer<typeof formSchema>) {
-		console.log(value)
-	}
 
 	useEffect(() => {
 		const hasFeatures = (featureFlags ?? []).length > 0
@@ -299,7 +311,6 @@ export default function AdminFeatureFlagPage() {
 							<FeatureFlagDetail
 								key={selectedFeature.key}
 								featureFlag={selectedFeature}
-								onSubmit={onSubmit}
 							/>
 						</div>
 					)}
