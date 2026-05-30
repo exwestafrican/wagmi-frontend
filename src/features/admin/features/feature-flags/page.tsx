@@ -208,7 +208,7 @@ export default function AdminFeatureFlagPage() {
 		if (isSuccess && hasFeatures) {
 			setSelectedFeature(featureFlags[0])
 		}
-	}, [isSuccess])
+	}, [isSuccess, featureFlags])
 
 	function deleteFeature(featureFlag: FeatureFlag) {
 		const pervFeatureFlags: FeatureFlag[] | undefined =
