@@ -21,7 +21,6 @@ export function usePostStatement() {
 			})
 		},
 		onSuccess: (response) => {
-			//g
 			// Update the query cache with the new data
 			queryClient.setQueryData(["uploads"], () => {
 				const newFile = {
