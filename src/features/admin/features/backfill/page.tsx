@@ -8,13 +8,14 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import { useTasks } from "@/features/admin/api/list-tasks.ts"
+import { type Task, useTasks } from "@/features/admin/api/list-tasks.ts"
 import {
 	type RunTaskSummary,
 	useRunTask,
 } from "@/features/admin/api/run-task.ts"
 import { isAxiosError } from "axios"
 import { Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 function notifyRunResult(summary: RunTaskSummary) {
@@ -48,8 +49,17 @@ function notifyRunError(error: unknown) {
 }
 
 export default function AdminBackfillPage() {
-	const { data: tasks } = useTasks()
+	const { data: tasks, isSuccess } = useTasks()
 	const { mutate: runTask, isPending, variables: runningJobId } = useRunTask()
+
+	const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined)
+
+	useEffect(() => {
+		const hasTasks = (tasks ?? []).length > 0
+		if (isSuccess && hasTasks) {
+			setSelectedTask(tasks[0])
+		}
+	}, [isSuccess, tasks])
 
 	function handleRun(jobId: string) {
 		if (isPending) return
@@ -80,7 +90,14 @@ export default function AdminBackfillPage() {
 						{tasks?.map((task) => {
 							const isRunning = isPending && runningJobId === task.jobId
 							return (
-								<TableRow key={task.jobId}>
+								<TableRow
+									key={task.jobId}
+									data-state={
+										selectedTask?.jobId === task.jobId ? "selected" : undefined
+									}
+									onClick={() => setSelectedTask(task)}
+									className="cursor-pointer"
+								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										{task.name}
 									</TableCell>
