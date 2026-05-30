@@ -11,6 +11,16 @@ vi.mock("@/lib/api-client", () => ({
 	},
 }))
 
+vi.mock("@/lib/admin-api-client", () => ({
+	adminApiClient: {
+		get: vi.fn(),
+		post: vi.fn(),
+		put: vi.fn(),
+		patch: vi.fn(),
+		delete: vi.fn(),
+	},
+}))
+
 beforeEach(() => {
 	localStorage.clear()
 	window.location.hash = ""
