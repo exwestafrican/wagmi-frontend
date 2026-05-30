@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { ChevronsUpDown } from "lucide-react"
-import FeatureStatus from "src/features/admin/features/feature-flags/components/feature-status"
+import FeatureStatus from "@/features/admin/features/feature-flags/components/feature-status.tsx"
 
 const formSchema = z.object({
 	name: z.string().trim(),
