@@ -6,8 +6,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import { useFeatureFlags } from "@/features/admin/api/list-feature-flags.ts"
-import { useState } from "react"
+import {
+	FEATURE_FLAGS,
+	useFeatureFlags,
+} from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
+import { useEffect, useState } from "react"
 import {
 	Form,
 	FormControl,
@@ -27,13 +30,22 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { ChevronsUpDown, CircleSlash2, Globe, Plus, Split } from "lucide-react"
+import {
+	ChevronsUpDown,
+	CircleSlash2,
+	Globe,
+	Plus,
+	Split,
+	Trash2,
+} from "lucide-react"
 import {
 	FeatureFlagStatus,
 	type FeatureFlag,
 } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
+import { useQueryClient } from "@tanstack/react-query"
+import { useDeleteFeatureFlag } from "@/features/admin/features/feature-flags/api/delete-feature-flag.ts"
 
 function FeatureStatus({ status }: { status: string }) {
 	switch (status) {
@@ -177,16 +189,40 @@ function FeatureFlagDetail({
 }
 
 export default function AdminFeatureFlagPage() {
-	const { data: featureFlags } = useFeatureFlags()
-	const [selectedRow, setSelectedRow] = useState(0)
+	const queryClient = useQueryClient()
+
+	const { data: featureFlags, isSuccess } = useFeatureFlags()
+	const { mutate: deleteFeatureFlag } = useDeleteFeatureFlag()
+
+	const [selectedFeature, setSelectedFeature] = useState<
+		FeatureFlag | undefined
+	>(undefined)
 	const [createModalOpen, setCreateModalOpen] = useState(false)
 
 	function onSubmit(value: z.infer<typeof formSchema>) {
 		console.log(value)
 	}
 
-	const selectedFeature = (features: FeatureFlag[], rowIdx: number) => {
-		return features[rowIdx]
+	useEffect(() => {
+		const hasFeatures = (featureFlags ?? []).length > 0
+		if (isSuccess && hasFeatures) {
+			setSelectedFeature(featureFlags[0])
+		}
+	}, [isSuccess])
+
+	function deleteFeature(featureFlag: FeatureFlag) {
+		const pervFeatureFlags: FeatureFlag[] | undefined =
+			queryClient.getQueryData([FEATURE_FLAGS])
+
+		if (pervFeatureFlags) {
+			const filtered = pervFeatureFlags.filter(
+				(prev) => prev.key !== featureFlag.key,
+			)
+			setSelectedFeature(filtered.length > 0 ? filtered[0] : undefined)
+			queryClient.setQueryData([FEATURE_FLAGS], () => filtered)
+		}
+
+		deleteFeatureFlag(featureFlag.key)
 	}
 
 	return (
@@ -225,8 +261,10 @@ export default function AdminFeatureFlagPage() {
 							{featureFlags?.map((ff, rowIdx) => (
 								<TableRow
 									key={ff.key}
-									data-state={selectedRow === rowIdx ? "selected" : undefined}
-									onClick={() => setSelectedRow(rowIdx)}
+									data-state={
+										selectedFeature?.key === ff.key ? "selected" : undefined
+									}
+									onClick={() => setSelectedFeature(featureFlags[rowIdx])}
 									className="cursor-pointer"
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
@@ -234,7 +272,17 @@ export default function AdminFeatureFlagPage() {
 									</TableCell>
 
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-										<FeatureBadge status={ff.status}>{ff.key}</FeatureBadge>
+										<div className="flex items-center justify-between">
+											<FeatureBadge status={ff.status}>{ff.key}</FeatureBadge>
+											<Trash2
+												size={16}
+												className="text-red-700"
+												onClick={(e) => {
+													e.stopPropagation()
+													deleteFeature(ff)
+												}}
+											/>
+										</div>
 									</TableCell>
 								</TableRow>
 							))}
@@ -242,12 +290,12 @@ export default function AdminFeatureFlagPage() {
 					</Table>
 				</div>
 				<div className="md:w-2/5">
-					{featureFlags && (
+					{selectedFeature && (
 						<div className="flex flex-col gap-6">
 							<h3 className="text-lg font-semibold">Details</h3>
 							<FeatureFlagDetail
-								key={selectedFeature(featureFlags, selectedRow).key}
-								featureFlag={selectedFeature(featureFlags, selectedRow)}
+								key={selectedFeature.key}
+								featureFlag={selectedFeature}
 								onSubmit={onSubmit}
 							/>
 						</div>
