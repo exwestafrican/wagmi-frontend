@@ -80,7 +80,9 @@ describe("AdminFeatureFlagPage", () => {
 		await setupFeatureFlagPage()
 		await screen.findByText(whatsAppIntegration.name)
 
-		const details = screen.getByRole("heading", { name: "Details" }).parentElement
+		const details = screen.getByRole("heading", {
+			name: "Details",
+		}).parentElement
 		expect(details).not.toBeNull()
 
 		const saveButton = within(details as HTMLElement).getByRole("button", {
