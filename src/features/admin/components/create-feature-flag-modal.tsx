@@ -19,11 +19,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { useCreateFeatureFlag } from "@/features/admin/api/create-feature-flag"
+import { useCreateFeatureFlag } from "@/features/admin/features/feature-flags/api/create-feature-flag.ts"
 import {
 	createFeatureFlagSchema,
 	type CreateFeatureFlagFormValues,
-} from "@/features/admin/schema/create-feature-flag-schema"
+} from "@/features/admin/features/feature-flags/schema/create-feature-flag-schema.ts"
 import { toast } from "sonner"
 
 const defaultValues: CreateFeatureFlagFormValues = {

@@ -1,0 +1,27 @@
+---
+description: Use realistic domain names in test data instead of generic placeholders
+globs: **/*.test.ts,**/*.test.tsx
+alwaysApply: false
+---
+
+# Test data naming
+
+Use realistic, domain-specific names for test fixtures. Avoid generic placeholders like `feature_a`, `Feature A`, `item1`, or `test-user-123` unless the test is specifically about those literal values.
+
+Prefer names that reflect how the product actually talks about the thing under test.
+
+```typescript
+// ❌ BAD
+const flagA = featureFlagFactory.build({
+  key: "feature_a",
+  name: "Feature A",
+})
+
+// ✅ GOOD
+const whatsAppIntegration = featureFlagFactory.build({
+  key: "can_integrate_whatsapp",
+  name: "WhatsApp Integration",
+})
+```
+
+Apply the same idea to variable names: `whatsAppIntegration`, not `flagA`; `envoyeWorkspace`, not `workspace1`.
