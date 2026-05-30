@@ -3,7 +3,7 @@ import {
 	FeatureFlagStatus,
 	type FeatureFlag,
 } from "@/features/admin/interface/feature-flag.ts"
-import { apiClient } from "@/lib/api-client.ts"
+import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
 
 export const FEATURE_FLAGS = "feature-flags"
@@ -29,7 +29,7 @@ export function useFeatureFlags() {
 	return useQuery<FeatureFlag[]>({
 		queryKey: [FEATURE_FLAGS],
 		queryFn: async () => {
-			const res = await apiClient.get<FeatureFlag[]>(
+			const res = await adminApiClient.get<FeatureFlag[]>(
 				AdminApiPaths.FEATURE_FLAGS,
 			)
 			return res.data.map((ff) => ({

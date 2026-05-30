@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { apiClient } from "@/lib/api-client.ts"
+import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
 
 export type Task = {
@@ -14,7 +14,7 @@ export function useTasks() {
 	return useQuery<Task[]>({
 		queryKey: [TASKS],
 		queryFn: async () => {
-			const res = await apiClient.get<Task[]>(AdminApiPaths.LIST_TASKS)
+			const res = await adminApiClient.get<Task[]>(AdminApiPaths.LIST_TASKS)
 			return res.data
 		},
 		staleTime: Number.POSITIVE_INFINITY,

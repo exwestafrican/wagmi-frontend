@@ -1,7 +1,7 @@
 import renderWithQueryClient from "@/common/renderWithQueryClient.tsx"
 import { AdminApiPaths } from "@/constants.ts"
 import AdminFeatureFlagPage from "@/features/admin/features/feature-flags/page.tsx"
-import { apiClient } from "@/lib/api-client.ts"
+import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { featureFlagFactory } from "@/test/factory/feature-flag.ts"
 import { mockAuthedUser } from "@/test/helpers/mocks.ts"
 import { screen, waitFor } from "@testing-library/react"
@@ -10,8 +10,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("AdminFeatureFlagPage", () => {
 	let user: UserEvent
-	const mockApiClientGet = vi.mocked(apiClient.get)
-	const mockApiClientPost = vi.mocked(apiClient.post)
+	const mockApiClientGet = vi.mocked(adminApiClient.get)
+	const mockApiClientPost = vi.mocked(adminApiClient.post)
 
 	beforeEach(() => {
 		user = userEvent.setup()
