@@ -7,7 +7,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import { MoreHorizontalIcon } from "lucide-react"
+import { Loader2, MoreHorizontalIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
 	DropdownMenu,
@@ -16,9 +16,54 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
 import { Badge } from "@/components/ui/badge.tsx"
+import {
+	type RunTaskSummary,
+	useRunTask,
+} from "@/features/admin/api/run-task.ts"
+import { isAxiosError } from "axios"
+import { toast } from "sonner"
+
+function notifyRunResult(summary: RunTaskSummary) {
+	const { status, workspacesProcessed, workspacesSucceeded, workspacesFailed } =
+		summary
+
+	if (status === "success") {
+		toast.success(
+			`Backfill complete — ran on ${workspacesProcessed} workspaces.`,
+		)
+		return
+	}
+
+	if (status === "partial") {
+		toast.warning(
+			`Ran on ${workspacesSucceeded} of ${workspacesProcessed} workspaces, ${workspacesFailed} failed.`,
+		)
+		return
+	}
+
+	toast.error(`Backfill failed on all ${workspacesProcessed} workspaces.`)
+}
+
+function notifyRunError(error: unknown) {
+	if (isAxiosError(error) && error.response?.status === 404) {
+		toast.error("That backfill job doesn't exist.")
+		return
+	}
+
+	toast.error("Couldn't run backfill job. Please try again.")
+}
 
 export default function AdminBackfillPage() {
 	const { data: tasks } = useTasks()
+	const { mutate: runTask, isPending, variables: runningJobId } = useRunTask()
+
+	function handleRun(jobId: string) {
+		if (isPending) return
+		runTask(jobId, {
+			onSuccess: notifyRunResult,
+			onError: notifyRunError,
+		})
+	}
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
@@ -38,43 +83,54 @@ export default function AdminBackfillPage() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{tasks?.map((task) => (
-							<TableRow key={task.jobId}>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-									{task.name}
-								</TableCell>
-								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
-									<Badge
-										variant="outline"
-										className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
-									>
-										{task.jobId}
-									</Badge>
-								</TableCell>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-									{task.description}
-								</TableCell>
-								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-8 cursor-pointer"
-											>
-												<MoreHorizontalIcon />
-												<span className="sr-only">Open menu</span>
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem className="cursor-pointer text-xs capitalize">
-												run job
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</TableCell>
-							</TableRow>
-						))}
+						{tasks?.map((task) => {
+							const isRunning = isPending && runningJobId === task.jobId
+							return (
+								<TableRow key={task.jobId}>
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										{task.name}
+									</TableCell>
+									<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
+										<Badge
+											variant="outline"
+											className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+										>
+											{task.jobId}
+										</Badge>
+									</TableCell>
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										{task.description}
+									</TableCell>
+									<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="size-8 cursor-pointer"
+												>
+													{isRunning ? (
+														<Loader2 className="animate-spin" />
+													) : (
+														<MoreHorizontalIcon />
+													)}
+													<span className="sr-only">Open menu</span>
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuItem
+													className="cursor-pointer text-xs capitalize"
+													disabled={isPending}
+													onSelect={() => handleRun(task.jobId)}
+												>
+													{isRunning ? "Running…" : "Run job"}
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</TableCell>
+								</TableRow>
+							)
+						})}
 					</TableBody>
 				</Table>
 			</div>
