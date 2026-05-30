@@ -274,14 +274,17 @@ export default function AdminFeatureFlagPage() {
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
 										<div className="flex items-center justify-between">
 											<FeatureBadge status={ff.status}>{ff.key}</FeatureBadge>
-											<Trash2
-												size={16}
-												className="text-red-700"
+											<button
+												type="button"
+												aria-label={`Delete ${ff.key}`}
+												className="cursor-pointer"
 												onClick={(e) => {
 													e.stopPropagation()
 													deleteFeature(ff)
 												}}
-											/>
+											>
+												<Trash2 size={16} className="text-red-700" />
+											</button>
 										</div>
 									</TableCell>
 								</TableRow>
