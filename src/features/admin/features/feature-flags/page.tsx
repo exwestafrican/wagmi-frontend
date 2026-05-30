@@ -12,7 +12,7 @@ import {
 } from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
 import { useEffect, useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
-import { type FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
 import { useQueryClient } from "@tanstack/react-query"
