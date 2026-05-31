@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
 
-type FeatureEnrollment = {
+export type FeatureEnrollment = {
 	appId: string
 	appCode: string
 	name: string

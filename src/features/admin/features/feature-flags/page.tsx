@@ -28,26 +28,25 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@/components/ui/tabs.tsx"
-import useFeatureEnrollment, {
-	FEATURE_ENROLMENT,
-} from "@/features/admin/features/feature-flags/api/enrollment.ts"
+import useFeatureEnrollment, {} from "@/features/admin/features/feature-flags/api/enrollment.ts"
 import { Switch } from "@/components/ui/switch.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import { cn } from "@/lib/utils.ts"
+import useUpdateEnrollment from "@/features/admin/features/feature-flags/api/update-enrollment.ts"
 
 export default function AdminFeatureFlagPage() {
 	const queryClient = useQueryClient()
 
 	const { data: featureFlags, isSuccess } = useFeatureFlags()
 	const { mutate: deleteFeatureFlag } = useDeleteFeatureFlag()
-
+	const { mutate: updateEnrollment } = useUpdateEnrollment()
 
 	const [createModalOpen, setCreateModalOpen] = useState(false)
-    const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
+	const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
 
-    const selectedFeature = featureFlags?.find((f) => f.key === selectedKey)
+	const selectedFeature = featureFlags?.find((f) => f.key === selectedKey)
 
-    const { data: featureEnrollment } = useFeatureEnrollment(selectedKey)
+	const { data: featureEnrollment } = useFeatureEnrollment(selectedKey)
 
 	useEffect(() => {
 		if (!isSuccess) return
@@ -55,13 +54,9 @@ export default function AdminFeatureFlagPage() {
 
 		const hasFeatures = (featureFlags ?? []).length > 0
 		if (hasFeatures) {
-            setSelectedKey(featureFlags[0].key)
+			setSelectedKey(featureFlags[0].key)
 		}
 	}, [isSuccess, featureFlags])
-
-	useEffect(() => {
-		void queryClient.invalidateQueries({ queryKey: [FEATURE_ENROLMENT] })
-	}, [selectedKey])
 
 	function deleteFeature(featureFlag: FeatureFlag) {
 		const pervFeatureFlags: FeatureFlag[] | undefined =
@@ -71,7 +66,7 @@ export default function AdminFeatureFlagPage() {
 			const filtered = pervFeatureFlags.filter(
 				(prev) => prev.key !== featureFlag.key,
 			)
-            setSelectedKey(filtered.length > 0 ? filtered[0].key : undefined)
+			setSelectedKey(filtered.length > 0 ? filtered[0].key : undefined)
 			queryClient.setQueryData([FEATURE_FLAGS], () => filtered)
 		}
 
@@ -155,6 +150,7 @@ export default function AdminFeatureFlagPage() {
 						<TabsList variant="line">
 							{["details", "apps"].map((tab) => (
 								<TabsTrigger
+									key={tab}
 									value={tab}
 									className="capitalize cursor-pointer mb-8"
 								>
@@ -175,7 +171,10 @@ export default function AdminFeatureFlagPage() {
 										<div className="space-y-2">
 											{(featureEnrollment ?? []).map((enrollment) => {
 												return (
-													<div className="flex items-center justify-between w-3/5">
+													<div
+														key={enrollment.appId}
+														className="flex items-center justify-between w-3/5"
+													>
 														<Label
 															htmlFor={enrollment.appId}
 															className={`text-sm ${enrollment.hasFeature ? "text-black" : "text-gray-500"} capitalize`}
@@ -190,8 +189,19 @@ export default function AdminFeatureFlagPage() {
 															)}
 															id={enrollment.appId}
 															disabled={canEditEnrollment}
-															defaultChecked={enrollment.hasFeature}
 															aria-label={`Enable ${enrollment.name}`}
+															key={`${selectedKey}-${enrollment.appId}-${enrollment.hasFeature}`}
+															checked={enrollment.hasFeature}
+															onCheckedChange={(checked) => {
+																const updatedEnrollment = {
+																	...enrollment,
+																	hasFeature: checked,
+																}
+																updateEnrollment({
+																	featureKey: selectedFeature.key,
+																	enrollment: updatedEnrollment,
+																})
+															}}
 														/>
 													</div>
 												)
