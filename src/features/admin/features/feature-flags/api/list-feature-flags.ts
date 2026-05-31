@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { type FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
 import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
 

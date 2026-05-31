@@ -50,13 +50,13 @@ export default function AdminFeatureFlagPage() {
 
 	useEffect(() => {
 		if (!isSuccess) return
-		if (selectedFeature) return
+		if (selectedKey) return
 
 		const hasFeatures = (featureFlags ?? []).length > 0
 		if (hasFeatures) {
 			setSelectedKey(featureFlags[0].key)
 		}
-	}, [isSuccess, featureFlags])
+	}, [isSuccess, featureFlags, selectedKey])
 
 	function deleteFeature(featureFlag: FeatureFlag) {
 		const pervFeatureFlags: FeatureFlag[] | undefined =
@@ -74,9 +74,7 @@ export default function AdminFeatureFlagPage() {
 	}
 
 	const canEditEnrollment =
-		selectedFeature &&
-		(selectedFeature.status == FeatureFlagStatus.GLOBAL ||
-			selectedFeature.status == FeatureFlagStatus.DISABLED)
+		selectedFeature && selectedFeature.status !== FeatureFlagStatus.PARTIAL
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
