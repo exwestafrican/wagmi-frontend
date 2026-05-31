@@ -44,7 +44,7 @@ export default function FeatureFlagDetail({
 		useUpdateFeatureFlagStatus()
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
+		values: {
 			name: featureFlag.name,
 			key: featureFlag.key,
 			description: featureFlag.description,

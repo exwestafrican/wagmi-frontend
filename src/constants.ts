@@ -24,6 +24,7 @@ export const AdminApiPaths = {
 	LOGIN: "auth/admin/login",
 	LIST_TASKS: "/backfill/tasks",
 	DELETE_FEATURE_FLAG: "admin/feature-flag/delete",
+	FEATURE_ENROLLMENT: "admin/feature-flag/apps/enrollment",
 } as const
 
 export const ROLES = {

@@ -1,7 +1,7 @@
 export const FeatureFlagStatus = {
-	GLOBAL: "global",
-	PARTIAL: "partial",
-	DISABLED: "disabled",
+	GLOBAL: "GLOBAL",
+	PARTIAL: "PARTIAL",
+	DISABLED: "DISABLED",
 } as const
 
 export interface FeatureFlag {

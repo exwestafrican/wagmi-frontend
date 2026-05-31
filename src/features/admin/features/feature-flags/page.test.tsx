@@ -80,18 +80,14 @@ describe("AdminFeatureFlagPage", () => {
 		await setupFeatureFlagPage()
 		await screen.findByText(whatsAppIntegration.name)
 
-		const details = screen.getByRole("heading", {
-			name: "Details",
-		}).parentElement
-		expect(details).not.toBeNull()
-
-		const saveButton = within(details as HTMLElement).getByRole("button", {
+		const detailsPanel = screen.getByRole("tabpanel")
+		const saveButton = within(detailsPanel).getByRole("button", {
 			name: "Save",
 		})
 		expect(saveButton).toBeDisabled()
 
 		await user.click(
-			within(details as HTMLElement).getByRole("button", { name: /partial/i }),
+			within(detailsPanel).getByRole("button", { name: /partial/i }),
 		)
 		await user.click(screen.getByRole("menuitemradio", { name: /global/i }))
 
