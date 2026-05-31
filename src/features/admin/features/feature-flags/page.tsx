@@ -168,6 +168,14 @@ export default function AdminFeatureFlagPage() {
 								</TabsContent>
 								<TabsContent value="apps">
 									<div className="space-y-2">
+										<div className="flex items-center justify-between w-3/5">
+											<span className="text-xs capitalize text-muted-foreground">
+												App
+											</span>
+											<span className="text-xs capitalize text-muted-foreground">
+												Enabled
+											</span>
+										</div>
 										<div className="space-y-2">
 											{(featureEnrollment ?? []).map((enrollment) => {
 												return (
