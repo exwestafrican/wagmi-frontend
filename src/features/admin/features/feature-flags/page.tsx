@@ -12,12 +12,28 @@ import {
 } from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
 import { useEffect, useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
-import type { FeatureFlag } from "@/features/admin/interface/feature-flag.ts"
+import {
+	type FeatureFlag,
+	FeatureFlagStatus,
+} from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDeleteFeatureFlag } from "@/features/admin/features/feature-flags/api/delete-feature-flag.ts"
 import FeatureFlagDetail from "@/features/admin/features/feature-flags/components/feature-flag-detail.tsx"
+
+import {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "@/components/ui/tabs.tsx"
+import useFeatureEnrollment, {
+	FEATURE_ENROLMENT,
+} from "@/features/admin/features/feature-flags/api/enrollment.ts"
+import { Switch } from "@/components/ui/switch.tsx"
+import { Label } from "@/components/ui/label.tsx"
+import { cn } from "@/lib/utils.ts"
 
 export default function AdminFeatureFlagPage() {
 	const queryClient = useQueryClient()
@@ -25,17 +41,27 @@ export default function AdminFeatureFlagPage() {
 	const { data: featureFlags, isSuccess } = useFeatureFlags()
 	const { mutate: deleteFeatureFlag } = useDeleteFeatureFlag()
 
-	const [selectedFeature, setSelectedFeature] = useState<
-		FeatureFlag | undefined
-	>(undefined)
+
 	const [createModalOpen, setCreateModalOpen] = useState(false)
+    const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
+
+    const selectedFeature = featureFlags?.find((f) => f.key === selectedKey)
+
+    const { data: featureEnrollment } = useFeatureEnrollment(selectedKey)
 
 	useEffect(() => {
+		if (!isSuccess) return
+		if (selectedFeature) return
+
 		const hasFeatures = (featureFlags ?? []).length > 0
-		if (isSuccess && hasFeatures) {
-			setSelectedFeature(featureFlags[0])
+		if (hasFeatures) {
+            setSelectedKey(featureFlags[0].key)
 		}
 	}, [isSuccess, featureFlags])
+
+	useEffect(() => {
+		void queryClient.invalidateQueries({ queryKey: [FEATURE_ENROLMENT] })
+	}, [selectedKey])
 
 	function deleteFeature(featureFlag: FeatureFlag) {
 		const pervFeatureFlags: FeatureFlag[] | undefined =
@@ -45,12 +71,17 @@ export default function AdminFeatureFlagPage() {
 			const filtered = pervFeatureFlags.filter(
 				(prev) => prev.key !== featureFlag.key,
 			)
-			setSelectedFeature(filtered.length > 0 ? filtered[0] : undefined)
+            setSelectedKey(filtered.length > 0 ? filtered[0].key : undefined)
 			queryClient.setQueryData([FEATURE_FLAGS], () => filtered)
 		}
 
 		deleteFeatureFlag(featureFlag.key)
 	}
+
+	const canEditEnrollment =
+		selectedFeature &&
+		(selectedFeature.status == FeatureFlagStatus.GLOBAL ||
+			selectedFeature.status == FeatureFlagStatus.DISABLED)
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
@@ -91,7 +122,7 @@ export default function AdminFeatureFlagPage() {
 									data-state={
 										selectedFeature?.key === ff.key ? "selected" : undefined
 									}
-									onClick={() => setSelectedFeature(featureFlags[rowIdx])}
+									onClick={() => setSelectedKey(featureFlags[rowIdx].key)}
 									className="cursor-pointer"
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
@@ -120,15 +151,57 @@ export default function AdminFeatureFlagPage() {
 					</Table>
 				</div>
 				<div className="md:w-2/5">
-					{selectedFeature && (
-						<div className="flex flex-col gap-6">
-							<h3 className="text-lg font-semibold">Details</h3>
-							<FeatureFlagDetail
-								key={selectedFeature.key}
-								featureFlag={selectedFeature}
-							/>
-						</div>
-					)}
+					<Tabs defaultValue="details">
+						<TabsList variant="line">
+							{["details", "apps"].map((tab) => (
+								<TabsTrigger
+									value={tab}
+									className="capitalize cursor-pointer mb-8"
+								>
+									{tab.split("-").join(" ")}
+								</TabsTrigger>
+							))}
+						</TabsList>
+						{selectedFeature && (
+							<>
+								<TabsContent value="details">
+									<FeatureFlagDetail
+										key={selectedFeature.key}
+										featureFlag={selectedFeature}
+									/>
+								</TabsContent>
+								<TabsContent value="apps">
+									<div className="space-y-2">
+										<div className="space-y-2">
+											{(featureEnrollment ?? []).map((enrollment) => {
+												return (
+													<div className="flex items-center justify-between w-3/5">
+														<Label
+															htmlFor={enrollment.appId}
+															className={`text-sm ${enrollment.hasFeature ? "text-black" : "text-gray-500"} capitalize`}
+														>
+															{enrollment.name}
+														</Label>
+														<Switch
+															className={cn(
+																"cursor-pointer",
+																"data-[state=checked]:bg-green-600",
+																"dark:data-[state=checked]:bg-green-500",
+															)}
+															id={enrollment.appId}
+															disabled={canEditEnrollment}
+															defaultChecked={enrollment.hasFeature}
+															aria-label={`Enable ${enrollment.name}`}
+														/>
+													</div>
+												)
+											})}
+										</div>
+									</div>
+								</TabsContent>
+							</>
+						)}
+					</Tabs>
 				</div>
 			</div>
 		</div>
