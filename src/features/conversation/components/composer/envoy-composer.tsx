@@ -10,7 +10,7 @@ export default function EnvoyComposer({
 	onEnter,
 }: { onEnter: (textInput: string) => void }) {
 	const [textInput, setTextInput] = useState("")
-	const hasNoInput = textInput.length == 0
+	const hasNoInput = textInput.length === 0
 	const exceedsTextInput = textInput.length > MAX_TEXT_INPUT
 
 	const invalidInput = textInput.length > MAX_TEXT_INPUT

@@ -5,7 +5,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card.tsx"
-import { type Teammate } from "@/features/workspace/interface/teammate.interface.ts"
+import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import {
 	buildTeammateRole,
 	formatRole,
