@@ -1,43 +1,21 @@
-import { describe, expect, vi, test, beforeEach } from "vitest"
-import { navigateToTestPage } from "@/test/helpers/navigate"
+import { describe, expect, test, beforeEach } from "vitest"
 import { WorkspaceCode } from "@/test/constants.ts"
 import { screen, waitFor } from "@testing-library/react"
-import { useAuthStore } from "@/stores/auth.store.ts"
 import { apiClient } from "@/lib/api-client.ts"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
 import {
-	type Workspace,
 	WorkspaceStatus,
 } from "@/features/workspace/interface/workspace.interface.ts"
-import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { ApiPaths } from "@/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
+import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
 
 const envoyeWorkspace = {
 	code: WorkspaceCode.ENVOYE,
 	name: "Envoye",
 	status: WorkspaceStatus.ACTIVE,
-}
-
-function mockWorkspaceAndCurrentTeammate(
-	workspace: Workspace,
-	teammate: Teammate = teammateFactory.build(),
-	workspaceTeammates: Teammate[] = [teammateFactory.build()],
-) {
-	vi.mocked(apiClient.get).mockImplementation((url: string) => {
-		if (url === ApiPaths.WORKSPACE) {
-			return Promise.resolve({ data: workspace })
-		}
-		if (url === ApiPaths.CURRENT_TEAMMATE) {
-			return Promise.resolve({ data: teammate })
-		}
-		if (url === ApiPaths.ACTIVE_TEAMMATES) {
-			return Promise.resolve({ data: workspaceTeammates })
-		}
-		return Promise.reject(new Error(`Unexpected GET ${url}`))
-	})
 }
 
 describe("Workspace Test", () => {
@@ -47,21 +25,8 @@ describe("Workspace Test", () => {
 		user = userEvent.setup()
 	})
 
-	async function navigateToWorkspacePage(
-		workspace: Workspace,
-		teammate: Teammate = teammateFactory.build(),
-		workspaceTeammates: Teammate[] = [teammateFactory.build()],
-	) {
-		useAuthStore.getState().setAuthToken("fake-token")
-		mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
-		return await navigateToTestPage({
-			to: "/workspace",
-			search: { code: workspace.code },
-		})
-	}
-
 	async function openInviteTeammateModal() {
-		const menuTrigger = screen.getByRole("button") // MoreVertical trigger
+		const menuTrigger = screen.getAllByRole("button")[0] // MoreVertical trigger
 		await user.click(menuTrigger)
 		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
 	}
