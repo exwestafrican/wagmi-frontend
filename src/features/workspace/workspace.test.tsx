@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from "vitest"
 import { WorkspaceCode } from "@/test/constants.ts"
-import { screen, waitFor } from "@testing-library/react"
+import { screen, waitFor, within } from "@testing-library/react"
 import { apiClient } from "@/lib/api-client.ts"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
@@ -81,18 +81,19 @@ describe("Workspace Test", () => {
 			)
 		})
 
-		expect(await screen.findByText("Derick Omari")).toBeInTheDocument()
-		expect(screen.getByText("@derick.omari")).toBeInTheDocument()
-		expect(
-			await screen.findByText(new RegExp(expectedRole, "i")),
-		).toBeInTheDocument()
+
+        const derickUsername = await screen.findByText("@derick.omari")
+        const derickCard = derickUsername.closest("[data-slot='card']") as HTMLElement
+        expect(within(derickCard).getByText("Derick Omari")).toBeInTheDocument()
+        expect(within(derickCard).getByText("@derick.omari")).toBeInTheDocument()
+        expect(
+            within(derickCard).getByText(new RegExp(expectedRole, "i")),
+        ).toBeInTheDocument()
 	})
 
 	describe("workspace invite", () => {
 		test("on click cancel we close modal and clear all emails typed in by user", async () => {
-			await waitFor(() => {
-				navigateToWorkspacePage(envoyeWorkspace)
-			})
+			await navigateToWorkspacePage(envoyeWorkspace)
 			await openInviteTeammateModal()
 			expect(screen.getByRole("dialog")).toBeInTheDocument()
 			await enterEmailToInvite(user, "tumise@useenvoye.io")
@@ -110,9 +111,7 @@ describe("Workspace Test", () => {
 		})
 
 		test("on click X button we clear all emails and close modal", async () => {
-			await waitFor(() => {
-				navigateToWorkspacePage(envoyeWorkspace)
-			})
+			await navigateToWorkspacePage(envoyeWorkspace)
 			await openInviteTeammateModal()
 
 			expect(screen.getByRole("dialog")).toBeInTheDocument()
@@ -135,9 +134,7 @@ describe("Workspace Test", () => {
 	})
 
 	test("on Escape key we close modal and clear emails", async () => {
-		await waitFor(() => {
-			navigateToWorkspacePage(envoyeWorkspace)
-		})
+		await navigateToWorkspacePage(envoyeWorkspace)
 		await openInviteTeammateModal()
 
 		expect(screen.getByRole("dialog")).toBeInTheDocument()
