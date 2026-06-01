@@ -275,9 +275,8 @@ export default function WorkspacePage() {
 										: "Unknown Teammate"
 
 									const route = conversationRoute(conversation.id)
-									console.log(route)
 									return (
-										<SidebarMenuItem>
+										<SidebarMenuItem key={conversation.id}>
 											<SidebarMenuButton
 												size="sm"
 												className="text-muted-brown text-xs cursor-pointer tracking-wide"

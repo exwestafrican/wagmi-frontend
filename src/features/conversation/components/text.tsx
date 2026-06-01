@@ -5,7 +5,7 @@ import { fullName } from "@/features/directory/utils/teammate.ts"
 export default function TextPart({
 	author,
 	content,
-}: { author: Teammate; content: string[] }) {
+}: { author: Teammate; content: { msg: string; timestamp: number }[] }) {
 	return (
 		<div className="flex flex-row gap-4 items-start">
 			<FallbackAvatar teammate={author} size="sm" />
@@ -17,8 +17,10 @@ export default function TextPart({
 						Today at 9:15pm{" "}
 					</span>
 				</div>
-				{content.map((msg) => (
-					<p className="text-sm font-normal">{msg}</p>
+				{content.map(({ msg, timestamp }) => (
+					<p key={timestamp} className="text-sm font-normal">
+						{msg}
+					</p>
 				))}
 			</div>
 		</div>

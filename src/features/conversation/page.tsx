@@ -55,7 +55,13 @@ export default function TeammateConversation() {
 						{allParts.map((part) => {
 							const author = registry.find(part.authorId)
 							return (
-								author && <TextPart author={author} content={[part.content]} />
+								author && (
+									<TextPart
+										key={`${part.authorId}-${part.sentAt}`}
+										author={author}
+										content={[{ msg: part.content, timestamp: part.sentAt }]}
+									/>
+								)
 							)
 						})}
 					</div>
