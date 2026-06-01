@@ -187,6 +187,7 @@ export default function WorkspacePage() {
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<button
+										aria-label="Workspace menu"
 										type="button"
 										className="text-gray-600 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-1 py-1.5 transition-colors cursor-pointer"
 									>

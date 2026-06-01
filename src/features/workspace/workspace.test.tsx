@@ -24,7 +24,7 @@ describe("Workspace Test", () => {
 	})
 
 	async function openInviteTeammateModal() {
-		const menuTrigger = screen.getAllByRole("button")[0] // MoreVertical trigger
+		const menuTrigger = screen.getByRole("button", { name: /workspace menu/i }) // MoreVertical trigger
 		await user.click(menuTrigger)
 		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
 	}
