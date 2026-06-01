@@ -5,9 +5,7 @@ import { apiClient } from "@/lib/api-client.ts"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
 import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
-import {
-	WorkspaceStatus,
-} from "@/features/workspace/interface/workspace.interface.ts"
+import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
 import { ApiPaths } from "@/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
