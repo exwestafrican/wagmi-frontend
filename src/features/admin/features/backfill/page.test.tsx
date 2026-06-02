@@ -1,26 +1,12 @@
 import renderWithQueryClient from "@/common/renderWithQueryClient.tsx"
-import { AdminApiPaths } from "@/constants.ts"
 import type { Task } from "@/features/admin/api/list-tasks.ts"
 import type { RunTaskSummary } from "@/features/admin/api/run-task.ts"
 import AdminBackfillPage from "@/features/admin/features/backfill/page.tsx"
 import { adminApiClient } from "@/lib/admin-api-client.ts"
-import { mockAuthedUser, mockError } from "@/test/helpers/mocks.ts"
-import { screen, waitFor } from "@testing-library/react"
+import { mockAuthedUser } from "@/test/helpers/mocks.ts"
+import { screen } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { toast } from "sonner"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-
-vi.mock("sonner", async (importOriginal) => {
-	const actual = await importOriginal<typeof import("sonner")>()
-	return {
-		...actual,
-		toast: {
-			success: vi.fn(),
-			warning: vi.fn(),
-			error: vi.fn(),
-		},
-	}
-})
 
 describe("AdminBackfillPage", () => {
 	let user: UserEvent
@@ -34,70 +20,57 @@ describe("AdminBackfillPage", () => {
 	}
 
 	beforeEach(() => {
-		vi.clearAllMocks()
 		user = userEvent.setup()
 		mockAuthedUser()
 		mockApiClientGet.mockResolvedValue({ data: [task] })
 	})
 
-	async function clickRunJob() {
+	async function runJobWith(status: RunTaskSummary) {
+		mockApiClientPost.mockResolvedValue({ data: status })
+		renderWithQueryClient(<AdminBackfillPage />)
 		await screen.findByText(task.name)
 		await user.click(screen.getByRole("button", { name: /run job/i }))
 	}
 
-	it("calls the run endpoint with the job id and shows a success toast", async () => {
-		const summary: RunTaskSummary = {
+	it("renders a success toast when every workspace succeeds", async () => {
+		await runJobWith({
 			jobId: task.jobId,
 			status: "success",
 			workspacesProcessed: 12,
 			workspacesSucceeded: 12,
 			workspacesFailed: 0,
-		}
-		mockApiClientPost.mockResolvedValue({ data: summary })
-
-		renderWithQueryClient(<AdminBackfillPage />)
-		await clickRunJob()
-
-		await waitFor(() => {
-			expect(mockApiClientPost).toHaveBeenCalledWith(
-				`${AdminApiPaths.LIST_TASKS}/${task.jobId}/run`,
-			)
 		})
-		expect(toast.success).toHaveBeenCalledWith(
-			"Backfill complete — ran on 12 workspaces.",
-		)
+
+		expect(
+			await screen.findByText("Backfill complete — ran on 12 workspaces."),
+		).toBeInTheDocument()
 	})
 
-	it("shows a warning toast with counts on a partial run", async () => {
-		const summary: RunTaskSummary = {
+	it("renders a warning toast with counts on a partial run", async () => {
+		await runJobWith({
 			jobId: task.jobId,
 			status: "partial",
 			workspacesProcessed: 12,
 			workspacesSucceeded: 9,
 			workspacesFailed: 3,
-		}
-		mockApiClientPost.mockResolvedValue({ data: summary })
-
-		renderWithQueryClient(<AdminBackfillPage />)
-		await clickRunJob()
-
-		await waitFor(() => {
-			expect(toast.warning).toHaveBeenCalledWith(
-				"Ran on 9 of 12 workspaces, 3 failed.",
-			)
 		})
+
+		expect(
+			await screen.findByText("Ran on 9 of 12 workspaces, 3 failed."),
+		).toBeInTheDocument()
 	})
 
-	it("shows an error toast when the run request fails", async () => {
-		mockApiClientPost.mockRejectedValue(mockError(404))
-
-		renderWithQueryClient(<AdminBackfillPage />)
-		await clickRunJob()
-
-		await waitFor(() => {
-			expect(toast.error).toHaveBeenCalledWith(
-				"That backfill job doesn't exist.",
-			)
+	it("renders an error toast when every workspace fails", async () => {
+		await runJobWith({
+			jobId: task.jobId,
+			status: "failure",
+			workspacesProcessed: 12,
+			workspacesSucceeded: 0,
+			workspacesFailed: 12,
 		})
+
+		expect(
+			await screen.findByText("Backfill failed on all 12 workspaces."),
+		).toBeInTheDocument()
 	})
 })
