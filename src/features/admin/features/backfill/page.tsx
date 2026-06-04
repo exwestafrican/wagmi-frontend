@@ -19,24 +19,17 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 function notifyRunResult(summary: RunTaskSummary) {
-	const { status, workspacesProcessed, workspacesSucceeded, workspacesFailed } =
-		summary
-
-	if (status === "success") {
-		toast.success(
-			`Backfill complete — ran on ${workspacesProcessed} workspaces.`,
-		)
+	if (summary.status === "success") {
+		toast.success("Backfill completed successfully.")
 		return
 	}
 
-	if (status === "partial") {
-		toast.warning(
-			`Ran on ${workspacesSucceeded} of ${workspacesProcessed} workspaces, ${workspacesFailed} failed.`,
-		)
+	if (summary.status === "partial") {
+		toast.warning("Backfill completed with some failures.")
 		return
 	}
 
-	toast.error(`Backfill failed on all ${workspacesProcessed} workspaces.`)
+	toast.error("Backfill failed.")
 }
 
 function notifyRunError(error: unknown) {

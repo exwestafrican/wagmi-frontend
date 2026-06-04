@@ -36,13 +36,11 @@ describe("AdminBackfillPage", () => {
 		await runJobWith({
 			jobId: task.jobId,
 			status: "success",
-			workspacesProcessed: 12,
-			workspacesSucceeded: 12,
-			workspacesFailed: 0,
+			result: { processed: 12, success: 12, failed: 0 },
 		})
 
 		expect(
-			await screen.findByText("Backfill complete — ran on 12 workspaces."),
+			await screen.findByText("Backfill completed successfully."),
 		).toBeInTheDocument()
 	})
 
@@ -50,13 +48,11 @@ describe("AdminBackfillPage", () => {
 		await runJobWith({
 			jobId: task.jobId,
 			status: "partial",
-			workspacesProcessed: 12,
-			workspacesSucceeded: 9,
-			workspacesFailed: 3,
+			result: { processed: 12, success: 9, failed: 3 },
 		})
 
 		expect(
-			await screen.findByText("Ran on 9 of 12 workspaces, 3 failed."),
+			await screen.findByText("Backfill completed with some failures."),
 		).toBeInTheDocument()
 	})
 
@@ -64,13 +60,9 @@ describe("AdminBackfillPage", () => {
 		await runJobWith({
 			jobId: task.jobId,
 			status: "failure",
-			workspacesProcessed: 12,
-			workspacesSucceeded: 0,
-			workspacesFailed: 12,
+			result: { processed: 12, success: 0, failed: 12 },
 		})
 
-		expect(
-			await screen.findByText("Backfill failed on all 12 workspaces."),
-		).toBeInTheDocument()
+		expect(await screen.findByText("Backfill failed.")).toBeInTheDocument()
 	})
 })

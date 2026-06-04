@@ -7,9 +7,11 @@ export type RunTaskStatus = "success" | "partial" | "failure"
 export type RunTaskSummary = {
 	jobId: string
 	status: RunTaskStatus
-	workspacesProcessed: number
-	workspacesSucceeded: number
-	workspacesFailed: number
+	result: {
+		processed: number
+		success: number
+		failed: number
+	}
 }
 
 export function useRunTask() {
