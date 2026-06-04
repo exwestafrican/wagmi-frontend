@@ -1,4 +1,5 @@
-import { useTasks } from "@/features/admin/api/list-tasks.ts"
+import { Badge } from "@/components/ui/badge.tsx"
+import { Button } from "@/components/ui/button"
 import {
 	Table,
 	TableBody,
@@ -7,18 +8,58 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import { MoreHorizontalIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { type Task, useTasks } from "@/features/admin/api/list-tasks.ts"
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.tsx"
-import { Badge } from "@/components/ui/badge.tsx"
+	type RunTaskSummary,
+	useRunTask,
+} from "@/features/admin/api/run-task.ts"
+import { isAxiosError } from "axios"
+import { Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+
+function notifyRunResult(summary: RunTaskSummary) {
+	if (summary.status === "success") {
+		toast.success("Backfill completed successfully.")
+		return
+	}
+
+	if (summary.status === "partial") {
+		toast.warning("Backfill completed with some failures.")
+		return
+	}
+
+	toast.error("Backfill failed.")
+}
+
+function notifyRunError(error: unknown) {
+	if (isAxiosError(error) && error.response?.status === 404) {
+		toast.error("That backfill job doesn't exist.")
+		return
+	}
+
+	toast.error("Couldn't run backfill job. Please try again.")
+}
 
 export default function AdminBackfillPage() {
-	const { data: tasks } = useTasks()
+	const { data: tasks, isSuccess } = useTasks()
+	const { mutate: runTask, isPending, variables: runningJobId } = useRunTask()
+
+	const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined)
+
+	useEffect(() => {
+		const hasTasks = (tasks ?? []).length > 0
+		if (isSuccess && hasTasks) {
+			setSelectedTask(tasks[0])
+		}
+	}, [isSuccess, tasks])
+
+	function handleRun(jobId: string) {
+		runTask(jobId, {
+			onSuccess: notifyRunResult,
+			onError: notifyRunError,
+		})
+	}
 
 	return (
 		<div className="p-8 flex justify-start flex-col">
@@ -38,43 +79,52 @@ export default function AdminBackfillPage() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{tasks?.map((task) => (
-							<TableRow key={task.jobId}>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-									{task.name}
-								</TableCell>
-								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
-									<Badge
-										variant="outline"
-										className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
-									>
-										{task.jobId}
-									</Badge>
-								</TableCell>
-								<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
-									{task.description}
-								</TableCell>
-								<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="size-8 cursor-pointer"
-											>
-												<MoreHorizontalIcon />
-												<span className="sr-only">Open menu</span>
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuItem className="cursor-pointer text-xs capitalize">
-												run job
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</TableCell>
-							</TableRow>
-						))}
+						{tasks?.map((task) => {
+							const isRunning = isPending && runningJobId === task.jobId
+							return (
+								<TableRow
+									key={task.jobId}
+									data-state={
+										selectedTask?.jobId === task.jobId ? "selected" : undefined
+									}
+									onClick={() => setSelectedTask(task)}
+									className="cursor-pointer"
+								>
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										{task.name}
+									</TableCell>
+									<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
+										<Badge
+											variant="outline"
+											className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+										>
+											{task.jobId}
+										</Badge>
+									</TableCell>
+									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
+										{task.description}
+									</TableCell>
+									<TableCell className="text-left whitespace-normal break-words min-w-0 max-w-md">
+										<Button
+											variant="outline"
+											size="sm"
+											className="min-w-28 cursor-pointer text-xs"
+											disabled={isPending}
+											onClick={() => handleRun(task.jobId)}
+										>
+											{isRunning ? (
+												<>
+													<Loader2 className="animate-spin" />
+													Running…
+												</>
+											) : (
+												"Run job"
+											)}
+										</Button>
+									</TableCell>
+								</TableRow>
+							)
+						})}
 					</TableBody>
 				</Table>
 			</div>
