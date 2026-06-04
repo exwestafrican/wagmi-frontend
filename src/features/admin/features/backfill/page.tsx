@@ -55,7 +55,6 @@ export default function AdminBackfillPage() {
 	}, [isSuccess, tasks])
 
 	function handleRun(jobId: string) {
-		if (isPending) return
 		runTask(jobId, {
 			onSuccess: notifyRunResult,
 			onError: notifyRunError,
