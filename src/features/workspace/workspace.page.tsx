@@ -270,6 +270,7 @@ export default function WorkspacePage() {
 								<div className="flex flex-row justify-between items-center w-full">
 									<div>direct messages </div>
 									<button
+										type="button"
 										aria-label="new-direct-message"
 										onClick={() =>
 											navigate({

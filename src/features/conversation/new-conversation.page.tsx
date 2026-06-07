@@ -49,7 +49,7 @@ export function NewConversationPage() {
 			if (open && !resultFound) setOpen(false)
 			if (!open && resultFound) setOpen(true)
 		}
-	}, [queryText, selectedTeammate])
+	}, [open, selectedTeammate, resultFound])
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
@@ -64,6 +64,7 @@ export function NewConversationPage() {
 							<Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate">
 								{fullName(selectedTeammate)}
 								<button
+									type="button"
 									onClick={() => setSelectedTeammate(undefined)}
 									aria-label={`Remove ${selectedTeammate.id}`}
 									className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
@@ -112,23 +113,24 @@ export function NewConversationPage() {
 				>
 					<ScrollArea>
 						{queryResult.slice(0, 10).map((teammate) => (
-							<div
+							<button
+								type="button"
 								data-testid="teammate-suggestions"
 								key={teammate.id}
 								onClick={() => {
 									setQueryText(fullName(teammate))
 									setSelectedTeammate(teammate)
 								}}
-								className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 "
+								className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full "
 							>
 								{" "}
 								<FallbackAvatar size="xs" teammate={teammate} />
 								<div className="flex items-center gap-1">
 									<span>{fullName(teammate)}</span>
-									<div className="w-0.5 h-4 bg-black rounded-sm"></div>
+									<div className="w-0.5 h-4 bg-black rounded-sm" />
 									<span>{teammate.username}</span>
 								</div>
-							</div>
+							</button>
 						))}
 					</ScrollArea>
 				</PopoverContent>

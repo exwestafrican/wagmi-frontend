@@ -186,7 +186,6 @@ describe("Create A new Direct Message", () => {
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
 
-
 		await user.click(
 			screen.getByRole("button", {
 				name: new RegExp(`remove ${mavo.id}`, "i"),
