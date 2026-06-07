@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import { DESKTOP_KEYS } from "@/constants.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
-import {useSidebar} from "@/components/ui/sidebar.tsx";
+import { useSidebar } from "@/components/ui/sidebar.tsx"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -26,7 +26,7 @@ export function NewConversationPage() {
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement>(null)
-    const { setOpenMobile } = useSidebar()
+	const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
@@ -43,10 +43,9 @@ export function NewConversationPage() {
 		}
 	}, [selectedTeammate])
 
-
-    useEffect(() => {
-         setOpenMobile(false)
-    }, []);
+	useEffect(() => {
+		setOpenMobile(false)
+	}, [setOpenMobile])
 
 	useEffect(() => {
 		if (selectedTeammate) {
