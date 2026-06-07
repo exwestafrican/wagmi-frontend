@@ -47,9 +47,9 @@ export function NewConversationPage() {
 			setOpen(false)
 		} else {
 			if (open && !resultFound) setOpen(false)
-			if (!open && resultFound) setOpen(true)
+			if (!open && resultFound && queryText.trim().length > 0) setOpen(true)
 		}
-	}, [open, selectedTeammate, resultFound])
+	}, [open, selectedTeammate, resultFound, queryText])
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
