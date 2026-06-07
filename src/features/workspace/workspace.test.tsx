@@ -81,14 +81,15 @@ describe("Workspace Test", () => {
 			)
 		})
 
-
-        const derickUsername = await screen.findByText("@derick.omari")
-        const derickCard = derickUsername.closest("[data-slot='card']") as HTMLElement
-        expect(within(derickCard).getByText("Derick Omari")).toBeInTheDocument()
-        expect(within(derickCard).getByText("@derick.omari")).toBeInTheDocument()
-        expect(
-            within(derickCard).getByText(new RegExp(expectedRole, "i")),
-        ).toBeInTheDocument()
+		const derickUsername = await screen.findByText("@derick.omari")
+		const derickCard = derickUsername.closest(
+			"[data-slot='card']",
+		) as HTMLElement
+		expect(within(derickCard).getByText("Derick Omari")).toBeInTheDocument()
+		expect(within(derickCard).getByText("@derick.omari")).toBeInTheDocument()
+		expect(
+			within(derickCard).getByText(new RegExp(expectedRole, "i")),
+		).toBeInTheDocument()
 	})
 
 	describe("workspace invite", () => {
