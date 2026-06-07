@@ -6,17 +6,20 @@ import { navigateToTestPage } from "@/test/helpers/navigate.tsx"
 import { vi } from "vitest"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
+import { act } from "@testing-library/react"
 
 export async function navigateToWorkspacePage(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
 	workspaceTeammates: Teammate[] = [],
 ) {
-	useAuthStore.getState().setAuthToken("fake-token")
-	mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
-	return await navigateToTestPage({
-		to: "/workspace",
-		search: { code: workspace.code },
+	return await act(async () => {
+		useAuthStore.getState().setAuthToken("fake-token")
+		mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
+		return await navigateToTestPage({
+			to: "/workspace",
+			search: { code: workspace.code },
+		})
 	})
 }
 

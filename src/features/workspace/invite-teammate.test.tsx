@@ -1,19 +1,11 @@
-import renderWithQueryClient, {
-	createTestQueryClient,
-} from "@/common/renderWithQueryClient.tsx"
-import { ApiPaths } from "@/constants.ts"
 import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
-import LanguageProvider from "@/i18n/LanguageProvider"
-import { apiClient } from "@/lib/api-client.ts"
-import { useAuthStore } from "@/stores/auth.store.ts"
 import { WorkspaceCode } from "@/test/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
-import { makeTestRouter } from "@/test/helpers/navigate.tsx"
-import { RouterProvider } from "@tanstack/react-router"
-import { act, screen, waitFor } from "@testing-library/react"
+import { screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
+import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
 
 const envoyeWorkspace = {
 	code: WorkspaceCode.ENVOYE,
@@ -25,34 +17,8 @@ describe("Invite Teammate", () => {
 	let user: UserEvent
 
 	async function setupInviteTeammateModal() {
-		const queryClient = createTestQueryClient()
-		const router = makeTestRouter()
-		useAuthStore.getState().setAuthToken("fake-token")
-		vi.mocked(apiClient.get).mockImplementation((url: string) => {
-			if (url === ApiPaths.WORKSPACE) {
-				return Promise.resolve({ data: envoyeWorkspace })
-			}
-			if (url === ApiPaths.CURRENT_TEAMMATE) {
-				return Promise.resolve({ data: teammateFactory.build() })
-			}
-			return Promise.reject(new Error(`Unexpected GET ${url}`))
-		})
-		const { container } = renderWithQueryClient(
-			<LanguageProvider>
-				<RouterProvider router={router} />
-			</LanguageProvider>,
-			{ queryClient },
-		)
-		await act(async () => {
-			await router.navigate({
-				to: "/workspace",
-				search: { code: "test-workspace-code" },
-			})
-		})
-		await waitFor(() => {
-			expect(container.firstChild?.childNodes.length).toBeGreaterThan(0)
-		})
-		const menuTrigger = screen.getByRole("button", { name: /workspace menu/i })
+		await navigateToWorkspacePage(envoyeWorkspace, teammateFactory.build())
+		const menuTrigger = screen.getByRole("button", { name: /Workspace menu/i }) // MoreVertical trigger
 		await user.click(menuTrigger)
 		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
 	}

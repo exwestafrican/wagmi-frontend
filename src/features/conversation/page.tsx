@@ -1,7 +1,6 @@
 import useTeammateConversationInfo from "@/features/conversation/api/list-conversation.ts"
 import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
-import { Separator } from "@/components/ui/separator.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import TextPart from "@/features/conversation/components/text.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
@@ -12,6 +11,7 @@ import { useState } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import EnvoyComposer from "@/features/conversation/components/composer/envoy-composer.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
+import ConversationHeader from "@/features/conversation/components/header.tsx"
 
 export default function TeammateConversation() {
 	const { code, conversationId } = useSearch({
@@ -42,14 +42,13 @@ export default function TeammateConversation() {
 	return (
 		participantInfo && (
 			<div className="flex flex-col h-full min-h-0">
-				<header className="px-4 pt-3 pb-3 flex gap-2 items-center">
+				<ConversationHeader>
 					<FallbackAvatar teammate={participantInfo} />
-					<h1 className="text-lg md:text-xl font-semibold">
+					<h1 className="text-lg md:text-lg font-semibold">
 						{" "}
 						{fullName(participantInfo)}{" "}
 					</h1>
-				</header>
-				<Separator />
+				</ConversationHeader>
 				<ScrollArea className="flex-1 min-h-0">
 					<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
 						{allParts.map((part) => {
