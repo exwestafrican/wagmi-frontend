@@ -10,7 +10,7 @@ import { ApiPaths } from "@/constants.ts"
 export async function navigateToWorkspacePage(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
-	workspaceTeammates?: Teammate[],
+	workspaceTeammates: Teammate[] = [],
 ) {
 	useAuthStore.getState().setAuthToken("fake-token")
 	mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
@@ -23,9 +23,9 @@ export async function navigateToWorkspacePage(
 export function mockWorkspaceAndCurrentTeammate(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
-	otherTeammates?: Teammate[],
+    otherTeammates: Teammate[] = [],
 ) {
-	const teammates = [teammate, ...(otherTeammates ?? [])]
+	const teammates = [teammate, ...otherTeammates]
 
 	vi.mocked(apiClient.get).mockImplementation((url: string) => {
 		if (url === ApiPaths.WORKSPACE) {
