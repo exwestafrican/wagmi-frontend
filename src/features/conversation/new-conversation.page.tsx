@@ -13,34 +13,30 @@ import { fullName } from "@/features/directory/utils/teammate.ts"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { ScrollArea } from "@/components/ui/scroll-area.tsx"
-
-const DESKTOP_KEYS = {
-	ENTER: "Enter",
-	ESCAPE: "Escape",
-}
+import { DESKTOP_KEYS } from "@/constants.ts"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
 		from: "/workspace/new-conversation",
 	})
 
+	const query = useTeammateFullNameSearch(code)
+	const placeholderName = usePlaceholderName()
+
+	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
+
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
 
-	const [open, setOpen] = useState<boolean>(true)
-
-	const placeholderName = usePlaceholderName()
-	const query = useTeammateFullNameSearch(code)
-
 	const queryResult = query(queryText)
+	const resultFound = queryResult.length > 0
 
 	useEffect(() => {
-		if (queryResult.length === 0 || selectedTeammate !== undefined) {
-			setOpen(false)
-		}
-	}, [queryResult, selectedTeammate])
+		if (open && !resultFound) setOpen(false)
+		if (!open && resultFound) setOpen(true)
+	}, [queryText])
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
@@ -57,25 +53,21 @@ export function NewConversationPage() {
 								console.log("focus")
 								setOpen(true)
 							}}
-							onBlur={() => {
-								console.log("blur")
-							}}
 							value={queryText}
 							type="text"
 							className="outline-none text-xs text-black px-2 w-full capitalize"
 							placeholder={placeholderName}
 							onChange={(e) => {
-								const input = e.target.value
-								setQueryText(input)
+								const value = e.target.value
+								setQueryText(value)
 								setSelectedTeammate(undefined)
 							}}
 							onKeyDown={(e) => {
-								console.log("enter", e.key)
-								console.log(e.key, "key code")
 								switch (e.key) {
 									case DESKTOP_KEYS.ENTER:
 										setQueryText("")
 										setSelectedTeammate(queryResult[0])
+										setOpen(false)
 										console.log("after enter key", queryResult[0])
 										break
 									case DESKTOP_KEYS.ESCAPE:
@@ -99,7 +91,7 @@ export function NewConversationPage() {
 					<ScrollArea>
 						{queryResult.slice(0, 10).map((teammate) => (
 							<div
-                                data-testid="teammate-suggestions"
+								data-testid="teammate-suggestions"
 								key={teammate.id}
 								onClick={() => {
 									setQueryText(fullName(teammate))

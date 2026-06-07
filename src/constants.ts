@@ -38,3 +38,8 @@ export const CHECK_MAIL_REASON = {
 	SIGNUP_SUCCESS: "signup-success",
 	INVITE_ACCEPTED_SUCCESS: "invite-accepted-success",
 }
+
+export const DESKTOP_KEYS = {
+	ENTER: "Enter",
+	ESCAPE: "Escape",
+}

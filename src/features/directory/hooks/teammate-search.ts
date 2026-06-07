@@ -5,7 +5,7 @@ import type { Teammate } from "@/features/workspace/interface/teammate.interface
 export default function useTeammateFullNameSearch(code: string) {
 	const { data: teammates } = useTeammates(code)
 	return (name: string): Teammate[] => {
-		if (name.length === 1) {
+		if (name.trim().length === 0) {
 			return teammates ?? []
 		}
 		return (teammates ?? []).filter((teammate) =>
