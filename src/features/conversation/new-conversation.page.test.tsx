@@ -4,7 +4,6 @@ import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { workspaceFactory } from "@/test/factory/workspace.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
-import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import { TEST_DESKTOP_KEYS } from "@/constants.ts"
@@ -16,11 +15,8 @@ describe("Create A new Direct Message", () => {
 		user = userEvent.setup()
 	})
 
-	async function openNewDmPage(
-		workspace: Workspace,
-		admin: Teammate,
-		otherTeammates: Teammate[],
-	) {
+	async function openNewDmPage(admin: Teammate, otherTeammates: Teammate[]) {
+		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		await navigateToWorkspacePage(workspace, admin, otherTeammates)
 
 		const createDmButton = screen.getByRole("button", {
@@ -30,8 +26,6 @@ describe("Create A new Direct Message", () => {
 	}
 
 	it("focus on input and popover displays suggested teammates", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
-
 		const admin = teammateFactory.build({
 			firstName: "Tochukwu",
 			lastName: "Gbubemi",
@@ -67,7 +61,7 @@ describe("Create A new Direct Message", () => {
 			...teammateFactory.buildList(20),
 		]
 
-		await openNewDmPage(workspace, admin, otherTeammates)
+		await openNewDmPage(admin, otherTeammates)
 
 		await screen.findByText(/direct messages/i)
 		expect(await screen.findByText(/new conversation/i)).toBeInTheDocument()
@@ -92,8 +86,6 @@ describe("Create A new Direct Message", () => {
 	})
 
 	it("does not render suggestion box when no teammates found", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
-
 		const admin = teammateFactory.build({
 			firstName: "Tochukwu",
 			lastName: "Gbubemi",
@@ -113,7 +105,7 @@ describe("Create A new Direct Message", () => {
 			}),
 		]
 
-		await openNewDmPage(workspace, admin, otherTeammates)
+		await openNewDmPage(admin, otherTeammates)
 		const input = screen.getByRole("textbox")
 		await user.type(input, "zzzzzz")
 
@@ -121,10 +113,9 @@ describe("Create A new Direct Message", () => {
 	})
 
 	it("closes suggestion box when user clicks escape", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		const admin = teammateFactory.build()
 		const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(workspace, admin, otherTeammates)
+		await openNewDmPage(admin, otherTeammates)
 
 		expect(screen.queryAllByTestId("teammate-suggestions")).length(10)
 		await user.keyboard(TEST_DESKTOP_KEYS.ESCAPE)
@@ -132,13 +123,12 @@ describe("Create A new Direct Message", () => {
 	})
 
 	it("After escaping user typing should pop up suggestion box", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		const admin = teammateFactory.build({
 			firstName: "Tochukwu",
 			username: "odumodublvck",
 		})
 		// const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(workspace, admin, [])
+		await openNewDmPage(admin, [])
 
 		expect(screen.queryAllByTestId("teammate-suggestions")).toHaveLength(1)
 		await user.keyboard(TEST_DESKTOP_KEYS.ESCAPE)
@@ -150,7 +140,6 @@ describe("Create A new Direct Message", () => {
 	})
 
 	it("closes suggestion box and picks user on click enter", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
 			firstName: "Marvin",
@@ -158,7 +147,7 @@ describe("Create A new Direct Message", () => {
 			username: "mavo",
 		})
 		const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(workspace, admin, [mavo, ...otherTeammates])
+		await openNewDmPage(admin, [mavo, ...otherTeammates])
 
 		const input = screen.getByRole("textbox")
 		await user.type(input, "marvin")
@@ -169,7 +158,6 @@ describe("Create A new Direct Message", () => {
 	})
 
 	it("removes selected teammate when user clicks out", async () => {
-		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
 			firstName: "Marvin",
@@ -177,7 +165,7 @@ describe("Create A new Direct Message", () => {
 			username: "mavo",
 		})
 		const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(workspace, admin, [mavo, ...otherTeammates])
+		await openNewDmPage(admin, [mavo, ...otherTeammates])
 
 		const input = screen.getByRole("textbox")
 		await user.type(input, mavo.firstName)
@@ -197,5 +185,29 @@ describe("Create A new Direct Message", () => {
 				name: new RegExp(`remove ${mavo.id}`, "i"),
 			}),
 		).not.toBeInTheDocument()
+	})
+
+	it("selects teammate on click", async () => {
+		const admin = teammateFactory.build({ firstName: "Tochukwu" })
+		const mavo = teammateFactory.build({
+			firstName: "Marvin",
+			lastName: "Ukanigbe",
+			username: "mavo",
+		})
+		const otherTeammates = teammateFactory.buildList(20)
+		await openNewDmPage(admin, [mavo, ...otherTeammates])
+
+		await user.click(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+			}),
+		)
+
+		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
+		expect(
+			screen.queryByRole("button", {
+				name: new RegExp(`remove ${mavo.id}`, "i"),
+			}),
+		).toBeInTheDocument()
 	})
 })
