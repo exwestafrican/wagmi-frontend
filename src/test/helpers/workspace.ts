@@ -23,7 +23,7 @@ export async function navigateToWorkspacePage(
 export function mockWorkspaceAndCurrentTeammate(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
-    otherTeammates: Teammate[] = [],
+	otherTeammates: Teammate[] = [],
 ) {
 	const teammates = [teammate, ...otherTeammates]
 
