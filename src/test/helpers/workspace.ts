@@ -10,7 +10,7 @@ import { ApiPaths } from "@/constants.ts"
 export async function navigateToWorkspacePage(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
-	workspaceTeammates: Teammate[] = [teammateFactory.build()],
+	workspaceTeammates: Teammate[] = [],
 ) {
 	useAuthStore.getState().setAuthToken("fake-token")
 	mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
@@ -23,8 +23,10 @@ export async function navigateToWorkspacePage(
 export function mockWorkspaceAndCurrentTeammate(
 	workspace: Workspace,
 	teammate: Teammate = teammateFactory.build(),
-	workspaceTeammates: Teammate[] = [teammateFactory.build()],
+	otherTeammates: Teammate[] = [],
 ) {
+	const teammates = [teammate, ...otherTeammates]
+
 	vi.mocked(apiClient.get).mockImplementation((url: string) => {
 		if (url === ApiPaths.WORKSPACE) {
 			return Promise.resolve({ data: workspace })
@@ -33,7 +35,7 @@ export function mockWorkspaceAndCurrentTeammate(
 			return Promise.resolve({ data: teammate })
 		}
 		if (url === ApiPaths.ACTIVE_TEAMMATES) {
-			return Promise.resolve({ data: workspaceTeammates })
+			return Promise.resolve({ data: teammates })
 		}
 		return Promise.reject(new Error(`Unexpected GET ${url}`))
 	})

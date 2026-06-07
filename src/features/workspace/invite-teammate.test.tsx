@@ -11,7 +11,7 @@ import { teammateFactory } from "@/test/factory/teammate.ts"
 import { enterEmailToInvite } from "@/test/helpers/invite-teammates.tsx"
 import { makeTestRouter } from "@/test/helpers/navigate.tsx"
 import { RouterProvider } from "@tanstack/react-router"
-import { screen, waitFor } from "@testing-library/react"
+import { act, screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -37,17 +37,22 @@ describe("Invite Teammate", () => {
 			}
 			return Promise.reject(new Error(`Unexpected GET ${url}`))
 		})
-		await router.navigate({
-			to: "/workspace",
-			search: { code: "test-workspace-code" },
-		})
-		renderWithQueryClient(
+		const { container } = renderWithQueryClient(
 			<LanguageProvider>
 				<RouterProvider router={router} />
 			</LanguageProvider>,
 			{ queryClient },
 		)
-		const menuTrigger = screen.getByRole("button") // MoreVertical trigger
+		await act(async () => {
+			await router.navigate({
+				to: "/workspace",
+				search: { code: "test-workspace-code" },
+			})
+		})
+		await waitFor(() => {
+			expect(container.firstChild?.childNodes.length).toBeGreaterThan(0)
+		})
+		const menuTrigger = screen.getByRole("button", { name: /workspace menu/i })
 		await user.click(menuTrigger)
 		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
 	}
