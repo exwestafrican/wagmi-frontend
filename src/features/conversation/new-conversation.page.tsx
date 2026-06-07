@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator.tsx"
 import usePlaceholderName from "@/common/hooks/placeholder-names.ts"
 import useTeammateFullNameSearch from "@/features/directory/hooks/teammate-search.ts"
 import { useSearch } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
 	Popover,
 	PopoverAnchor,
@@ -24,6 +24,7 @@ export function NewConversationPage() {
 
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
+	const inputRef = useRef<HTMLInputElement>(null)
 
 	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
@@ -34,6 +35,12 @@ export function NewConversationPage() {
 
 	const queryResult = query(queryText)
 	const resultFound = queryResult.length > 0
+
+	useEffect(() => {
+		if (!selectedTeammate) {
+			inputRef.current?.focus()
+		}
+	}, [selectedTeammate])
 
 	useEffect(() => {
 		if (selectedTeammate) {
@@ -67,7 +74,7 @@ export function NewConversationPage() {
 						)}
 						{!selectedTeammate && (
 							<input
-								autoFocus
+								ref={inputRef}
 								onFocus={() => setOpen(true)}
 								value={queryText}
 								type="text"

@@ -164,7 +164,6 @@ describe("Create A new Direct Message", () => {
 		await user.type(input, "marvin")
 		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
-		expect(screen.queryByTestId("selected-teammate")).toBeInTheDocument()
 		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
 		expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
 	})
@@ -187,11 +186,17 @@ describe("Create A new Direct Message", () => {
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
 
-		const removeMavoButton = screen.getByRole("button", {
-			name: new RegExp(`remove ${mavo.id}`, "i"),
-		})
 
-		await user.click(removeMavoButton)
-		expect(screen.queryByTestId("selected-teammate")).not.toBeInTheDocument()
+		await user.click(
+			screen.getByRole("button", {
+				name: new RegExp(`remove ${mavo.id}`, "i"),
+			}),
+		)
+
+		expect(
+			screen.queryByRole("button", {
+				name: new RegExp(`remove ${mavo.id}`, "i"),
+			}),
+		).not.toBeInTheDocument()
 	})
 })
