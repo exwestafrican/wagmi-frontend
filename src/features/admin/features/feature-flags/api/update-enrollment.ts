@@ -3,10 +3,21 @@ import {
 	FEATURE_ENROLMENT,
 	type FeatureEnrollment,
 } from "@/features/admin/features/feature-flags/api/enrollment.ts"
+import { adminApiClient } from "@/lib/admin-api-client.ts"
+import { AdminApiPaths } from "@/constants.ts"
 
 export default function useUpdateEnrollment() {
 	const queryClient = useQueryClient()
 	return useMutation({
+		mutationFn: async ({
+			featureKey,
+			enrollment,
+		}: { featureKey: string; enrollment: FeatureEnrollment }) => {
+			await adminApiClient.post(AdminApiPaths.ENABLE_FEATURE, {
+				key: featureKey,
+				appCodes: [enrollment.appCode],
+			})
+		},
 		onMutate: async ({
 			featureKey,
 			enrollment,
