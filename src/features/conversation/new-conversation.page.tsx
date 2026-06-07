@@ -52,6 +52,12 @@ export function NewConversationPage() {
 		if (resultFound && queryText.trim().length > 0) setOpen(true)
 	}, [selectedTeammate, resultFound, queryText])
 
+	function handleSelection(teammate: Teammate) {
+		setQueryText("")
+		setSelectedTeammate(teammate)
+		setOpen(false)
+	}
+
 	return (
 		<div className="flex flex-col h-full min-h-0">
 			<ConversationHeader>
@@ -90,9 +96,7 @@ export function NewConversationPage() {
 								onKeyDown={(e) => {
 									switch (e.key) {
 										case DESKTOP_KEYS.ENTER:
-											setQueryText("")
-											setSelectedTeammate(queryResult[0])
-											setOpen(false)
+											handleSelection(queryResult[0])
 											break
 										case DESKTOP_KEYS.ESCAPE:
 											setOpen(false)
@@ -119,10 +123,10 @@ export function NewConversationPage() {
 								data-testid="teammate-suggestions"
 								key={teammate.id}
 								onClick={() => {
-									setQueryText(fullName(teammate))
-									setSelectedTeammate(teammate)
+									handleSelection(teammate)
 								}}
-								className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full "
+								className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full"
+								aria-label={`suggested teammate=${teammate.id}`}
 							>
 								{" "}
 								<FallbackAvatar size="xs" teammate={teammate} />
