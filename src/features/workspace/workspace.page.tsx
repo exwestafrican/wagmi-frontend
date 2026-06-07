@@ -269,8 +269,8 @@ export default function WorkspacePage() {
 							<SidebarGroupLabel className="sidebar-group-layout">
 								<div className="flex flex-row justify-between items-center w-full">
 									<div>direct messages </div>
-									<PlusIcon
-										className="h-5 w-5 cursor-pointer hover:text-gray-700 hover:bg-gray-200  bg-gray-100  rounded-md transition-colors p-1"
+									<button
+										aria-label="new-direct-message"
 										onClick={() =>
 											navigate({
 												from: "/workspace",
@@ -280,7 +280,9 @@ export default function WorkspacePage() {
 												},
 											})
 										}
-									/>
+									>
+										<PlusIcon className="h-5 w-5 cursor-pointer hover:text-gray-700 hover:bg-gray-200  bg-gray-100  rounded-md transition-colors p-1" />
+									</button>
 								</div>
 							</SidebarGroupLabel>
 
