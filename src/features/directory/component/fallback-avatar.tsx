@@ -7,6 +7,7 @@ const variant = cva(
 	{
 		variants: {
 			size: {
+				xs: "min-w-6 min-h-6 text-xs",
 				sm: "min-w-8 min-h-8 text-sm",
 				m: "min-w-10 min-h-10 text-base",
 			},

@@ -28,6 +28,7 @@ import {
 	UserCheck,
 	Users,
 	MessagesSquare,
+	PlusIcon,
 } from "lucide-react"
 import { Outlet, useNavigate, useSearch } from "@tanstack/react-router"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
@@ -266,8 +267,23 @@ export default function WorkspacePage() {
 						</SideNavGroupWithTopSeparator>
 						<SideNavGroupWithTopSeparator>
 							<SidebarGroupLabel className="sidebar-group-layout">
-								direct messages
+								<div className="flex flex-row justify-between items-center w-full">
+									<div>direct messages </div>
+									<PlusIcon
+										className="h-5 w-5 cursor-pointer hover:text-gray-700 hover:bg-gray-200  bg-gray-100  rounded-md transition-colors p-1"
+										onClick={() =>
+											navigate({
+												from: "/workspace",
+												to: "/workspace/new-conversation",
+												search: {
+													code: code,
+												},
+											})
+										}
+									/>
+								</div>
 							</SidebarGroupLabel>
+
 							<SidebarMenu className="px-3 gap-0">
 								{conversations?.map((conversation) => {
 									const teammate = registry.find(conversation.recipientId)
