@@ -14,6 +14,8 @@ import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import { DESKTOP_KEYS } from "@/constants.ts"
+import { Badge } from "@/components/ui/badge.tsx"
+import { X } from "lucide-react"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -34,9 +36,13 @@ export function NewConversationPage() {
 	const resultFound = queryResult.length > 0
 
 	useEffect(() => {
-		if (open && !resultFound) setOpen(false)
-		if (!open && resultFound) setOpen(true)
-	}, [queryText])
+		if (selectedTeammate) {
+			setOpen(false)
+		} else {
+			if (open && !resultFound) setOpen(false)
+			if (!open && resultFound) setOpen(true)
+		}
+	}, [queryText, selectedTeammate])
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
@@ -45,43 +51,51 @@ export function NewConversationPage() {
 			</ConversationHeader>
 			<Popover open={open}>
 				<PopoverAnchor asChild>
-					<div className="px-4 p-1 text-gray-600 flex">
+					<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 						<span className="text-xs"> To:</span>
-						<input
-							autoFocus
-							onFocus={() => {
-								console.log("focus")
-								setOpen(true)
-							}}
-							value={queryText}
-							type="text"
-							className="outline-none text-xs text-black px-2 w-full capitalize"
-							placeholder={placeholderName}
-							onChange={(e) => {
-								const value = e.target.value
-								setQueryText(value)
-								setSelectedTeammate(undefined)
-							}}
-							onKeyDown={(e) => {
-								switch (e.key) {
-									case DESKTOP_KEYS.ENTER:
-										setQueryText("")
-										setSelectedTeammate(queryResult[0])
-										setOpen(false)
-										console.log("after enter key", queryResult[0])
-										break
-									case DESKTOP_KEYS.ESCAPE:
-										setOpen(false)
-										break
-									default:
-										break
-								}
-							}}
-						/>
+						{selectedTeammate && (
+							<Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate">
+								{fullName(selectedTeammate)}
+								<button
+									aria-label={`Remove ${selectedTeammate.id}`}
+									className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
+								>
+									<X className="size-3.5" />
+								</button>
+							</Badge>
+						)}
+						{!selectedTeammate && (
+							<input
+								autoFocus
+								onFocus={() => setOpen(true)}
+								value={queryText}
+								type="text"
+								className="outline-none text-xs text-black px-2 w-full capitalize"
+								placeholder={placeholderName}
+								onChange={(e) => {
+									const value = e.target.value
+									setQueryText(value)
+									setSelectedTeammate(undefined)
+								}}
+								onKeyDown={(e) => {
+									switch (e.key) {
+										case DESKTOP_KEYS.ENTER:
+											setQueryText("")
+											setSelectedTeammate(queryResult[0])
+											setOpen(false)
+											break
+										case DESKTOP_KEYS.ESCAPE:
+											setOpen(false)
+											break
+										default:
+											break
+									}
+								}}
+							/>
+						)}
 					</div>
 				</PopoverAnchor>
 				<Separator />
-
 				<PopoverContent
 					alignOffset={19}
 					onOpenAutoFocus={(e) => e.preventDefault()}

@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from "vitest"
-import { screen, waitFor } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { workspaceFactory } from "@/test/factory/workspace.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
@@ -7,7 +7,7 @@ import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
 import type { Workspace } from "@/features/workspace/interface/workspace.interface.ts"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { fullName } from "@/features/directory/utils/teammate.ts"
-import { DESKTOP_KEYS } from "@/constants.ts"
+import { TEST_DESKTOP_KEYS } from "@/constants.ts"
 
 describe("Create A new Direct Message", () => {
 	let user: UserEvent
@@ -127,41 +127,45 @@ describe("Create A new Direct Message", () => {
 		await openNewDmPage(workspace, admin, otherTeammates)
 
 		expect(screen.queryAllByTestId("teammate-suggestions")).length(10)
-		await user.keyboard(DESKTOP_KEYS.ESCAPE)
+		await user.keyboard(TEST_DESKTOP_KEYS.ESCAPE)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 	})
 
 	it("After escaping user typing should pop up suggestion box", async () => {
 		const workspace = workspaceFactory.build({ name: "Antiworld" })
-		const admin = teammateFactory.build({ firstName: "Tochukwu", username: "odumodublvck", })
+		const admin = teammateFactory.build({
+			firstName: "Tochukwu",
+			username: "odumodublvck",
+		})
 		// const otherTeammates = teammateFactory.buildList(20)
 		await openNewDmPage(workspace, admin, [])
 
 		expect(screen.queryAllByTestId("teammate-suggestions")).toHaveLength(1)
-		await user.keyboard(DESKTOP_KEYS.ESCAPE)
+		await user.keyboard(TEST_DESKTOP_KEYS.ESCAPE)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 
 		const input = screen.getByRole("textbox")
-		await user.type(input, "to")
-
-		await waitFor(() => {
-			expect(screen.getByTestId("teammate-suggestions")).toBeInTheDocument()
-		})
-
-		// expect(screen.queryByTestId("teammate-suggestions")).toBeInTheDocument()
+		await user.type(input, "t")
+		expect(screen.getByTestId("teammate-suggestions")).toBeInTheDocument()
 	})
 
 	it("closes suggestion box and picks user on click enter", async () => {
 		const workspace = workspaceFactory.build({ name: "Antiworld" })
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
+		const mavo = teammateFactory.build({
+			firstName: "Marvin",
+			lastName: "Ukanigbe",
+			username: "mavo",
+		})
 		const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(workspace, admin, otherTeammates)
+		await openNewDmPage(workspace, admin, [mavo, ...otherTeammates])
 
 		const input = screen.getByRole("textbox")
-		await user.type(input, "tochukwu")
-		await user.keyboard(DESKTOP_KEYS.ENTER)
+		await user.type(input, "marvin")
+		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
-
-		// test that tochu is on dm screen
+		expect(screen.queryByTestId("selected-teammate")).toBeInTheDocument()
+		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
+		expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
 	})
 })

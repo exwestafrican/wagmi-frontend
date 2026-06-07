@@ -43,3 +43,8 @@ export const DESKTOP_KEYS = {
 	ENTER: "Enter",
 	ESCAPE: "Escape",
 }
+
+export const TEST_DESKTOP_KEYS = {
+	ENTER: "{Enter}",
+	ESCAPE: "{Escape}",
+}
