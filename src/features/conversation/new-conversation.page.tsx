@@ -99,6 +99,7 @@ export function NewConversationPage() {
 					<ScrollArea>
 						{queryResult.slice(0, 10).map((teammate) => (
 							<div
+                                data-testid="teammate-suggestions"
 								key={teammate.id}
 								onClick={() => {
 									setQueryText(fullName(teammate))
