@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import { DESKTOP_KEYS } from "@/constants.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
+import {useSidebar} from "@/components/ui/sidebar.tsx";
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -25,10 +26,10 @@ export function NewConversationPage() {
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement>(null)
+    const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
-
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
@@ -41,6 +42,11 @@ export function NewConversationPage() {
 			inputRef.current?.focus()
 		}
 	}, [selectedTeammate])
+
+
+    useEffect(() => {
+         setOpenMobile(false)
+    }, []);
 
 	useEffect(() => {
 		if (selectedTeammate) {
@@ -114,7 +120,7 @@ export function NewConversationPage() {
 					alignOffset={19}
 					onOpenAutoFocus={(e) => e.preventDefault()}
 					onCloseAutoFocus={(e) => e.preventDefault()}
-					className="px-0 flex space-y-0 flex-col  w-[calc(var(--radix-popover-trigger-width)-36px)]"
+					className="p-0 flex space-y-0 flex-col  w-[calc(var(--radix-popover-trigger-width)-36px)]"
 				>
 					<ScrollArea>
 						{queryResult.slice(0, 10).map((teammate) => (

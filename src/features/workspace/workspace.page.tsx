@@ -1,16 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import {
-	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuBadge,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarProvider,
-	SidebarTrigger,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuBadge,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarProvider,
+    SidebarTrigger,
 } from "@/components/ui/sidebar.tsx"
 import { Sidebar } from "@/components/ui/sidebar"
 import {
@@ -165,7 +165,7 @@ export default function WorkspacePage() {
 				open={openTeammateInviteModal}
 				onOpenChange={setOpenTeammateInviteModal}
 			/>
-			<SidebarProvider>
+			<SidebarProvider >
 				<Sidebar>
 					<SidebarHeader className="p-3">
 						<div className="flex items-center justify-between gap-2 min-w-0">
