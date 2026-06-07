@@ -41,6 +41,9 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
 import useActivePath from "@/hooks/use-active-path.ts"
 import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
+import useTeammateConversationInfo from "@/features/conversation/api/list-conversation.ts"
+import { fullName } from "@/features/directory/utils/teammate.ts"
+import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -90,10 +93,12 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
+	const { data: conversations } = useTeammateConversationInfo(code, 1)
 
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
 	const isActivePath = useActivePath()
+	const registry = useTeammateInfoRegistry(code)
 
 	const workspace = workspaceDataResponse?.data ?? ({} as Workspace) //TODO we should have workspace before here
 
@@ -112,7 +117,7 @@ export default function WorkspacePage() {
 		},
 		{
 			id: "conversation",
-			path: "/workspace/conversation",
+			path: "/workspace/conversations",
 			icon: MessagesSquare,
 			label: "Conversations",
 		},
@@ -150,6 +155,8 @@ export default function WorkspacePage() {
 	]
 
 	const badgeText = (count: number) => (count > 10 ? "10+" : count)
+	const conversationRoute = (conversationId: number) =>
+		`/workspace/conversation?code=${code}&conversationId=${conversationId}`
 
 	return (
 		<div>
@@ -180,6 +187,7 @@ export default function WorkspacePage() {
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<button
+										aria-label="Workspace menu"
 										type="button"
 										className="text-gray-600 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-1 py-1.5 transition-colors cursor-pointer"
 									>
@@ -260,6 +268,38 @@ export default function WorkspacePage() {
 							<SidebarGroupLabel className="sidebar-group-layout">
 								direct messages
 							</SidebarGroupLabel>
+							<SidebarMenu className="px-3 gap-0">
+								{conversations?.map((conversation) => {
+									const teammate = registry.find(conversation.recipientId)
+									const name = teammate
+										? fullName(teammate)
+										: "Unknown Teammate"
+
+									const route = conversationRoute(conversation.id)
+									return (
+										<SidebarMenuItem key={conversation.id}>
+											<SidebarMenuButton
+												size="sm"
+												className="text-muted-brown text-xs cursor-pointer tracking-wide"
+												onClick={() =>
+													navigate({
+														from: "/workspace",
+														to: "/workspace/conversation",
+														search: {
+															code: code,
+															conversationId: conversation.id,
+														},
+													})
+												}
+												isActive={isActivePath(route)}
+											>
+												<div className="h-2 w-2 rounded-full bg-green-500" />
+												{name}
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									)
+								})}
+							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
 					</SidebarContent>
 				</Sidebar>

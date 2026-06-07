@@ -5,12 +5,12 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card.tsx"
+import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import {
 	buildTeammateRole,
 	formatRole,
 	fullName,
-	type Teammate,
-} from "@/features/workspace/interface/teammate.interface.ts"
+} from "@/features/directory/utils/teammate.ts"
 
 export default function TeamMemberCard({ teammate }: { teammate: Teammate }) {
 	const role = buildTeammateRole(teammate)
