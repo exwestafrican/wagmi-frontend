@@ -45,11 +45,12 @@ export function NewConversationPage() {
 	useEffect(() => {
 		if (selectedTeammate) {
 			setOpen(false)
-		} else {
-			if (open && !resultFound) setOpen(false)
-			if (!open && resultFound && queryText.trim().length > 0) setOpen(true)
 		}
-	}, [open, selectedTeammate, resultFound, queryText])
+
+		if (!resultFound) setOpen(false)
+
+		if (resultFound && queryText.trim().length > 0) setOpen(true)
+	}, [selectedTeammate, resultFound, queryText])
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
