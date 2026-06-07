@@ -57,6 +57,7 @@ export function NewConversationPage() {
 							<Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate">
 								{fullName(selectedTeammate)}
 								<button
+									onClick={() => setSelectedTeammate(undefined)}
 									aria-label={`Remove ${selectedTeammate.id}`}
 									className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
 								>

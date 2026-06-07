@@ -168,4 +168,30 @@ describe("Create A new Direct Message", () => {
 		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
 		expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
 	})
+
+	it("removes selected teammate when user clicks out", async () => {
+		const workspace = workspaceFactory.build({ name: "Antiworld" })
+		const admin = teammateFactory.build({ firstName: "Tochukwu" })
+		const mavo = teammateFactory.build({
+			firstName: "Marvin",
+			lastName: "Ukanigbe",
+			username: "mavo",
+		})
+		const otherTeammates = teammateFactory.buildList(20)
+		await openNewDmPage(workspace, admin, [mavo, ...otherTeammates])
+
+		const input = screen.getByRole("textbox")
+		await user.type(input, mavo.firstName)
+		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+
+		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
+		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
+
+		const removeMavoButton = screen.getByRole("button", {
+			name: new RegExp(`remove ${mavo.id}`, "i"),
+		})
+
+		await user.click(removeMavoButton)
+		expect(screen.queryByTestId("selected-teammate")).not.toBeInTheDocument()
+	})
 })
