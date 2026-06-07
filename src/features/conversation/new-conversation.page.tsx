@@ -17,6 +17,10 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
 import { useSidebar } from "@/components/ui/sidebar.tsx"
+import EnvoyComposer from "@/features/conversation/components/composer/envoy-composer.tsx"
+import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
+import TextPart from "@/features/conversation/components/text-part.tsx"
+import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -25,11 +29,17 @@ export function NewConversationPage() {
 
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
+	const inputRef = useRef<HTMLInputElement | null>(null)
+	const composerRef = useRef<HTMLTextAreaElement | null>(null)
+	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 	const inputRef = useRef<HTMLInputElement>(null)
 	const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
+
+	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
+
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
@@ -101,9 +111,16 @@ export function NewConversationPage() {
 								onKeyDown={(e) => {
 									switch (e.key) {
 										case DESKTOP_KEYS.ENTER:
-											handleSelection(queryResult[0])
+											e.preventDefault()
+											setQueryText("")
+											setSelectedTeammate(queryResult[0])
+											setOpen(false)
+											requestAnimationFrame(() => {
+												composerRef.current?.focus()
+											})
 											break
 										case DESKTOP_KEYS.ESCAPE:
+											e.preventDefault()
 											setOpen(false)
 											break
 										default:
@@ -145,6 +162,26 @@ export function NewConversationPage() {
 					</ScrollArea>
 				</PopoverContent>
 			</Popover>
+			<ScrollArea className="flex-1 min-h-0">
+				<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
+					{messageContents.map((content) => (
+						<TextPart author={content.author} node={content.node} />
+					))}
+				</div>
+			</ScrollArea>
+			<div className="px-4 pt-4 pb-6">
+				<EnvoyComposer
+					ref={composerRef}
+					onSend={(nodes) => {
+						const newContent = nodes.map((node) => ({
+							node,
+							author: currentTeammate!,
+						}))
+						setMessageContents((prev) => [...prev, ...newContent])
+					}}
+					onEnter={() => {}}
+				/>
+			</div>
 		</div>
 	)
 }

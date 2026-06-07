@@ -1,11 +1,13 @@
-import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
+import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
+import type { TextNode } from "@/features/conversation/interface/text-node.ts"
+import { SPACE } from "@/features/conversation/hooks/text-node.tsx"
 
 export default function TextPart({
 	author,
-	content,
-}: { author: Teammate; content: { msg: string; timestamp: number }[] }) {
+	node,
+}: { author: Teammate; node: TextNode }) {
 	return (
 		<div className="flex flex-row gap-4 items-start">
 			<FallbackAvatar teammate={author} size="sm" />
@@ -17,11 +19,8 @@ export default function TextPart({
 						Today at 9:15pm{" "}
 					</span>
 				</div>
-				{content.map(({ msg, timestamp }) => (
-					<p key={timestamp} className="text-sm font-normal">
-						{msg}
-					</p>
-				))}
+
+				<p className="text-sm font-normal">{node.content.join(SPACE)}</p>
 			</div>
 		</div>
 	)

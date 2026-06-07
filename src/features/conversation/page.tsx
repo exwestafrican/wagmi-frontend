@@ -2,7 +2,7 @@ import useTeammateConversationInfo from "@/features/conversation/api/list-conver
 import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
-import TextPart from "@/features/conversation/components/text.tsx"
+import LegacyTextPart from "@/features/conversation/components/text-part.legacy.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
 import useConversationParts, {
 	type ConversationPart,
@@ -55,7 +55,7 @@ export default function TeammateConversation() {
 							const author = registry.find(part.authorId)
 							return (
 								author && (
-									<TextPart
+									<LegacyTextPart
 										key={`${part.authorId}-${part.sentAt}`}
 										author={author}
 										content={[{ msg: part.content, timestamp: part.sentAt }]}
@@ -67,6 +67,7 @@ export default function TeammateConversation() {
 				</ScrollArea>
 				<div className="px-4 py-3">
 					<EnvoyComposer
+						onSend={() => {}}
 						onEnter={(textInput) =>
 							setLocalParts((prev) => [
 								...prev,
