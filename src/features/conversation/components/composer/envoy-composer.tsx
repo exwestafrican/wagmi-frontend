@@ -25,9 +25,12 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 		const invalidInput = textInput.length > MAX_TEXT_INPUT
 		const disableSend = hasNoInput || exceedsTextInput
 
-		function sendMessage() {
-			setTextInput("")
-			onSend(parser.build())
+		function sendMessageIfEnabled() {
+            if(!disableSend){
+                setTextInput("")
+                onSend(parser.build())
+            }
+
 		}
 		return (
 			<Field
@@ -50,10 +53,14 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						setTextInput(e.target.value)
 					}}
 					onKeyDown={(e) => {
+                        console.log(e.key)
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:
+                                if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                                    return
+                                }
 								e.preventDefault()
-								sendMessage()
+								sendMessageIfEnabled()
 								break
 							default:
 								break
@@ -75,7 +82,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						size="icon-sm"
 						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
 						disabled={disableSend}
-						onClick={() => sendMessage()}
+						onClick={() => sendMessageIfEnabled()}
 					>
 						<SendHorizontal />
 					</Button>
