@@ -260,5 +260,15 @@ describe("Create A new Direct Message", () => {
 			expect(screen.getByText(fullName(recipient))).toBeInTheDocument()
 			expect(screen.getByText(fullName(sender))).toBeInTheDocument()
 		})
+
+		it("sends message and displays on screen when user clicks enter", async () => {
+			const message = "Mavo!! how you dey?"
+
+			const { recipient, sender } = await startNewDm(message)
+			await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+			expect(await screen.findByText(message)).toBeInTheDocument()
+			expect(screen.getByText(fullName(recipient))).toBeInTheDocument()
+			expect(screen.getByText(fullName(sender))).toBeInTheDocument()
+		})
 	})
 })

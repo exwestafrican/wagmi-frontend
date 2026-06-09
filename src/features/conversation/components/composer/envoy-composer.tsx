@@ -5,6 +5,7 @@ import { SendHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
 import useTextNodeParser from "@/features/conversation/hooks/text-node.tsx"
 import type { TextNode } from "@/features/conversation/interface/text-node.ts"
+import { DESKTOP_KEYS } from "@/constants.ts"
 
 const MAX_TEXT_INPUT = 2000
 
@@ -23,6 +24,11 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 
 		const invalidInput = textInput.length > MAX_TEXT_INPUT
 		const disableSend = hasNoInput || exceedsTextInput
+
+		function sendMessage() {
+			setTextInput("")
+			onSend(parser.build())
+		}
 		return (
 			<Field
 				className={cn(
@@ -43,6 +49,16 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
 					}}
+					onKeyDown={(e) => {
+						switch (e.key) {
+							case DESKTOP_KEYS.ENTER:
+								e.preventDefault()
+								sendMessage()
+								break
+							default:
+								break
+						}
+					}}
 				/>
 				<div className="flex flex-row gap-4 items-center justify-end px-3 pb-2 pt-0">
 					<span
@@ -59,10 +75,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						size="icon-sm"
 						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
 						disabled={disableSend}
-						onClick={() => {
-							setTextInput("")
-							onSend(parser.build())
-						}}
+						onClick={() => sendMessage()}
 					>
 						<SendHorizontal />
 					</Button>
