@@ -58,6 +58,7 @@ export default function TeammateConversation() {
 				</ScrollArea>
 				<div className="px-4 py-3">
 					<EnvoyComposer
+						placeholder={`Message ${participantInfo.username}`}
 						onSend={(nodes) => {
 							if (currentTeammate) {
 								setMessageContents((prev) => [

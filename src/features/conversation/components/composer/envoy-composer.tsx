@@ -10,11 +10,12 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 const MAX_TEXT_INPUT = 2000
 
 type EnvoyComposerProps = {
+	placeholder: string
 	onSend: (nodes: TextNode[]) => void
 }
 
 const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
-	function EnvoyComposer({ onSend }, ref) {
+	function EnvoyComposer({ placeholder, onSend }, ref) {
 		const [textInput, setTextInput] = useState("")
 
 		const parser = useTextNodeParser()
@@ -26,11 +27,10 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-            if(!disableSend){
-                setTextInput("")
-                onSend(parser.build())
-            }
-
+			if (!disableSend) {
+				setTextInput("")
+				onSend(parser.build())
+			}
 		}
 		return (
 			<Field
@@ -47,18 +47,17 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
 					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed  font-sans"
-					placeholder="Message Raymond..." //TODO pass this as an argument
+					placeholder={placeholder} //TODO pass this as an argument
 					onChange={(e) => {
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
 					}}
 					onKeyDown={(e) => {
-                        console.log(e.key)
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:
-                                if (e.ctrlKey || e.shiftKey) {
-                                    return
-                                }
+								if (e.ctrlKey || e.shiftKey) {
+									return
+								}
 								e.preventDefault()
 								sendMessageIfEnabled()
 								break

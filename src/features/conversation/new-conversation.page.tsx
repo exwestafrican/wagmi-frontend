@@ -179,6 +179,7 @@ export function NewConversationPage() {
 			<div className="px-4 pt-4 pb-6">
 				<EnvoyComposer
 					ref={composerRef}
+					placeholder={"Start a new message"}
 					onSend={(nodes) => {
 						if (currentTeammate) {
 							setMessageContents((prev) => [
