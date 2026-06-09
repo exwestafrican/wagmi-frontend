@@ -59,13 +59,15 @@ export default function TeammateConversation() {
 				<div className="px-4 py-3">
 					<EnvoyComposer
 						onSend={(nodes) => {
-							setMessageContents((prev) => [
-								...prev,
-								{
-									author: currentTeammate!,
-									nodes: nodes,
-								},
-							])
+							if (currentTeammate) {
+								setMessageContents((prev) => [
+									...prev,
+									{
+										author: currentTeammate,
+										nodes: nodes,
+									},
+								])
+							}
 						}}
 					/>
 				</div>

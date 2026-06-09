@@ -32,7 +32,7 @@ export function NewConversationPage() {
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const composerRef = useRef<HTMLTextAreaElement | null>(null)
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
-	const inputRef = useRef<HTMLInputElement>(null)
+
 	const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
@@ -97,6 +97,7 @@ export function NewConversationPage() {
 						)}
 						{!selectedTeammate && (
 							<input
+								aria-label="recipient-search"
 								ref={inputRef}
 								onFocus={() => setOpen(true)}
 								value={queryText}
@@ -153,8 +154,7 @@ export function NewConversationPage() {
 								{" "}
 								<FallbackAvatar size="xs" teammate={teammate} />
 								<div className="flex items-center gap-1">
-									<span>{fullName(teammate)}</span>
-									<div className="w-0.5 h-4 bg-black rounded-sm" />
+									<span>{fullName(teammate)}</span> ~
 									<span>{teammate.username}</span>
 								</div>
 							</button>
@@ -166,10 +166,9 @@ export function NewConversationPage() {
 				<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
 					{messageContents.map((content) => {
 						const author = content.author
-						const partSentAt = Date.now()
 						return (
 							<TextPart
-								key={`${author.id}-${partSentAt}`}
+								key={`${content.nodes.map((n) => n.id).join("-")}`}
 								author={author}
 								nodes={content.nodes}
 							/>
@@ -181,13 +180,15 @@ export function NewConversationPage() {
 				<EnvoyComposer
 					ref={composerRef}
 					onSend={(nodes) => {
-						setMessageContents((prev) => [
-							...prev,
-							{
-								author: currentTeammate!,
-								nodes: nodes,
-							},
-						])
+						if (currentTeammate) {
+							setMessageContents((prev) => [
+								...prev,
+								{
+									author: currentTeammate,
+									nodes: nodes,
+								},
+							])
+						}
 					}}
 				/>
 			</div>

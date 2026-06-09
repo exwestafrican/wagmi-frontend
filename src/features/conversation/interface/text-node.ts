@@ -5,6 +5,7 @@ export type TextStyle = "bold" | "italic" | "underline" | "strike"
 export type NodeType = "p"
 
 export type TextNode = {
+	id: string
 	node: NodeType
 	content: string[]
 	styles: Record<TextStyle, number[]>

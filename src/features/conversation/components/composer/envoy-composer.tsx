@@ -33,6 +33,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 				)}
 			>
 				<textarea
+					aria-label="message-composer"
 					ref={ref}
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
@@ -54,6 +55,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 					</span>
 
 					<Button
+						aria-label="send-message"
 						size="icon-sm"
 						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
 						disabled={disableSend}

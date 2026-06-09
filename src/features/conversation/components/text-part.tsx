@@ -21,7 +21,7 @@ export default function TextPart({
 				</div>
 
 				{nodes.map((node) => (
-					<p className="text-sm font-normal tracking-tight">
+					<p key={node.id} className="text-sm font-normal tracking-tight">
 						{node.content.join(SPACE)}
 					</p>
 				))}
