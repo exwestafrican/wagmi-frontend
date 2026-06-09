@@ -66,7 +66,9 @@ describe("Create A new Direct Message", () => {
 		await screen.findByText(/direct messages/i)
 		expect(await screen.findByText(/new conversation/i)).toBeInTheDocument()
 
-		const input = screen.getByRole("textbox")
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
 		expect(input).toHaveFocus()
 
 		// teammate suggestions is displayed
@@ -106,7 +108,9 @@ describe("Create A new Direct Message", () => {
 		]
 
 		await openNewDmPage(admin, otherTeammates)
-		const input = screen.getByRole("textbox")
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
 		await user.type(input, "zzzzzz")
 
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
@@ -134,7 +138,9 @@ describe("Create A new Direct Message", () => {
 		await user.keyboard(TEST_DESKTOP_KEYS.ESCAPE)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 
-		const input = screen.getByRole("textbox")
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
 		await user.type(input, "t")
 		expect(screen.getByTestId("teammate-suggestions")).toBeInTheDocument()
 	})
@@ -149,15 +155,21 @@ describe("Create A new Direct Message", () => {
 		const otherTeammates = teammateFactory.buildList(20)
 		await openNewDmPage(admin, [mavo, ...otherTeammates])
 
-		const input = screen.getByRole("textbox")
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
 		await user.type(input, "marvin")
 		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
 		expect(screen.getByText(fullName(mavo))).toBeInTheDocument()
-		expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+		expect(
+			screen.queryByRole("textbox", {
+				name: /recipient-search/i,
+			}),
+		).not.toBeInTheDocument()
 	})
 
-	it("removes selected teammate when user clicks out", async () => {
+	it("removes selected teammate when user hits enter", async () => {
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
 			firstName: "Marvin",
@@ -167,7 +179,9 @@ describe("Create A new Direct Message", () => {
 		const otherTeammates = teammateFactory.buildList(20)
 		await openNewDmPage(admin, [mavo, ...otherTeammates])
 
-		const input = screen.getByRole("textbox")
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
 		await user.type(input, mavo.firstName)
 		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 
@@ -209,5 +223,87 @@ describe("Create A new Direct Message", () => {
 				name: new RegExp(`remove ${mavo.id}`, "i"),
 			}),
 		).toBeInTheDocument()
+	})
+
+	async function composeMessage(msg: string) {
+		const composer = screen.getByRole("textbox")
+		await user.type(composer, msg)
+	}
+
+	describe("send new message with no previous chat history", () => {
+		async function startNewDm(message: string) {
+			const admin = teammateFactory.build()
+			const mavo = teammateFactory.build({
+				firstName: "Marvin",
+				lastName: "Ukanigbe",
+				username: "mavo",
+			})
+			const otherTeammates = teammateFactory.buildList(20)
+			await openNewDmPage(admin, [mavo, ...otherTeammates])
+
+			await user.click(
+				screen.getByRole("button", {
+					name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+				}),
+			)
+
+			await composeMessage(message)
+			return { recipient: mavo, sender: admin }
+		}
+
+		async function openComposer() {
+			const admin = teammateFactory.build({ firstName: "Dami" })
+			const mavo = teammateFactory.build({
+				firstName: "Marvin",
+				lastName: "Ukanigbe",
+				username: "mavo",
+			})
+			const otherTeammates = teammateFactory.buildList(20)
+			await openNewDmPage(admin, [mavo, ...otherTeammates])
+
+			await user.click(
+				screen.getByRole("button", {
+					name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+				}),
+			)
+
+			return { recipient: mavo, sender: admin }
+		}
+
+		it("sends message and displays on screen when user clicks send", async () => {
+			const message = "Mavo!! how you dey?"
+
+			const { recipient, sender } = await startNewDm(message)
+			await user.click(screen.getByRole("button", { name: /send-message/i }))
+
+			expect(await screen.findByText(message)).toBeInTheDocument()
+			expect(screen.getByText(fullName(recipient))).toBeInTheDocument()
+			expect(screen.getByText(fullName(sender))).toBeInTheDocument()
+		})
+
+		it("sends message and displays on screen when user clicks enter", async () => {
+			const message = "Mavo!! how you dey?"
+
+			const { recipient, sender } = await startNewDm(message)
+			await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+			expect(await screen.findByText(message)).toBeInTheDocument()
+			expect(screen.getByText(fullName(recipient))).toBeInTheDocument()
+			expect(screen.getByText(fullName(sender))).toBeInTheDocument()
+		})
+
+		it("does not send message on click enter when send is disabled", async () => {
+			const { sender } = await openComposer()
+
+			const sendButton = screen.getByRole("button", { name: /send-message/i })
+			expect(sendButton).toBeDisabled()
+
+			const composer = screen.getByRole("textbox", {
+				name: /message-composer/i,
+			})
+			await user.click(composer)
+			await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+			// sender name only appears in the message list after send
+			expect(screen.queryByText(fullName(sender))).not.toBeInTheDocument()
+		})
 	})
 })

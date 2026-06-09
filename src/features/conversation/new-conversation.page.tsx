@@ -17,6 +17,10 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
 import { useSidebar } from "@/components/ui/sidebar.tsx"
+import EnvoyComposer from "@/features/conversation/components/composer/envoy-composer.tsx"
+import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
+import TextPart from "@/features/conversation/components/text-part.tsx"
+import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -25,11 +29,17 @@ export function NewConversationPage() {
 
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
-	const inputRef = useRef<HTMLInputElement>(null)
+	const inputRef = useRef<HTMLInputElement | null>(null)
+	const composerRef = useRef<HTMLTextAreaElement | null>(null)
+	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
+
 	const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
 	const [queryText, setQueryText] = useState<string>("")
+
+	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
+
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
@@ -73,7 +83,7 @@ export function NewConversationPage() {
 					<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 						<span className="text-xs"> To:</span>
 						{selectedTeammate && (
-							<Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate">
+							<Badge className="bg-purple-200 text-purple-900 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate rounded-sm">
 								{fullName(selectedTeammate)}
 								<button
 									type="button"
@@ -87,6 +97,7 @@ export function NewConversationPage() {
 						)}
 						{!selectedTeammate && (
 							<input
+								aria-label="recipient-search"
 								ref={inputRef}
 								onFocus={() => setOpen(true)}
 								value={queryText}
@@ -101,9 +112,16 @@ export function NewConversationPage() {
 								onKeyDown={(e) => {
 									switch (e.key) {
 										case DESKTOP_KEYS.ENTER:
-											handleSelection(queryResult[0])
+											e.preventDefault()
+											setQueryText("")
+											setSelectedTeammate(queryResult[0])
+											setOpen(false)
+											requestAnimationFrame(() => {
+												composerRef.current?.focus()
+											})
 											break
 										case DESKTOP_KEYS.ESCAPE:
+											e.preventDefault()
 											setOpen(false)
 											break
 										default:
@@ -136,8 +154,7 @@ export function NewConversationPage() {
 								{" "}
 								<FallbackAvatar size="xs" teammate={teammate} />
 								<div className="flex items-center gap-1">
-									<span>{fullName(teammate)}</span>
-									<div className="w-0.5 h-4 bg-black rounded-sm" />
+									<span>{fullName(teammate)}</span> ~
 									<span>{teammate.username}</span>
 								</div>
 							</button>
@@ -145,6 +162,37 @@ export function NewConversationPage() {
 					</ScrollArea>
 				</PopoverContent>
 			</Popover>
+			<ScrollArea className="flex-1 min-h-0">
+				<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
+					{messageContents.map((content) => {
+						const author = content.author
+						return (
+							<TextPart
+								key={`${content.nodes.map((n) => n.id).join("-")}`}
+								author={author}
+								nodes={content.nodes}
+							/>
+						)
+					})}
+				</div>
+			</ScrollArea>
+			<div className="px-4 pt-4 pb-6">
+				<EnvoyComposer
+					ref={composerRef}
+					placeholder={"Start a new message"}
+					onSend={(nodes) => {
+						if (currentTeammate) {
+							setMessageContents((prev) => [
+								...prev,
+								{
+									author: currentTeammate,
+									nodes: nodes,
+								},
+							])
+						}
+					}}
+				/>
+			</div>
 		</div>
 	)
 }
