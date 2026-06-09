@@ -47,7 +47,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
 					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed  font-sans"
-					placeholder={placeholder} //TODO pass this as an argument
+					placeholder={placeholder}
 					onChange={(e) => {
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
