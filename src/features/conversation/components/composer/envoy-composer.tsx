@@ -9,15 +9,14 @@ import type { TextNode } from "@/features/conversation/interface/text-node.ts"
 const MAX_TEXT_INPUT = 2000
 
 type EnvoyComposerProps = {
-	onEnter: (textInput: string) => void
 	onSend: (nodes: TextNode[]) => void
 }
 
 const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
-	function EnvoyComposer({ onEnter, onSend }, ref) {
-		const parser = useTextNodeParser()
-
+	function EnvoyComposer({ onSend }, ref) {
 		const [textInput, setTextInput] = useState("")
+
+		const parser = useTextNodeParser()
 
 		const hasNoInput = textInput.length === 0
 		const exceedsTextInput = textInput.length > MAX_TEXT_INPUT
@@ -28,17 +27,17 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 			<Field
 				className={cn(
 					"w-full",
-					"border border-gray-300",
+					" border-zinc-200 border",
 					"rounded-md",
-					"shadow-xm",
+					"shadow-sm",
 				)}
 			>
 				<textarea
 					ref={ref}
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
-					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed font-sans"
-					placeholder="Message Raymond..."
+					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed  font-sans"
+					placeholder="Message Raymond..." //TODO pass this as an argument
 					onChange={(e) => {
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
@@ -56,12 +55,10 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 
 					<Button
 						size="icon-sm"
-						className=" w-11 h-7 bg-green-950  hover:bg-green-950/90"
+						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
 						disabled={disableSend}
 						onClick={() => {
-							console.log("Sending...")
 							setTextInput("")
-							onEnter(textInput)
 							onSend(parser.build())
 						}}
 					>

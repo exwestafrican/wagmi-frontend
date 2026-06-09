@@ -83,7 +83,7 @@ export function NewConversationPage() {
 					<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 						<span className="text-xs"> To:</span>
 						{selectedTeammate && (
-							<Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate">
+							<Badge className="bg-purple-200 text-purple-900 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate rounded-sm">
 								{fullName(selectedTeammate)}
 								<button
 									type="button"
@@ -164,22 +164,31 @@ export function NewConversationPage() {
 			</Popover>
 			<ScrollArea className="flex-1 min-h-0">
 				<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
-					{messageContents.map((content) => (
-						<TextPart author={content.author} node={content.node} />
-					))}
+					{messageContents.map((content) => {
+						const author = content.author
+						const partSentAt = Date.now()
+						return (
+							<TextPart
+								key={`${author.id}-${partSentAt}`}
+								author={author}
+								nodes={content.nodes}
+							/>
+						)
+					})}
 				</div>
 			</ScrollArea>
 			<div className="px-4 pt-4 pb-6">
 				<EnvoyComposer
 					ref={composerRef}
 					onSend={(nodes) => {
-						const newContent = nodes.map((node) => ({
-							node,
-							author: currentTeammate!,
-						}))
-						setMessageContents((prev) => [...prev, ...newContent])
+						setMessageContents((prev) => [
+							...prev,
+							{
+								author: currentTeammate!,
+								nodes: nodes,
+							},
+						])
 					}}
-					onEnter={() => {}}
 				/>
 			</div>
 		</div>

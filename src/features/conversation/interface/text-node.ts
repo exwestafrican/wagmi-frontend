@@ -12,5 +12,5 @@ export type TextNode = {
 
 export type MessageContent = {
 	author: Teammate
-	node: TextNode
+	nodes: TextNode[]
 }

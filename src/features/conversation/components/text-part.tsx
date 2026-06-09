@@ -6,8 +6,8 @@ import { SPACE } from "@/features/conversation/hooks/text-node.tsx"
 
 export default function TextPart({
 	author,
-	node,
-}: { author: Teammate; node: TextNode }) {
+	nodes,
+}: { author: Teammate; nodes: TextNode[] }) {
 	return (
 		<div className="flex flex-row gap-4 items-start">
 			<FallbackAvatar teammate={author} size="sm" />
@@ -20,7 +20,11 @@ export default function TextPart({
 					</span>
 				</div>
 
-				<p className="text-sm font-normal">{node.content.join(SPACE)}</p>
+				{nodes.map((node) => (
+					<p className="text-sm font-normal tracking-tight">
+						{node.content.join(SPACE)}
+					</p>
+				))}
 			</div>
 		</div>
 	)
