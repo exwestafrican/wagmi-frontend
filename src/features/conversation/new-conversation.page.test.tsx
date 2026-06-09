@@ -231,7 +231,6 @@ describe("Create A new Direct Message", () => {
 	}
 
 	describe("send new message with no previous chat history", () => {
-
 		async function startNewDm(message: string) {
 			const admin = teammateFactory.build()
 			const mavo = teammateFactory.build({
@@ -252,26 +251,24 @@ describe("Create A new Direct Message", () => {
 			return { recipient: mavo, sender: admin }
 		}
 
+		async function openComposer() {
+			const admin = teammateFactory.build({ firstName: "Dami" })
+			const mavo = teammateFactory.build({
+				firstName: "Marvin",
+				lastName: "Ukanigbe",
+				username: "mavo",
+			})
+			const otherTeammates = teammateFactory.buildList(20)
+			await openNewDmPage(admin, [mavo, ...otherTeammates])
 
-        async function openComposer(){
-            const admin = teammateFactory.build({ firstName: "Dami" })
-            const mavo = teammateFactory.build({
-                firstName: "Marvin",
-                lastName: "Ukanigbe",
-                username: "mavo",
-            })
-            const otherTeammates = teammateFactory.buildList(20)
-            await openNewDmPage(admin, [mavo, ...otherTeammates])
+			await user.click(
+				screen.getByRole("button", {
+					name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+				}),
+			)
 
-            await user.click(
-                screen.getByRole("button", {
-                    name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
-                }),
-            )
-
-            return { recipient: mavo, sender: admin }
-        }
-
+			return { recipient: mavo, sender: admin }
+		}
 
 		it("sends message and displays on screen when user clicks send", async () => {
 			const message = "Mavo!! how you dey?"
@@ -294,18 +291,19 @@ describe("Create A new Direct Message", () => {
 			expect(screen.getByText(fullName(sender))).toBeInTheDocument()
 		})
 
-        it("does not send message on click enter when send is disabled", async () => {
-            const {sender } = await openComposer()
+		it("does not send message on click enter when send is disabled", async () => {
+			const { sender } = await openComposer()
 
-            const sendButton = screen.getByRole("button", { name: /send-message/i })
-            expect(sendButton).toBeDisabled()
+			const sendButton = screen.getByRole("button", { name: /send-message/i })
+			expect(sendButton).toBeDisabled()
 
-            const composer = screen.getByRole("textbox", { name: /message-composer/i })
-            await user.click(composer)
-            await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
-            // sender name only appears in the message list after send
-            expect(screen.queryByText(fullName(sender))).not.toBeInTheDocument()
-
-        })
+			const composer = screen.getByRole("textbox", {
+				name: /message-composer/i,
+			})
+			await user.click(composer)
+			await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+			// sender name only appears in the message list after send
+			expect(screen.queryByText(fullName(sender))).not.toBeInTheDocument()
+		})
 	})
 })
