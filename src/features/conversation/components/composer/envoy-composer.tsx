@@ -56,7 +56,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
                         console.log(e.key)
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:
-                                if (e.metaKey || e.ctrlKey || e.shiftKey) {
+                                if (e.ctrlKey || e.shiftKey) {
                                     return
                                 }
 								e.preventDefault()
