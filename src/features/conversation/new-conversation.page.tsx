@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator.tsx"
 import usePlaceholderName from "@/common/hooks/placeholder-names.ts"
 import useTeammateFullNameSearch from "@/features/directory/hooks/teammate-search.ts"
 import { useSearch } from "@tanstack/react-router"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import {
 	Popover,
 	PopoverAnchor,
@@ -31,6 +31,7 @@ export function NewConversationPage() {
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const composerRef = useRef<HTMLTextAreaElement | null>(null)
+	const messageScrollRef = useRef<HTMLDivElement | null>(null)
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 
 	const { setOpenMobile } = useSidebar()
@@ -73,12 +74,28 @@ export function NewConversationPage() {
 		setOpen(false)
 	}
 
+	function scrollToLatestMessage() {
+		const viewport = messageScrollRef.current?.querySelector(
+			'[data-slot="scroll-area-viewport"]',
+		) as HTMLElement | null
+		if (viewport) {
+			viewport.scrollTop = viewport.scrollHeight
+		}
+	}
+
+	useLayoutEffect(() => {
+		if (messageContents.length > 0) {
+			scrollToLatestMessage()
+		}
+	}, [messageContents])
+
 	return (
-		<div className="flex flex-col h-full min-h-0">
-			<ConversationHeader>
-				<h1 className="text-lg md:text-lg font-semibold">New Conversation</h1>
-			</ConversationHeader>
-			<Popover open={open}>
+		<div className="flex flex-col h-svh min-h-0 overflow-hidden">
+			<div className="shrink-0">
+				<ConversationHeader>
+					<h1 className="text-lg md:text-lg font-semibold">New Conversation</h1>
+				</ConversationHeader>
+				<Popover open={open}>
 				<PopoverAnchor asChild>
 					<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 						<span className="text-xs"> To:</span>
@@ -162,21 +179,24 @@ export function NewConversationPage() {
 					</ScrollArea>
 				</PopoverContent>
 			</Popover>
-			<ScrollArea className="flex-1 min-h-0">
-				<div className="px-4 py-3 flex flex-col gap-3 flex-1 ">
-					{messageContents.map((content) => {
-						const author = content.author
-						return (
-							<TextPart
-								key={`${content.nodes.map((n) => n.id).join("-")}`}
-								author={author}
-								nodes={content.nodes}
-							/>
-						)
-					})}
-				</div>
-			</ScrollArea>
-			<div className="px-4 pt-4 pb-6">
+			</div>
+			<div ref={messageScrollRef} className="flex-1 min-h-0">
+				<ScrollArea className="h-full">
+					<div className="px-4 py-3 flex flex-col gap-3">
+						{messageContents.map((content) => {
+							const author = content.author
+							return (
+								<TextPart
+									key={`${content.nodes.map((n) => n.id).join("-")}`}
+									author={author}
+									nodes={content.nodes}
+								/>
+							)
+						})}
+					</div>
+				</ScrollArea>
+			</div>
+			<div className="shrink-0 px-4 pt-4 pb-6">
 				<EnvoyComposer
 					ref={composerRef}
 					placeholder={"Start a new message"}
