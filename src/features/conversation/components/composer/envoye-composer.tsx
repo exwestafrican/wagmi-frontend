@@ -48,7 +48,6 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-			textareaRef?.current?.focus()
 			if (!disableSend) {
 				setTextInput("")
 				onSend(parser.build())
@@ -103,7 +102,11 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 						size="icon-sm"
 						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
 						disabled={disableSend}
-						onClick={() => sendMessageIfEnabled()}
+						onClick={(e) => {
+							e.preventDefault()
+							textareaRef?.current?.focus()
+							sendMessageIfEnabled()
+						}}
 					>
 						<SendHorizontal />
 					</Button>
