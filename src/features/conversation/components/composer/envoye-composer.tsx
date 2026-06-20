@@ -1,5 +1,11 @@
 import { Field } from "@/components/ui/field.tsx"
-import {type ForwardedRef, forwardRef, useImperativeHandle, useRef, useState} from "react"
+import {
+	type ForwardedRef,
+	forwardRef,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react"
 import { Button } from "@/components/ui/button.tsx"
 import { SendHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
@@ -15,18 +21,21 @@ type EnvoyeComposerProps = {
 }
 
 export type EnvoyeComposerRef = {
-    focus: ()=> void
+	focus: () => void
 }
 
 const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
-	function EnvoyeComposer({ placeholder, onSend }: EnvoyeComposerProps, ref: ForwardedRef<EnvoyeComposerRef>) {
-        const textareaRef = useRef<HTMLTextAreaElement>(null);
+	function EnvoyeComposer(
+		{ placeholder, onSend }: EnvoyeComposerProps,
+		ref: ForwardedRef<EnvoyeComposerRef>,
+	) {
+		const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-        useImperativeHandle(ref, () => ({
-            focus() {
-                textareaRef?.current?.focus();
-            },
-        }));
+		useImperativeHandle(ref, () => ({
+			focus() {
+				textareaRef?.current?.focus()
+			},
+		}))
 
 		const [textInput, setTextInput] = useState("")
 
@@ -39,8 +48,8 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-            console.log(textareaRef, "<---")
-            textareaRef?.current?.focus()
+			console.log(textareaRef, "<---")
+			textareaRef?.current?.focus()
 			if (!disableSend) {
 				setTextInput("")
 				onSend(parser.build())

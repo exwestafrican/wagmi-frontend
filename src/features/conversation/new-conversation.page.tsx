@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
 import { useSidebar } from "@/components/ui/sidebar.tsx"
 import EnvoyeComposer, {
-    type EnvoyeComposerRef
+	type EnvoyeComposerRef,
 } from "@/features/conversation/components/composer/envoye-composer.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import TextPart from "@/features/conversation/components/text-part.tsx"
@@ -38,7 +38,7 @@ export function NewConversationPage() {
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement | null>(null)
-    const composerRef = useRef<EnvoyeComposerRef>(null);
+	const composerRef = useRef<EnvoyeComposerRef>(null)
 	const messageScrollRef = useRef<HTMLDivElement | null>(null)
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 
