@@ -54,7 +54,6 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						setTextInput(e.target.value)
 					}}
 					onKeyDown={(e) => {
-						// console.log("here--->")
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:
 								if (e.ctrlKey || e.shiftKey) {
