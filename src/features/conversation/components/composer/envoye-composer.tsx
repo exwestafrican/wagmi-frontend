@@ -48,7 +48,6 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-			console.log(textareaRef, "<---")
 			textareaRef?.current?.focus()
 			if (!disableSend) {
 				setTextInput("")
