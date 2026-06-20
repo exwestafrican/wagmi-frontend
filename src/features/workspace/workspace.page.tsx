@@ -42,9 +42,11 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils.ts"
 import useActivePath from "@/hooks/use-active-path.ts"
 import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
-import useTeammateConversationInfo from "@/features/conversation/api/list-conversation.ts"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
+import useTeammateConversations, {
+	type ConversationInfo,
+} from "@/features/conversation/api/list-conversation.ts"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -94,7 +96,7 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
-	const { data: conversations } = useTeammateConversationInfo(code, 1)
+	const { data: conversations } = useTeammateConversations(code)
 
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
@@ -288,8 +290,9 @@ export default function WorkspacePage() {
 							</SidebarGroupLabel>
 
 							<SidebarMenu className="px-3 gap-0">
-								{conversations?.map((conversation) => {
-									const teammate = registry.find(conversation.recipientId)
+								{conversations?.map((conversation: ConversationInfo) => {
+									const recipientId = conversation.participantIds[0]
+									const teammate = registry.find(recipientId)
 									const name = teammate
 										? fullName(teammate)
 										: "Unknown Teammate"

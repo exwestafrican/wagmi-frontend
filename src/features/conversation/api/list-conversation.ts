@@ -1,37 +1,27 @@
 import { useQuery } from "@tanstack/react-query"
+import { apiClient } from "@/lib/api-client.ts"
+import { ApiPaths } from "@/constants.ts"
 
-export type TeammateConversationInfo = {
+export type ConversationInfo = {
 	id: number
 	authorId: number
-	recipientId: number
+	participantIds: number[]
 }
 
 export const TEAMMATE_CONVERSATION_LIST = "teammate-conversation-list"
 
-export default function useTeammateConversationInfo(
-	appCode: string,
-	adminId: number,
-) {
-	return useQuery<TeammateConversationInfo[]>({
-		queryKey: [TEAMMATE_CONVERSATION_LIST, adminId, appCode],
+export default function useTeammateConversations(workspaceCode: string) {
+	return useQuery<ConversationInfo[]>({
+		queryKey: [TEAMMATE_CONVERSATION_LIST, workspaceCode],
 		queryFn: async () => {
-			return Promise.resolve([
+			const res = await apiClient.get<ConversationInfo[]>(
+				ApiPaths.CONVERSATIONS,
 				{
-					id: 1,
-					authorId: 7,
-					recipientId: 9,
+					params: { workspaceCode },
 				},
-				{
-					id: 2,
-					authorId: 7,
-					recipientId: 11,
-				},
-				{
-					id: 3,
-					authorId: 7,
-					recipientId: 10,
-				},
-			])
+			)
+			return res.data
 		},
+		enabled: Boolean(workspaceCode),
 	})
 }
