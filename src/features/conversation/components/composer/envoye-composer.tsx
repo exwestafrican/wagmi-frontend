@@ -48,7 +48,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-			ref.current.focus()
+			ref?.current?.focus()
 			if (!disableSend) {
 				setTextInput("")
 				onSend(parser.build())
