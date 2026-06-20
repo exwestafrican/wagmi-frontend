@@ -221,7 +221,9 @@ describe("Create A new Direct Message", () => {
 			}),
 		)
 
-		expect(screen.getByRole("heading", { name: fullName(mavo) })).toBeInTheDocument()
+		expect(
+			screen.getByRole("heading", { name: fullName(mavo) }),
+		).toBeInTheDocument()
 		expect(
 			screen.queryByRole("button", {
 				name: new RegExp(`remove ${mavo.id}`, "i"),
@@ -246,13 +248,13 @@ describe("Create A new Direct Message", () => {
 				}),
 			)
 
-            expect(
-                screen.getByText(/This conversation is just between/i),
-            ).toBeInTheDocument()
-            expect(screen.getByLabelText("intro-username")).toHaveTextContent(
-                `@${mavo.username}`,
-            )
-            expect(screen.getByText(/and you\./i)).toBeInTheDocument()
+			expect(
+				screen.getByText(/This conversation is just between/i),
+			).toBeInTheDocument()
+			expect(screen.getByLabelText("intro-username")).toHaveTextContent(
+				`@${mavo.username}`,
+			)
+			expect(screen.getByText(/and you\./i)).toBeInTheDocument()
 		})
 
 		it("shows copy when selected teammate is myself", async () => {
