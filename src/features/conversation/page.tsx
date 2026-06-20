@@ -1,4 +1,3 @@
-import useTeammateConversationInfo from "@/features/conversation/api/list-conversation.ts"
 import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
@@ -10,16 +9,14 @@ import ConversationHeader from "@/features/conversation/components/header.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import { Chat } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
+import useTeammateConversations from "@/features/conversation/api/list-conversation.ts"
 
 export default function TeammateConversation() {
 	const { code, conversationId } = useSearch({
 		from: "/workspace/conversation",
 	})
 
-	const { data: conversationParticipated } = useTeammateConversationInfo(
-		code,
-		1,
-	)
+	const { data: conversationParticipated } = useTeammateConversations(code)
 	const registry = useTeammateInfoRegistry(code)
 	const conversationInfo = conversationParticipated?.find(
 		(convo) => convo.id === conversationId,
@@ -27,9 +24,10 @@ export default function TeammateConversation() {
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
 
-	const participantInfo = conversationInfo
-		? registry.find(conversationInfo.recipientId)
-		: undefined
+	const participantInfo =
+		conversationInfo?.participantIds[0] && conversationInfo
+			? registry.find(conversationInfo.participantIds[0])
+			: undefined
 
 	return (
 		participantInfo && (
