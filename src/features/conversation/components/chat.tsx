@@ -13,7 +13,15 @@ function ChatHeader({ children }: { children: ReactNode }) {
 }
 
 function ChatBody({ children }: { children: ReactNode }) {
-	return <div className="flex flex-col flex-1 min-h-0">{children}</div>
+	return (
+		<div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
+			<div className="flex-1 min-h-0 overflow-y-auto">
+				<div className="min-h-full flex flex-col justify-end gap-3 pb-3">
+					{children}
+				</div>
+			</div>
+		</div>
+	)
 }
 
 function ChatComposer({ children }: { children: ReactNode }) {
