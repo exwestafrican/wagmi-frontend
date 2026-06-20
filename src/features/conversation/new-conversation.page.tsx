@@ -76,10 +76,13 @@ export function NewConversationPage() {
 		if (resultFound && queryText.trim().length > 0) setOpen(true)
 	}, [selectedTeammate, resultFound, queryText])
 
-	function handleSelection(teammate: Teammate) {
+	function handleSelectionAndFocus(teammate: Teammate) {
 		setQueryText("")
 		setSelectedTeammate(teammate)
 		setOpen(false)
+        requestAnimationFrame(() => {
+            composerRef.current?.focus()
+        })
 	}
 
 	const scrollToLatestMessage = useCallback(() => {
@@ -138,12 +141,7 @@ export function NewConversationPage() {
 										switch (e.key) {
 											case DESKTOP_KEYS.ENTER:
 												e.preventDefault()
-												setQueryText("")
-												setSelectedTeammate(queryResult[0])
-												setOpen(false)
-												requestAnimationFrame(() => {
-													composerRef.current?.focus()
-												})
+                                                handleSelectionAndFocus(queryResult[0])
 												break
 											case DESKTOP_KEYS.ESCAPE:
 												e.preventDefault()
@@ -171,7 +169,7 @@ export function NewConversationPage() {
 									data-testid="teammate-suggestions"
 									key={teammate.id}
 									onClick={() => {
-										handleSelection(teammate)
+										handleSelectionAndFocus(teammate)
 									}}
 									className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full"
 									aria-label={`suggested teammate=${teammate.id}`}
