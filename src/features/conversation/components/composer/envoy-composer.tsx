@@ -27,6 +27,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
+			ref.current.focus()
 			if (!disableSend) {
 				setTextInput("")
 				onSend(parser.build())
@@ -53,6 +54,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						setTextInput(e.target.value)
 					}}
 					onKeyDown={(e) => {
+						// console.log("here--->")
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:
 								if (e.ctrlKey || e.shiftKey) {
