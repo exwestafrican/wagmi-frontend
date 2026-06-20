@@ -23,7 +23,9 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { X } from "lucide-react"
 import { useSidebar } from "@/components/ui/sidebar.tsx"
-import EnvoyComposer from "@/features/conversation/components/composer/envoy-composer.tsx"
+import EnvoyeComposer, {
+    type EnvoyeComposerRef
+} from "@/features/conversation/components/composer/envoye-composer.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import TextPart from "@/features/conversation/components/text-part.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
@@ -36,7 +38,7 @@ export function NewConversationPage() {
 	const query = useTeammateFullNameSearch(code)
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement | null>(null)
-	const composerRef = useRef<HTMLTextAreaElement | null>(null)
+    const composerRef = useRef<EnvoyeComposerRef>(null);
 	const messageScrollRef = useRef<HTMLDivElement | null>(null)
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 
@@ -203,7 +205,7 @@ export function NewConversationPage() {
 				</ScrollArea>
 			</div>
 			<div className="shrink-0 px-4 pt-4 pb-6">
-				<EnvoyComposer
+				<EnvoyeComposer
 					ref={composerRef}
 					placeholder={"Start a new message"}
 					onSend={(nodes) => {

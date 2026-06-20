@@ -5,7 +5,7 @@ import { fullName } from "@/features/directory/utils/teammate.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
 import { useState } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area.tsx"
-import EnvoyComposer from "@/features/conversation/components/composer/envoy-composer.tsx"
+import EnvoyeComposer from "@/features/conversation/components/composer/envoye-composer.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import ConversationHeader from "@/features/conversation/components/header.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
@@ -57,7 +57,7 @@ export default function TeammateConversation() {
 					</div>
 				</ScrollArea>
 				<div className="px-4 py-3">
-					<EnvoyComposer
+					<EnvoyeComposer
 						placeholder={`Message ${participantInfo.username}`}
 						onSend={(nodes) => {
 							if (currentTeammate) {

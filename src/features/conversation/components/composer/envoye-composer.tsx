@@ -1,5 +1,5 @@
 import { Field } from "@/components/ui/field.tsx"
-import { forwardRef, useState } from "react"
+import {type ForwardedRef, forwardRef, useImperativeHandle, useRef, useState} from "react"
 import { Button } from "@/components/ui/button.tsx"
 import { SendHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
@@ -9,13 +9,25 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 
 const MAX_TEXT_INPUT = 2000
 
-type EnvoyComposerProps = {
+type EnvoyeComposerProps = {
 	placeholder: string
 	onSend: (nodes: TextNode[]) => void
 }
 
-const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
-	function EnvoyComposer({ placeholder, onSend }, ref) {
+export type EnvoyeComposerRef = {
+    focus: ()=> void
+}
+
+const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
+	function EnvoyeComposer({ placeholder, onSend }: EnvoyeComposerProps, ref: ForwardedRef<EnvoyeComposerRef>) {
+        const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+        useImperativeHandle(ref, () => ({
+            focus() {
+                textareaRef?.current?.focus();
+            },
+        }));
+
 		const [textInput, setTextInput] = useState("")
 
 		const parser = useTextNodeParser()
@@ -27,7 +39,8 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 		const disableSend = hasNoInput || exceedsTextInput
 
 		function sendMessageIfEnabled() {
-			ref?.current?.focus()
+            console.log(textareaRef, "<---")
+            textareaRef?.current?.focus()
 			if (!disableSend) {
 				setTextInput("")
 				onSend(parser.build())
@@ -44,7 +57,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 			>
 				<textarea
 					aria-label="message-composer"
-					ref={ref}
+					ref={textareaRef}
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
 					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed  font-sans"
@@ -92,4 +105,4 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 	},
 )
 
-export default EnvoyComposer
+export default EnvoyeComposer
