@@ -3,13 +3,7 @@ import { Separator } from "@/components/ui/separator.tsx"
 import usePlaceholderName from "@/common/hooks/placeholder-names.ts"
 import useTeammateFullNameSearch from "@/features/directory/hooks/teammate-search.ts"
 import { useSearch } from "@tanstack/react-router"
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react"
+import { useEffect, useRef, useState } from "react"
 import {
 	Popover,
 	PopoverAnchor,
@@ -27,8 +21,9 @@ import EnvoyeComposer, {
 	type EnvoyeComposerRef,
 } from "@/features/conversation/components/composer/envoye-composer.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
-import TextPart from "@/features/conversation/components/text-part.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
+import { Chat } from "@/features/conversation/components/chat.tsx"
+import { MessageList } from "@/features/conversation/components/message-list.tsx"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
@@ -39,7 +34,6 @@ export function NewConversationPage() {
 	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const composerRef = useRef<EnvoyeComposerRef>(null)
-	const messageScrollRef = useRef<HTMLDivElement | null>(null)
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 
 	const { setOpenMobile } = useSidebar()
@@ -80,29 +74,14 @@ export function NewConversationPage() {
 		setQueryText("")
 		setSelectedTeammate(teammate)
 		setOpen(false)
-        requestAnimationFrame(() => {
-            composerRef.current?.focus()
-        })
+		requestAnimationFrame(() => {
+			composerRef.current?.focus()
+		})
 	}
 
-	const scrollToLatestMessage = useCallback(() => {
-		const viewport = messageScrollRef.current?.querySelector(
-			'[data-slot="scroll-area-viewport"]',
-		) as HTMLElement | null
-		if (viewport) {
-			viewport.scrollTop = viewport.scrollHeight
-		}
-	}, [])
-
-	useLayoutEffect(() => {
-		if (messageContents.length > 0) {
-			scrollToLatestMessage()
-		}
-	}, [messageContents, scrollToLatestMessage])
-
 	return (
-		<div className="flex flex-col h-svh min-h-0 overflow-hidden">
-			<div className="shrink-0">
+		<Chat>
+			<Chat.Header>
 				<ConversationHeader>
 					<h1 className="text-lg md:text-lg font-semibold">New Conversation</h1>
 				</ConversationHeader>
@@ -141,7 +120,7 @@ export function NewConversationPage() {
 										switch (e.key) {
 											case DESKTOP_KEYS.ENTER:
 												e.preventDefault()
-                                                handleSelectionAndFocus(queryResult[0])
+												handleSelectionAndFocus(queryResult[0])
 												break
 											case DESKTOP_KEYS.ESCAPE:
 												e.preventDefault()
@@ -185,24 +164,13 @@ export function NewConversationPage() {
 						</ScrollArea>
 					</PopoverContent>
 				</Popover>
-			</div>
-			<div ref={messageScrollRef} className="flex-1 min-h-0">
-				<ScrollArea className="h-full">
-					<div className="px-4 py-3 flex flex-col gap-3">
-						{messageContents.map((content) => {
-							const author = content.author
-							return (
-								<TextPart
-									key={`${content.nodes.map((n) => n.id).join("-")}`}
-									author={author}
-									nodes={content.nodes}
-								/>
-							)
-						})}
-					</div>
-				</ScrollArea>
-			</div>
-			<div className="shrink-0 px-4 pt-4 pb-6">
+			</Chat.Header>
+
+			<Chat.Body>
+				<MessageList messages={messageContents} />
+			</Chat.Body>
+
+			<Chat.Composer>
 				<EnvoyeComposer
 					ref={composerRef}
 					placeholder={"Start a new message"}
@@ -218,7 +186,7 @@ export function NewConversationPage() {
 						}
 					}}
 				/>
-			</div>
-		</div>
+			</Chat.Composer>
+		</Chat>
 	)
 }
