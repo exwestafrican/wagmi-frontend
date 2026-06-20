@@ -12,10 +12,11 @@ const MAX_TEXT_INPUT = 2000
 type EnvoyComposerProps = {
 	placeholder: string
 	onSend: (nodes: TextNode[]) => void
+	onFocus: () => void
 }
 
 const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
-	function EnvoyComposer({ placeholder, onSend }, ref) {
+	function EnvoyComposer({ placeholder, onSend, onFocus }, ref) {
 		const [textInput, setTextInput] = useState("")
 
 		const parser = useTextNodeParser()
@@ -52,6 +53,7 @@ const EnvoyComposer = forwardRef<HTMLTextAreaElement, EnvoyComposerProps>(
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
 					}}
+					onFocus={onFocus}
 					onKeyDown={(e) => {
 						switch (e.key) {
 							case DESKTOP_KEYS.ENTER:

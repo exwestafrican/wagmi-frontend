@@ -96,7 +96,7 @@ export function NewConversationPage() {
 	}, [messageContents, scrollToLatestMessage])
 
 	return (
-		<div className="flex flex-col h-svh min-h-0 overflow-hidden">
+		<div className="flex flex-col h-dvh min-h-0 overflow-hidden">
 			<div className="shrink-0">
 				<ConversationHeader>
 					<h1 className="text-lg md:text-lg font-semibold">New Conversation</h1>
@@ -186,7 +186,7 @@ export function NewConversationPage() {
 					</PopoverContent>
 				</Popover>
 			</div>
-			<div ref={messageScrollRef} className="flex-1 min-h-0">
+			<div ref={messageScrollRef} className="flex-1 min-h-0 overflow-hidden">
 				<ScrollArea className="h-full">
 					<div className="px-4 py-3 flex flex-col gap-3">
 						{messageContents.map((content) => {
@@ -202,10 +202,18 @@ export function NewConversationPage() {
 					</div>
 				</ScrollArea>
 			</div>
-			<div className="shrink-0 px-4 pt-4 pb-6">
+			<div className="shrink-0 sticky bottom-0 bg-background px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 				<EnvoyComposer
 					ref={composerRef}
 					placeholder={"Start a new message"}
+					onFocus={() => {
+						setTimeout(() => {
+							composerRef.current?.scrollIntoView({
+								block: "end",
+								behavior: "smooth",
+							})
+						}, 100)
+					}}
 					onSend={(nodes) => {
 						if (currentTeammate) {
 							setMessageContents((prev) => [
