@@ -41,7 +41,7 @@ export default function TeammateConversation() {
 					</ConversationHeader>
 				</Chat.Header>
 
-				<Chat.Body>
+				<Chat.Body scrollKey={messageContents.length}>
 					<MessageList messages={messageContents} />
 				</Chat.Body>
 

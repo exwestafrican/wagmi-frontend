@@ -172,7 +172,7 @@ export function NewConversationPage() {
 				</Popover>
 			</Chat.Header>
 
-			<Chat.Body>
+			<Chat.Body scrollKey={messageContents.length}>
 				<div className="space-y-6">
 					{selectedTeammate && (
 						<ConversationIntro
