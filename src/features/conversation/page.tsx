@@ -2,8 +2,8 @@ import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
-import { useState } from "react"
-import EnvoyeComposer from "@/features/conversation/components/composer/envoye-composer.tsx"
+import {useEffect, useRef, useState} from "react"
+import EnvoyeComposer, {type EnvoyeComposerRef} from "@/features/conversation/components/composer/envoye-composer.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import ConversationHeader from "@/features/conversation/components/header.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
@@ -15,6 +15,8 @@ export default function TeammateConversation() {
 	const { code, conversationId } = useSearch({
 		from: "/workspace/conversation",
 	})
+
+    const composerRef = useRef<EnvoyeComposerRef>(null)
 
 	const { data: conversationParticipated } = useTeammateConversations(code)
 	const registry = useTeammateInfoRegistry(code)
@@ -28,6 +30,10 @@ export default function TeammateConversation() {
 		conversationInfo?.participantIds[0] && conversationInfo
 			? registry.find(conversationInfo.participantIds[0])
 			: undefined
+
+    useEffect(() => {
+        composerRef.current?.focus()
+    })
 
 	return (
 		participantInfo && (
@@ -47,16 +53,18 @@ export default function TeammateConversation() {
 
 				<Chat.Composer>
 					<EnvoyeComposer
+                        ref={composerRef}
 						placeholder={`Message ${participantInfo.username}`}
 						onSend={(nodes) => {
 							if (currentTeammate) {
-								setMessageContents((prev) => [
-									...prev,
-									{
-										author: currentTeammate,
-										nodes: nodes,
-									},
-								])
+								const mostRecentMessage: MessageContent = {
+									id: crypto.randomUUID(),
+									author: currentTeammate,
+									nodes: nodes,
+									sent: false,
+								}
+
+								setMessageContents((prev) => [...prev, mostRecentMessage])
 							}
 						}}
 					/>

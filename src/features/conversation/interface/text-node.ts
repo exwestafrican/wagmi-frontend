@@ -12,6 +12,8 @@ export type TextNode = {
 }
 
 export type MessageContent = {
+	id: string
 	author: Teammate
 	nodes: TextNode[]
+	sent: boolean
 }

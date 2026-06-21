@@ -56,6 +56,8 @@ const newConversationPoute = createRoute({
 	getParentRoute: () => workspaceLayoutRoute,
 	path: "new-conversation",
 	component: NewConversationPage,
+    validateSearch: z.object({conversationId: z.number().optional()})
+
 })
 
 export const workspaceRouteTree = workspaceLayoutRoute.addChildren([

@@ -18,7 +18,7 @@ export const ApiPaths = {
 	CHECK_USERNAME: "/teammates/check-username",
 	ACTIVE_TEAMMATES: "/teammates",
 	CONVERSATIONS: "/conversations",
-	SEND_NEW_MESSAGE: "/direct-message",
+	SEND_NEW_MESSAGE: "conversations/direct-message",
 } as const
 
 export const AdminApiPaths = {

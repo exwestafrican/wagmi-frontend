@@ -36,7 +36,7 @@ export default function useTextNodeParser(type = "p" as NodeType) {
 		return rawTextRef.current
 			.join(SPACE)
 			.split(NEW_LINE)
-			.filter((text) => text.trim().length > 0)
+			// .filter((text) => text.trim().length > 0)
 			.map((text) => makeTextNode(text))
 	}
 
