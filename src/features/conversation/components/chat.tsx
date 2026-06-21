@@ -1,4 +1,4 @@
-import { type ReactNode, useLayoutEffect, useRef } from "react"
+import {type ReactNode, useLayoutEffect, useRef} from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -18,9 +18,10 @@ function ChatBody({
 }: { children: ReactNode; scrollKey: number }) {
 	const bottomRef = useRef<HTMLDivElement>(null)
 
-	useLayoutEffect(() => {
-		bottomRef.current?.scrollIntoView({ block: "end" })
-	}, [scrollKey])
+    useLayoutEffect(() => {
+        if (scrollKey === 0) return // doing this to satisfy lint dependency.
+        bottomRef.current?.scrollIntoView({ block: "end" })
+    }, [scrollKey])
 
 	return (
 		<div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
