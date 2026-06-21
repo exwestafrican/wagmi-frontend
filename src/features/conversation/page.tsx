@@ -47,6 +47,8 @@ export default function TeammateConversation() {
 
 				<Chat.Composer>
 					<EnvoyeComposer
+                        onFocus={() => {}}
+						disabled={false}
 						placeholder={`Message ${participantInfo.username}`}
 						onSend={(nodes) => {
 							if (currentTeammate) {
