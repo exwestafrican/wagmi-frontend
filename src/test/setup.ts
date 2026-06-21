@@ -24,7 +24,7 @@ vi.mock("@/lib/admin-api-client", () => ({
 beforeEach(() => {
 	localStorage.clear()
 	window.location.hash = ""
-    window.HTMLElement.prototype.scrollIntoView = vi.fn();
+	window.HTMLElement.prototype.scrollIntoView = vi.fn()
 })
 
 afterEach(() => {
