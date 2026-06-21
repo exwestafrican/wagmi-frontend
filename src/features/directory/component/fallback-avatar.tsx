@@ -2,8 +2,8 @@ import type { Teammate } from "@/features/workspace/interface/teammate.interface
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils.ts"
 
-const variant = cva(
-	"rounded-md  text-base font-semibold flex items-center justify-center border-2 border-solid",
+const fallbackAvatarVariants = cva(
+	"rounded-md  text-base font-semibold flex items-center justify-center w-fit ",
 	{
 		variants: {
 			size: {
@@ -11,19 +11,28 @@ const variant = cva(
 				sm: "min-w-8 min-h-8 text-sm",
 				m: "min-w-10 min-h-10 text-base",
 			},
+			variant: {
+				outline: "border-2 border-solid",
+				stone: "bg-stone-200 text-stone-800",
+			},
 		},
 		defaultVariants: {
 			size: "m",
+			variant: "outline",
 		},
 	},
 )
 
 type Props = {
 	teammate: Teammate
-} & VariantProps<typeof variant>
-export default function FallbackAvatar({ teammate, size = "m" }: Props) {
+} & VariantProps<typeof fallbackAvatarVariants>
+export default function FallbackAvatar({
+	teammate,
+	size = "m",
+	variant = "outline",
+}: Props) {
 	return (
-		<div className={cn(variant({ size }))}>
+		<div className={cn(fallbackAvatarVariants({ size, variant }))}>
 			{" "}
 			{teammate.firstName.charAt(0).toUpperCase()}
 		</div>

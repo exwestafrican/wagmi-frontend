@@ -24,18 +24,20 @@ import type { MessageContent } from "@/features/conversation/interface/text-node
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import { Chat } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
+import { ConversationIntro } from "@/features/conversation/components/conversation-intro.tsx"
 
 export function NewConversationPage() {
 	const { code } = useSearch({
 		from: "/workspace/new-conversation",
 	})
 
-	const query = useTeammateFullNameSearch(code)
-	const placeholderName = usePlaceholderName()
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const composerRef = useRef<EnvoyeComposerRef>(null)
-	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 
+	const query = useTeammateFullNameSearch(code)
+	const placeholderName = usePlaceholderName()
+
+	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 	const { setOpenMobile } = useSidebar()
 
 	const [open, setOpen] = useState<boolean>(true)
@@ -79,6 +81,10 @@ export function NewConversationPage() {
 		})
 	}
 
+	// if conversation exists navigate user to existing conversation
+	// filter out people we have alteady sent
+	// on send, add text to ui -> sendNewText -> navigate to new conversation page
+
 	return (
 		<Chat>
 			<Chat.Header>
@@ -90,7 +96,7 @@ export function NewConversationPage() {
 						<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 							<span className="text-xs"> To:</span>
 							{selectedTeammate && (
-								<Badge className="bg-purple-200 text-purple-900 dark:bg-purple-950 dark:text-purple-300 text-xs shrink-0 max-w-48 truncate rounded-sm">
+								<Badge className="bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200  text-xs shrink-0 max-w-48 truncate rounded-sm">
 									{fullName(selectedTeammate)}
 									<button
 										type="button"
@@ -167,7 +173,20 @@ export function NewConversationPage() {
 			</Chat.Header>
 
 			<Chat.Body>
-				<MessageList messages={messageContents} />
+				<div className="space-y-6">
+					{selectedTeammate && (
+						<ConversationIntro
+							teammate={selectedTeammate}
+							isWithSelf={selectedTeammate.id === currentTeammate?.id}
+						/>
+					)}
+					{messageContents.length > 0 && (
+						<>
+							<Separator />
+							<MessageList messages={messageContents} />
+						</>
+					)}
+				</div>
 			</Chat.Body>
 
 			<Chat.Composer>
@@ -184,6 +203,9 @@ export function NewConversationPage() {
 								},
 							])
 						}
+						// sendNewMessage
+						// create conversation => with opening line.
+						// navigate user to new conversation screen
 					}}
 				/>
 			</Chat.Composer>
