@@ -7,7 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import { X } from "lucide-react"
-import { type RefObject, useEffect, useState } from "react"
+import { type RefObject, useCallback, useEffect, useState } from "react"
 import { DESKTOP_KEYS } from "@/constants.ts"
 import useTeammateFullNameSearch from "@/features/directory/hooks/teammate-search.ts"
 import { Separator } from "@/components/ui/separator.tsx"
@@ -41,11 +41,15 @@ export default function RecipientPicker({
 		onSubmit(teammate)
 	}
 
+	const focusInput = useCallback(() => {
+		inputRef.current?.focus()
+	}, [inputRef])
+
 	useEffect(() => {
 		if (!recipient) {
-			inputRef.current?.focus()
+			focusInput()
 		}
-	}, [recipient])
+	}, [recipient, focusInput])
 
 	useEffect(() => {
 		if (recipient) {

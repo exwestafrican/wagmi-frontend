@@ -89,9 +89,9 @@ export function NewConversationPage() {
 					ref={composerRef}
 					placeholder={"Start a new message"}
 					onFocus={() => {
-                        requestAnimationFrame(() => {
-                            chatBodyRef.current?.scrollIntoView({ block: "end" })
-                        })
+						requestAnimationFrame(() => {
+							chatBodyRef.current?.scrollIntoView({ block: "end" })
+						})
 					}}
 					onSend={(nodes) => {
 						if (currentTeammate) {
