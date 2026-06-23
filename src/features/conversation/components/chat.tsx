@@ -1,4 +1,11 @@
-import { type ReactNode, useLayoutEffect, useRef } from "react"
+import {
+	type ForwardedRef,
+	forwardRef,
+	type ReactNode,
+	useImperativeHandle,
+	useLayoutEffect,
+	useRef,
+} from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -12,11 +19,26 @@ function ChatHeader({ children }: { children: ReactNode }) {
 	return <div className="shrink-0">{children}</div>
 }
 
-function ChatBody({
-	children,
-	scrollKey,
-}: { children: ReactNode; scrollKey: number }) {
+type ChatBodyProps = {
+	children: ReactNode
+	scrollKey: number
+}
+
+export type ChatBodyRef = {
+	scrollIntoView: (options: ScrollIntoViewOptions) => void
+}
+
+const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
+	{ children, scrollKey }: ChatBodyProps,
+	ref: ForwardedRef<ChatBodyRef>,
+) {
 	const bottomRef = useRef<HTMLDivElement>(null)
+
+	useImperativeHandle(ref, () => ({
+		scrollIntoView(options: ScrollIntoViewOptions) {
+			bottomRef.current?.scrollIntoView(options)
+		},
+	}))
 
 	useLayoutEffect(() => {
 		if (scrollKey === 0) return // doing this to satisfy lint dependency.
@@ -33,7 +55,7 @@ function ChatBody({
 			</div>
 		</div>
 	)
-}
+})
 
 function ChatComposer({ children }: { children: ReactNode }) {
 	return <div className="shrink-0 px-4 pt-4 pb-6">{children}</div>
