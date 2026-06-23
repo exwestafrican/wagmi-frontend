@@ -110,7 +110,7 @@ export default function WorkspacePage() {
 			id: "directory",
 			path: "/workspace/directory",
 			icon: Users,
-			label: "Directory",
+			label: "People",
 		},
 		{
 			id: "activity",
