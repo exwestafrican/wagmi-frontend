@@ -25,7 +25,7 @@ export default function WorkspaceDirectoryPage() {
 					{isMobile ? (
 						<div className="flex flex-col w-full gap-4">
 							{teammates?.map((teammate, idx) => (
-								<div className="flex flex-col gap-2">
+								<div key={teammate.id} className="flex flex-col gap-2">
 									<TeamMemberCardMobile key={teammate.id} teammate={teammate} />
 									{idx < teammates.length - 1 && (
 										<Separator className="text-gray-500" />
