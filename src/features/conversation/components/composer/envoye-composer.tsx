@@ -7,7 +7,7 @@ import {
 	useState,
 } from "react"
 import { Button } from "@/components/ui/button.tsx"
-import { SendHorizontal } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
 import useTextNodeParser from "@/features/conversation/hooks/text-node.tsx"
 import type { TextNode } from "@/features/conversation/interface/text-node.ts"
@@ -100,7 +100,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 					<Button
 						aria-label="send-message"
 						size="icon-sm"
-						className=" w-11 h-7 bg-[#c15f3c]  hover:bg-[#c15f3c]/90"
+						className="rounded-full bg-[#c15f3c] text-white hover:bg-[#c15f3c]/90"
 						disabled={disableSend}
 						onClick={(e) => {
 							e.preventDefault()
@@ -108,7 +108,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 							sendMessageIfEnabled()
 						}}
 					>
-						<SendHorizontal />
+						<ArrowUp />
 					</Button>
 				</div>
 			</Field>
