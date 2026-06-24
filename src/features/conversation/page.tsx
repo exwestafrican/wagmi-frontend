@@ -6,7 +6,10 @@ import EnvoyeComposer from "@/features/conversation/components/composer/envoye-c
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import ConversationHeader from "@/features/conversation/components/header.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
-import { Chat, type ChatBodyRef } from "@/features/conversation/components/chat.tsx"
+import {
+	Chat,
+	type ChatBodyRef,
+} from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
 import useTeammateConversations from "@/features/conversation/api/list-conversation.ts"
 import {
@@ -67,13 +70,12 @@ export default function TeammateConversation() {
 								])
 							}
 
-								requestAnimationFrame(() => {
-									chatBodyRef.current?.scrollIntoView({
-										block: "end",
-										behavior: "auto",
-									})
+							requestAnimationFrame(() => {
+								chatBodyRef.current?.scrollIntoView({
+									block: "end",
+									behavior: "auto",
 								})
-
+							})
 						}}
 					/>
 				</Chat.Composer>

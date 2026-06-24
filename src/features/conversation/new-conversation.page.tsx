@@ -9,7 +9,10 @@ import EnvoyeComposer, {
 } from "@/features/conversation/components/composer/envoye-composer.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
-import { Chat, type ChatBodyRef } from "@/features/conversation/components/chat.tsx"
+import {
+	Chat,
+	type ChatBodyRef,
+} from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
 import { ConversationIntro } from "@/features/conversation/components/conversation-intro.tsx"
 import RecipientPicker from "@/features/conversation/components/recipient-picker.tsx"

@@ -1,5 +1,11 @@
-import {type ForwardedRef, type ReactNode, useCallback} from "react"
-import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react"
+import { type ForwardedRef, type ReactNode, useCallback } from "react"
+import {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useLayoutEffect,
+	useRef,
+} from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -30,13 +36,13 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 	const wasNearBottomRef = useRef(true)
 
-    const isNearBottom = useCallback(() => {
-        const viewport = viewportRef.current
-        if (!viewport) return true
-        const distanceFromBottom =
-            viewport.scrollHeight - (viewport.scrollTop + viewport.clientHeight)
-        return distanceFromBottom <= 120
-    }, [])
+	const isNearBottom = useCallback(() => {
+		const viewport = viewportRef.current
+		if (!viewport) return true
+		const distanceFromBottom =
+			viewport.scrollHeight - (viewport.scrollTop + viewport.clientHeight)
+		return distanceFromBottom <= 120
+	}, [])
 
 	useImperativeHandle(ref, () => ({
 		scrollIntoView(options: ScrollIntoViewOptions) {
@@ -48,8 +54,8 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		if (scrollKey === 0) return
 		// Only auto-scroll when user is already near bottom.
 		// Sending a message force-scrolls via the imperative call in onSend.
-        // Tumise: if a new message came in, this might trigger <=======
-        // if this annoys user, take it out.
+		// Tumise: if a new message came in, this might trigger <=======
+		// if this annoys user, take it out.
 		if (!wasNearBottomRef.current) return
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
