@@ -19,6 +19,7 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import TeammateConversation from "@/features/conversation/page.tsx"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -99,6 +100,16 @@ export function makeTestRouter() {
 		component: NewConversationPage,
 	})
 
+	const conversationRoute = createRoute({
+		getParentRoute: () => workspaceRoute,
+		path: "conversation",
+		validateSearch: z.object({
+			code: z.string(),
+			conversationId: z.number(),
+		}),
+		component: TeammateConversation,
+	})
+
 	const acceptInviteRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/workspace-invite",
@@ -122,6 +133,7 @@ export function makeTestRouter() {
 			workspaceRoute.addChildren([
 				workspaceDirectoryRoute,
 				newConversationRoute,
+				conversationRoute,
 			]),
 			acceptInviteRoute,
 			checkEmailRoute,
@@ -134,7 +146,11 @@ export async function navigateToTestPage({
 	to,
 	search,
 	hash,
-}: { to: string; search: Record<string, string>; hash?: string }) {
+}: {
+	to: string
+	search: Record<string, string | number>
+	hash?: string
+}) {
 	const queryClient = createTestQueryClient()
 	const router = makeTestRouter()
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
