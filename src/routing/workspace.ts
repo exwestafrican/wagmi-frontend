@@ -6,7 +6,6 @@ import { z } from "zod"
 import { rootRoute } from "@/routing/root.ts"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import NotFound from "@/features/not-found.tsx"
-import TeammateConversation from "@/features/conversation/page.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
 
 export const workspaceLayoutRoute = createRoute({
@@ -49,12 +48,6 @@ const conversationRoute = createRoute({
 				conversationId: z.number(),
 			})
 			.parse(search),
-	component: TeammateConversation,
-})
-
-const newConversationPoute = createRoute({
-	getParentRoute: () => workspaceLayoutRoute,
-	path: "new-conversation",
 	component: NewConversationPage,
 })
 
@@ -62,5 +55,4 @@ export const workspaceRouteTree = workspaceLayoutRoute.addChildren([
 	workspaceIndexRoute,
 	workspaceDirectoryRoute,
 	conversationRoute,
-	newConversationPoute,
 ])

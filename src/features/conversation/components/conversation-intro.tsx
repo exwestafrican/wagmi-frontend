@@ -11,7 +11,9 @@ export function ConversationIntro({
 		<div className="flex flex-col gap-2">
 			<FallbackAvatar size={"m"} variant={"stone"} teammate={teammate} />
 			<div className="flex flex-col gap-0 justify-start ">
-				<h1 className="text-sm font-semibold">{fullName(teammate)}</h1>
+				<h1 aria-label="intro-fullname" className="text-sm font-semibold">
+					{fullName(teammate)}
+				</h1>
 				<span aria-label="intro-username" className="text-xs text-muted-brown">
 					@{teammate.username}
 				</span>

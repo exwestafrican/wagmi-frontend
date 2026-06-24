@@ -161,9 +161,9 @@ describe("Create A new Direct Message", () => {
 		await user.type(input, "marvin")
 		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
-		expect(
-			screen.getByRole("heading", { name: fullName(mavo) }),
-		).toBeInTheDocument()
+		expect(screen.getByLabelText("intro-fullname")).toHaveTextContent(
+			fullName(mavo),
+		)
 		expect(
 			screen.queryByRole("textbox", {
 				name: /recipient-search/i,
@@ -188,9 +188,10 @@ describe("Create A new Direct Message", () => {
 		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 
 		expect(screen.queryByTestId("teammate-suggestions")).not.toBeInTheDocument()
-		expect(
-			screen.getByRole("heading", { name: fullName(mavo) }),
-		).toBeInTheDocument()
+
+		expect(screen.getByLabelText("intro-fullname")).toHaveTextContent(
+			fullName(mavo),
+		)
 
 		await user.click(
 			screen.getByRole("button", {
@@ -221,9 +222,9 @@ describe("Create A new Direct Message", () => {
 			}),
 		)
 
-		expect(
-			screen.getByRole("heading", { name: fullName(mavo) }),
-		).toBeInTheDocument()
+		expect(screen.getByLabelText("intro-fullname")).toHaveTextContent(
+			fullName(mavo),
+		)
 		expect(
 			screen.queryByRole("button", {
 				name: new RegExp(`remove ${mavo.id}`, "i"),
@@ -334,9 +335,9 @@ describe("Create A new Direct Message", () => {
 			await user.click(screen.getByRole("button", { name: /send-message/i }))
 
 			expect(await screen.findByText(message)).toBeInTheDocument()
-			expect(
-				screen.getByRole("heading", { name: fullName(recipient) }),
-			).toBeInTheDocument()
+			expect(screen.getByLabelText("intro-fullname")).toHaveTextContent(
+				fullName(recipient),
+			)
 			expect(
 				screen.getByRole("heading", { name: fullName(sender) }),
 			).toBeInTheDocument()
@@ -348,9 +349,9 @@ describe("Create A new Direct Message", () => {
 			const { recipient, sender } = await startNewDm(message)
 			await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
 			expect(await screen.findByText(message)).toBeInTheDocument()
-			expect(
-				screen.getByRole("heading", { name: fullName(recipient) }),
-			).toBeInTheDocument()
+			expect(screen.getByLabelText("intro-fullname")).toHaveTextContent(
+				fullName(recipient),
+			)
 			expect(
 				screen.getByRole("heading", { name: fullName(sender) }),
 			).toBeInTheDocument()

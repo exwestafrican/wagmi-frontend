@@ -283,9 +283,10 @@ export default function WorkspacePage() {
 										onClick={() =>
 											navigate({
 												from: "/workspace",
-												to: "/workspace/new-conversation",
+												to: "/workspace/conversation",
 												search: {
 													code: code,
+													conversationId: 0,
 												},
 											})
 										}
