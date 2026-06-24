@@ -123,10 +123,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
-			workspaceRoute.addChildren([
-				workspaceDirectoryRoute,
-				conversationRoute,
-			]),
+			workspaceRoute.addChildren([workspaceDirectoryRoute, conversationRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),

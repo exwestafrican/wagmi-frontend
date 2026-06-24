@@ -58,10 +58,10 @@ export function NewConversationPage() {
 		setOpenMobile(false)
 	}, [setOpenMobile])
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: reset draft state when conversationId changes
-    useEffect(() => {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft state when conversationId changes
+	useEffect(() => {
 		setSelectedTeammate(undefined)
-        setMessageContents([])
+		setMessageContents([])
 	}, [conversationId])
 	//clear message content and selected teammate
 
@@ -134,7 +134,7 @@ export function NewConversationPage() {
 							: `Message ${introTeammate.username}`
 					}
 					onSend={(nodes) => {
-						if (currentTeammate ) {
+						if (currentTeammate) {
 							setMessageContents((prev) => [
 								...prev,
 								{
@@ -143,25 +143,25 @@ export function NewConversationPage() {
 								},
 							])
 
-                            if(selectedTeammate) {
-                                const prevConversation = conversationRegistry.findIfExists(
-                                    currentTeammate.id,
-                                    [selectedTeammate.id],
-                                )
+							if (selectedTeammate) {
+								const prevConversation = conversationRegistry.findIfExists(
+									currentTeammate.id,
+									[selectedTeammate.id],
+								)
 
-                                if (prevConversation) {
-                                    // fetch conversation
+								if (prevConversation) {
+									// fetch conversation
 
-                                    navigate({
-                                        from: "/workspace",
-                                        to: "/workspace/conversation",
-                                        search: {
-                                            code: code,
-                                            conversationId: prevConversation.id,
-                                        },
-                                    })
-                                }
-                            }
+									navigate({
+										from: "/workspace",
+										to: "/workspace/conversation",
+										search: {
+											code: code,
+											conversationId: prevConversation.id,
+										},
+									})
+								}
+							}
 
 							// disable conversation picker
 							// create new conversation
