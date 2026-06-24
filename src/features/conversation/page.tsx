@@ -1,12 +1,12 @@
 import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import EnvoyeComposer from "@/features/conversation/components/composer/envoye-composer.tsx"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import ConversationHeader from "@/features/conversation/components/header.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
-import { Chat } from "@/features/conversation/components/chat.tsx"
+import { Chat, type ChatBodyRef } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
 import useTeammateConversations from "@/features/conversation/api/list-conversation.ts"
 import {
@@ -29,6 +29,7 @@ export default function TeammateConversation() {
 		(convo) => convo.id === conversationId,
 	)
 	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
+	const chatBodyRef = useRef<ChatBodyRef>(null)
 
 	const counterparty = conversationInfo
 		? counterpartyTeammates(registry, conversationInfo)[0]
@@ -47,7 +48,7 @@ export default function TeammateConversation() {
 					</ConversationHeader>
 				</Chat.Header>
 
-				<Chat.Body>
+				<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
 					<MessageList messages={messageContents} />
 				</Chat.Body>
 
@@ -65,6 +66,14 @@ export default function TeammateConversation() {
 									},
 								])
 							}
+
+								requestAnimationFrame(() => {
+									chatBodyRef.current?.scrollIntoView({
+										block: "end",
+										behavior: "auto",
+									})
+								})
+
 						}}
 					/>
 				</Chat.Composer>

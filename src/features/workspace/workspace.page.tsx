@@ -329,7 +329,7 @@ export default function WorkspacePage() {
 						</SideNavGroupWithTopSeparator>
 					</SidebarContent>
 				</Sidebar>
-				<div className="relative  min-h-svh w-full">
+				<div className="relative min-h-dvh w-full">
 					{isMobile && <SidebarTrigger className="fixed top-4 right-4 z-50" />}
 					<Outlet />
 				</div>

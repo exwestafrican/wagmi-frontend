@@ -9,7 +9,7 @@ import EnvoyeComposer, {
 } from "@/features/conversation/components/composer/envoye-composer.tsx"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
-import { Chat } from "@/features/conversation/components/chat.tsx"
+import { Chat, type ChatBodyRef } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
 import { ConversationIntro } from "@/features/conversation/components/conversation-intro.tsx"
 import RecipientPicker from "@/features/conversation/components/recipient-picker.tsx"
@@ -22,6 +22,7 @@ export function NewConversationPage() {
 
 	const inputRef = useRef<HTMLInputElement | null>(null)
 	const composerRef = useRef<EnvoyeComposerRef>(null)
+	const chatBodyRef = useRef<ChatBodyRef>(null)
 
 	const placeholderName = usePlaceholderName()
 
@@ -62,7 +63,7 @@ export function NewConversationPage() {
 				/>
 			</Chat.Header>
 
-			<Chat.Body>
+			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
 				<div className="space-y-6">
 					{selectedTeammate && (
 						<ConversationIntro
@@ -94,6 +95,14 @@ export function NewConversationPage() {
 								},
 							])
 						}
+						requestAnimationFrame(() => {
+							requestAnimationFrame(() => {
+								chatBodyRef.current?.scrollIntoView({
+									block: "end",
+									behavior: "auto",
+								})
+							})
+						})
 						// sendNewMessage
 						// create conversation => with opening line.
 						// navigate user to new conversation screen
