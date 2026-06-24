@@ -1,4 +1,4 @@
-import type { ForwardedRef, ReactNode } from "react"
+import {type ForwardedRef, type ReactNode, useCallback} from "react"
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
@@ -30,13 +30,13 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 	const wasNearBottomRef = useRef(true)
 
-	const isNearBottom = () => {
-		const viewport = viewportRef.current
-		if (!viewport) return true
-		const distanceFromBottom =
-			viewport.scrollHeight - (viewport.scrollTop + viewport.clientHeight)
-		return distanceFromBottom <= 120
-	}
+    const isNearBottom = useCallback(() => {
+        const viewport = viewportRef.current
+        if (!viewport) return true
+        const distanceFromBottom =
+            viewport.scrollHeight - (viewport.scrollTop + viewport.clientHeight)
+        return distanceFromBottom <= 120
+    }, [])
 
 	useImperativeHandle(ref, () => ({
 		scrollIntoView(options: ScrollIntoViewOptions) {
@@ -88,7 +88,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		return () => {
 			vk.removeEventListener("geometrychange", onGeometryChange)
 		}
-	}, [])
+	}, [isNearBottom])
 
 	return (
 		<div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
