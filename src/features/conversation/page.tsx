@@ -1,6 +1,5 @@
 import { useSearch } from "@tanstack/react-router"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
-import { fullName } from "@/features/directory/utils/teammate.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
 import { useState } from "react"
 import EnvoyeComposer from "@/features/conversation/components/composer/envoye-composer.tsx"
@@ -10,33 +9,40 @@ import type { MessageContent } from "@/features/conversation/interface/text-node
 import { Chat } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
 import useTeammateConversations from "@/features/conversation/api/list-conversation.ts"
+import {
+	counterpartyTeammates,
+	displayName,
+} from "@/features/conversation/utils/participants.ts"
 
 export default function TeammateConversation() {
 	const { code, conversationId } = useSearch({
 		from: "/workspace/conversation",
 	})
 
-	const { data: conversationParticipated } = useTeammateConversations(code)
+	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
+	const { data: conversationParticipated } = useTeammateConversations(
+		code,
+		currentTeammate?.id ?? 0,
+	)
 	const registry = useTeammateInfoRegistry(code)
 	const conversationInfo = conversationParticipated?.find(
 		(convo) => convo.id === conversationId,
 	)
-	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
 	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
 
-	const participantInfo =
-		conversationInfo?.participantIds[0] && conversationInfo
-			? registry.find(conversationInfo.participantIds[0])
-			: undefined
+	const counterparty = conversationInfo
+		? counterpartyTeammates(registry, conversationInfo)[0]
+		: undefined
 
 	return (
-		participantInfo && (
+		counterparty &&
+		conversationInfo && (
 			<Chat>
 				<Chat.Header>
 					<ConversationHeader>
-						<FallbackAvatar teammate={participantInfo} />
+						<FallbackAvatar teammate={counterparty} />
 						<h1 className="text-lg md:text-lg font-semibold">
-							{fullName(participantInfo)}
+							{displayName(counterpartyTeammates(registry, conversationInfo))}
 						</h1>
 					</ConversationHeader>
 				</Chat.Header>
@@ -49,7 +55,7 @@ export default function TeammateConversation() {
 					<EnvoyeComposer
 						onFocus={() => {}}
 						disabled={false}
-						placeholder={`Message ${participantInfo.username}`}
+						placeholder={`Message ${counterparty.username}`}
 						onSend={(nodes) => {
 							if (currentTeammate) {
 								setMessageContents((prev) => [
