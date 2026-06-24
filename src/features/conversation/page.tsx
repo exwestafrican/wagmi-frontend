@@ -47,13 +47,12 @@ export default function TeammateConversation() {
 					</ConversationHeader>
 				</Chat.Header>
 
-				<Chat.Body scrollKey={messageContents.length}>
+				<Chat.Body>
 					<MessageList messages={messageContents} />
 				</Chat.Body>
 
 				<Chat.Composer>
 					<EnvoyeComposer
-						onFocus={() => {}}
 						disabled={false}
 						placeholder={`Message ${counterparty.username}`}
 						onSend={(nodes) => {
