@@ -17,7 +17,7 @@ export default function useConversationInfoRegistry(
 	)
 	return {
 		find: (conversationId: number) => indexedConversations.get(conversationId),
-		findIfExits: (teammateId: number, participantIds: number[]) => {
+		findIfExists: (teammateId: number, participantIds: number[]) => {
 			const id = [...participantIds, teammateId].sort().join("-")
 			return indexByCounterParty.get(id)
 		},

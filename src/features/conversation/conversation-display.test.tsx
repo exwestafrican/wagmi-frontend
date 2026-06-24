@@ -160,4 +160,54 @@ describe("Conversation page display name", () => {
 		).not.toBeInTheDocument()
 		expect(screen.queryByLabelText("intro-username")).not.toBeInTheDocument()
 	})
+
+	test("does not show messages from previous conversation after starting a new one", async () => {
+		const user = userEvent.setup()
+		const message = "How far, Raymond?"
+		const you = teammateFactory.build({
+			id: 7,
+			firstName: "Tochukwu",
+			lastName: "Gbubemi",
+			username: "odumodublvck",
+		})
+		const raymond = teammateFactory.build({
+			id: 1,
+			firstName: "Raymond",
+			lastName: "Omon",
+			username: "raymond.omon",
+		})
+		const oladele = teammateFactory.build({
+			id: 3,
+			firstName: "Oladele",
+			lastName: "Alade",
+			username: "oladele.alade",
+		})
+
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			you,
+			[raymond, oladele],
+			[{ id: 1, authorId: you.id, participantIds: [raymond.id] }],
+		)
+
+		await screen.findByText(/direct messages/i)
+		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+
+		const composer = screen.getByRole("textbox", { name: /message-composer/i })
+		await user.type(composer, message)
+		await user.click(screen.getByRole("button", { name: /send-message/i }))
+
+		expect(await screen.findByText(message)).toBeInTheDocument()
+
+		await user.click(
+			screen.getByRole("button", { name: /new-direct-message/i }),
+		)
+		await user.click(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${oladele.id}`, "i"),
+			}),
+		)
+
+		expect(screen.queryByText(message)).not.toBeInTheDocument()
+	})
 })

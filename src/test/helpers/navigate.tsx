@@ -93,12 +93,6 @@ export function makeTestRouter() {
 		component: WorkspaceDirectoryPage,
 	})
 
-	const newConversationRoute = createRoute({
-		getParentRoute: () => workspaceRoute,
-		path: "new-conversation",
-		component: NewConversationPage,
-	})
-
 	const conversationRoute = createRoute({
 		getParentRoute: () => workspaceRoute,
 		path: "conversation",
@@ -131,7 +125,6 @@ export function makeTestRouter() {
 			setupRoute,
 			workspaceRoute.addChildren([
 				workspaceDirectoryRoute,
-				newConversationRoute,
 				conversationRoute,
 			]),
 			acceptInviteRoute,

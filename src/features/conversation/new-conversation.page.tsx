@@ -58,8 +58,10 @@ export function NewConversationPage() {
 		setOpenMobile(false)
 	}, [setOpenMobile])
 
-	useEffect(() => {
+    // biome-ignore lint/correctness/useExhaustiveDependencies: reset draft state when conversationId changes
+    useEffect(() => {
 		setSelectedTeammate(undefined)
+        setMessageContents([])
 	}, [conversationId])
 	//clear message content and selected teammate
 
@@ -124,7 +126,7 @@ export function NewConversationPage() {
 			</Chat.Body>
 			<Chat.Composer>
 				<EnvoyeComposer
-					disabled={noTeammateSelected}
+					disabled={isNewConversation && noTeammateSelected}
 					ref={composerRef}
 					placeholder={
 						introTeammate == null
@@ -132,7 +134,7 @@ export function NewConversationPage() {
 							: `Message ${introTeammate.username}`
 					}
 					onSend={(nodes) => {
-						if (currentTeammate && selectedTeammate) {
+						if (currentTeammate ) {
 							setMessageContents((prev) => [
 								...prev,
 								{
@@ -140,23 +142,27 @@ export function NewConversationPage() {
 									nodes: nodes,
 								},
 							])
-							const prevConversation = conversationRegistry.findIfExits(
-								currentTeammate.id,
-								[selectedTeammate.id],
-							)
 
-							if (prevConversation) {
-								// fetch conversation
+                            if(selectedTeammate) {
+                                const prevConversation = conversationRegistry.findIfExists(
+                                    currentTeammate.id,
+                                    [selectedTeammate.id],
+                                )
 
-								navigate({
-									from: "/workspace",
-									to: "/workspace/conversation",
-									search: {
-										code: code,
-										conversationId: prevConversation.id,
-									},
-								})
-							}
+                                if (prevConversation) {
+                                    // fetch conversation
+
+                                    navigate({
+                                        from: "/workspace",
+                                        to: "/workspace/conversation",
+                                        search: {
+                                            code: code,
+                                            conversationId: prevConversation.id,
+                                        },
+                                    })
+                                }
+                            }
+
 							// disable conversation picker
 							// create new conversation
 							// navigate user.
