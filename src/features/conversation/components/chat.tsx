@@ -1,10 +1,5 @@
 import { type ForwardedRef, type ReactNode, useCallback } from "react"
-import {
-	forwardRef,
-	useImperativeHandle,
-	useLayoutEffect,
-	useRef,
-} from "react"
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -60,7 +55,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
 
-    useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		wasNearBottomRef.current = isNearBottom()
 
 		function isComposerFocused() {
@@ -71,7 +66,10 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 			)
 		}
 
-		function applyScrollDelta(delta: number, wasNearBottomBeforeResize: boolean) {
+		function applyScrollDelta(
+			delta: number,
+			wasNearBottomBeforeResize: boolean,
+		) {
 			if (Math.abs(delta) < 10) return
 			if (!isComposerFocused()) return
 			if (!wasNearBottomBeforeResize) return
