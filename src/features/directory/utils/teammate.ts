@@ -18,6 +18,10 @@ export function fullName(teammate: Teammate) {
 		.join(" ")
 }
 
+export function fullNameWithFallback(teammate: Teammate | undefined): string {
+	return teammate ? fullName(teammate) : "Unknown Teammate"
+}
+
 export function buildTeammateRole(teammate: Teammate) {
 	if (ROLES[teammate.role] === undefined) {
 		return fallBackRole
