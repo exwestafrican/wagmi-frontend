@@ -19,7 +19,6 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
-import TeammateConversation from "@/features/conversation/page.tsx"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -94,12 +93,6 @@ export function makeTestRouter() {
 		component: WorkspaceDirectoryPage,
 	})
 
-	const newConversationRoute = createRoute({
-		getParentRoute: () => workspaceRoute,
-		path: "new-conversation",
-		component: NewConversationPage,
-	})
-
 	const conversationRoute = createRoute({
 		getParentRoute: () => workspaceRoute,
 		path: "conversation",
@@ -107,7 +100,7 @@ export function makeTestRouter() {
 			code: z.string(),
 			conversationId: z.number(),
 		}),
-		component: TeammateConversation,
+		component: NewConversationPage,
 	})
 
 	const acceptInviteRoute = createRoute({
@@ -130,11 +123,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
-			workspaceRoute.addChildren([
-				workspaceDirectoryRoute,
-				newConversationRoute,
-				conversationRoute,
-			]),
+			workspaceRoute.addChildren([workspaceDirectoryRoute, conversationRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),
