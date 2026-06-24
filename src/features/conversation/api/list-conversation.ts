@@ -25,8 +25,7 @@ export function toConversationSummary(
 	return {
 		id: raw.id,
 		authorId: raw.authorId,
-		counterParties:
-			counterParties.length > 0 ? counterParties : [raw.authorId],
+		counterParties: counterParties.length > 0 ? counterParties : [raw.authorId],
 	}
 }
 

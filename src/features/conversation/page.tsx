@@ -35,38 +35,41 @@ export default function TeammateConversation() {
 		: undefined
 
 	return (
-		(counterparty && conversationInfo) && <Chat>
-			<Chat.Header>
-				<ConversationHeader>
-					<FallbackAvatar teammate={counterparty} />
-					<h1 className="text-lg md:text-lg font-semibold">
-						{displayName(counterpartyTeammates(registry, conversationInfo))}
-					</h1>
-				</ConversationHeader>
-			</Chat.Header>
+		counterparty &&
+		conversationInfo && (
+			<Chat>
+				<Chat.Header>
+					<ConversationHeader>
+						<FallbackAvatar teammate={counterparty} />
+						<h1 className="text-lg md:text-lg font-semibold">
+							{displayName(counterpartyTeammates(registry, conversationInfo))}
+						</h1>
+					</ConversationHeader>
+				</Chat.Header>
 
-			<Chat.Body scrollKey={messageContents.length}>
-				<MessageList messages={messageContents} />
-			</Chat.Body>
+				<Chat.Body scrollKey={messageContents.length}>
+					<MessageList messages={messageContents} />
+				</Chat.Body>
 
-			<Chat.Composer>
-				<EnvoyeComposer
-					onFocus={() => {}}
-					disabled={false}
-					placeholder={`Message ${counterparty.username}`}
-					onSend={(nodes) => {
-						if (currentTeammate) {
-							setMessageContents((prev) => [
-								...prev,
-								{
-									author: currentTeammate,
-									nodes: nodes,
-								},
-							])
-						}
-					}}
-				/>
-			</Chat.Composer>
-		</Chat>
+				<Chat.Composer>
+					<EnvoyeComposer
+						onFocus={() => {}}
+						disabled={false}
+						placeholder={`Message ${counterparty.username}`}
+						onSend={(nodes) => {
+							if (currentTeammate) {
+								setMessageContents((prev) => [
+									...prev,
+									{
+										author: currentTeammate,
+										nodes: nodes,
+									},
+								])
+							}
+						}}
+					/>
+				</Chat.Composer>
+			</Chat>
+		)
 	)
 }

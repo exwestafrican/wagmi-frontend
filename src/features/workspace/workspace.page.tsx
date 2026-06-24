@@ -43,7 +43,10 @@ import { cn } from "@/lib/utils.ts"
 import useActivePath from "@/hooks/use-active-path.ts"
 import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
-import { counterpartyTeammates, displayName } from "@/features/conversation/utils/participants.ts"
+import {
+	counterpartyTeammates,
+	displayName,
+} from "@/features/conversation/utils/participants.ts"
 import useTeammateConversations, {
 	type ConversationSummary,
 } from "@/features/conversation/api/list-conversation.ts"
