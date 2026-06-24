@@ -19,7 +19,6 @@ type EnvoyeComposerProps = {
 	disabled: boolean
 	placeholder: string
 	onSend: (nodes: TextNode[]) => void
-	onFocus: () => void
 }
 
 export type EnvoyeComposerRef = {
@@ -28,7 +27,7 @@ export type EnvoyeComposerRef = {
 
 const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 	function EnvoyeComposer(
-		{ disabled, placeholder, onSend, onFocus }: EnvoyeComposerProps,
+		{ disabled, placeholder, onSend }: EnvoyeComposerProps,
 		ref: ForwardedRef<EnvoyeComposerRef>,
 	) {
 		const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -72,7 +71,6 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 					maxLength={MAX_TEXT_INPUT}
 					className="w-full bg-transparent border-none outline-none focus:outline-none text-sm placeholder:text-gray-400 resize-none px-5 pt-3 pb-2 min-h-[70px] font-normal leading-relaxed  font-sans"
 					placeholder={placeholder}
-					onFocus={() => onFocus()}
 					onChange={(e) => {
 						parser.setText(e.target.value)
 						setTextInput(e.target.value)
