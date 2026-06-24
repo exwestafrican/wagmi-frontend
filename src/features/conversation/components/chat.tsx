@@ -1,11 +1,5 @@
 import { type ForwardedRef, type ReactNode, useCallback } from "react"
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useLayoutEffect,
-	useRef,
-} from "react"
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -34,14 +28,15 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 ) {
 	const viewportRef = useRef<HTMLDivElement | null>(null)
 	const bottomRef = useRef<HTMLDivElement | null>(null)
-	const wasNearBottomRef = useRef(true)
+	const wasNearBottomRef = useRef(false)
 
-	const isNearBottom = useCallback(() => {
+	const isNearBottom = useCallback((clientHeight?: number) => {
 		const viewport = viewportRef.current
-		if (!viewport) return true
+		if (!viewport) return false
+		const height = clientHeight ?? viewport.clientHeight
 		const distanceFromBottom =
-			viewport.scrollHeight - (viewport.scrollTop + viewport.clientHeight)
-		return distanceFromBottom <= 120
+			viewport.scrollHeight - (viewport.scrollTop + height)
+		return distanceFromBottom <= 60
 	}, [])
 
 	useImperativeHandle(ref, () => ({
@@ -60,39 +55,54 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		wasNearBottomRef.current = isNearBottom()
 
-		const vk = navigator.virtualKeyboard
-		let lastKeyboardHeight = vk.boundingRect?.height ?? 0
-
-		const onGeometryChange = () => {
-			const nextKeyboardHeight = vk.boundingRect?.height ?? 0
-			const delta = nextKeyboardHeight - lastKeyboardHeight
-			lastKeyboardHeight = nextKeyboardHeight
-
-			// Ignore tiny changes (rounding / jitter).
-			if (Math.abs(delta) < 10) return
-
+		function isComposerFocused() {
 			const active = document.activeElement
-			const isComposerFocused =
+			return (
 				active instanceof HTMLElement &&
 				active.getAttribute("aria-label") === "message-composer"
+			)
+		}
 
-			if (!isComposerFocused) return
+		function applyScrollDelta(
+			delta: number,
+			wasNearBottomBeforeResize: boolean,
+		) {
+			if (Math.abs(delta) < 10) return
+			if (!isComposerFocused()) return
+			if (!wasNearBottomBeforeResize) return
 
-			// Keyboard opening increases keyboardHeight (delta > 0).
-			// Adjust scrollTop by delta to keep content stable.
 			requestAnimationFrame(() => {
 				const viewport = viewportRef.current
 				if (!viewport) return
 				viewport.scrollTop += delta
+				wasNearBottomRef.current = isNearBottom()
 			})
 		}
 
-		vk.addEventListener("geometrychange", onGeometryChange)
+		const viewport = viewportRef.current
+		if (!viewport) return
+
+		let lastViewportHeight = viewport.clientHeight
+
+		const observer = new ResizeObserver(() => {
+			const current = viewportRef.current
+			if (!current) return
+
+			const previousHeight = lastViewportHeight
+			const nextHeight = current.clientHeight
+			const delta = previousHeight - nextHeight
+			lastViewportHeight = nextHeight
+
+			const wasNearBottomBeforeResize = isNearBottom(previousHeight)
+			applyScrollDelta(delta, wasNearBottomBeforeResize)
+		})
+
+		observer.observe(viewport)
 		return () => {
-			vk.removeEventListener("geometrychange", onGeometryChange)
+			observer.disconnect()
 		}
 	}, [isNearBottom])
 

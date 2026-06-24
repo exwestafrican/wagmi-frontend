@@ -51,13 +51,3 @@ globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
 	unobserve: vi.fn(),
 	disconnect: vi.fn(),
 }))
-
-// JSDOM doesn't implement the VirtualKeyboard API. Our chat layout listens to it.
-Object.defineProperty(navigator, "virtualKeyboard", {
-	configurable: true,
-	value: {
-		boundingRect: { height: 0 },
-		addEventListener: vi.fn(),
-		removeEventListener: vi.fn(),
-	},
-})
