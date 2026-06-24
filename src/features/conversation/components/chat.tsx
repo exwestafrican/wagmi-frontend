@@ -48,6 +48,8 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		if (scrollKey === 0) return
 		// Only auto-scroll when user is already near bottom.
 		// Sending a message force-scrolls via the imperative call in onSend.
+        // Tumise: if a new message came in, this might trigger <=======
+        // if this annoys user, take it out.
 		if (!wasNearBottomRef.current) return
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
