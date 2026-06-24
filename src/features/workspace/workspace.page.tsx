@@ -50,6 +50,8 @@ import {
 import useTeammateConversations, {
 	type ConversationSummary,
 } from "@/features/conversation/api/list-conversation.ts"
+import { FEATURE } from "@/features/feature-flag/const.ts"
+import { useEnabledFeature } from "@/features/feature-flag/hooks/use-enabled-feature.ts"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -102,6 +104,10 @@ export default function WorkspacePage() {
 	const { data: conversations } = useTeammateConversations(
 		code,
 		teammate?.id ?? 0,
+	)
+	const { isEnabled: isSupportEnabled } = useEnabledFeature(
+		code,
+		FEATURE.SUPPORT_WORKSPACE,
 	)
 
 	const isMobile = useIsMobile()
@@ -235,44 +241,46 @@ export default function WorkspacePage() {
 								))}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
-						<SideNavGroupWithTopSeparator>
-							<SidebarGroupLabel className="sidebar-group-layout">
-								support
-							</SidebarGroupLabel>
-							<SidebarMenu className="px-3">
-								{supportMenuItems.map((item) => (
-									<SidebarMenuItem key={item.id}>
-										<SidebarMenuButton
-											className="cursor-pointer"
-											size="sm"
-											asChild
-											onClick={() =>
-												navigate({
-													from: "/workspace",
-													to: item.path,
-													search: { code: code },
-												})
-											}
-											isActive={isActivePath(item.path)}
-										>
-											<div>
-												<div className="flex gap-2 items-center text-muted-brown">
-													<item.icon className="h-4 w-4" />
-													<span>{item.label}</span>
+						{isSupportEnabled && (
+							<SideNavGroupWithTopSeparator>
+								<SidebarGroupLabel className="sidebar-group-layout">
+									support
+								</SidebarGroupLabel>
+								<SidebarMenu className="px-3">
+									{supportMenuItems.map((item) => (
+										<SidebarMenuItem key={item.id}>
+											<SidebarMenuButton
+												className="cursor-pointer"
+												size="sm"
+												asChild
+												onClick={() =>
+													navigate({
+														from: "/workspace",
+														to: item.path,
+														search: { code: code },
+													})
+												}
+												isActive={isActivePath(item.path)}
+											>
+												<div>
+													<div className="flex gap-2 items-center text-muted-brown">
+														<item.icon className="h-4 w-4" />
+														<span>{item.label}</span>
+													</div>
+													{item.count > 0 && (
+														<SidebarMenuBadge>
+															<span className="text-xs px-1.5 py-0.5 rounded-full bg-chestnut-brown text-stone-100">
+																{badgeText(item.count)}
+															</span>
+														</SidebarMenuBadge>
+													)}
 												</div>
-												{item.count > 0 && (
-													<SidebarMenuBadge>
-														<span className="text-xs px-1.5 py-0.5 rounded-full bg-chestnut-brown text-stone-100">
-															{badgeText(item.count)}
-														</span>
-													</SidebarMenuBadge>
-												)}
-											</div>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								))}
-							</SidebarMenu>
-						</SideNavGroupWithTopSeparator>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									))}
+								</SidebarMenu>
+							</SideNavGroupWithTopSeparator>
+						)}
 						<SideNavGroupWithTopSeparator>
 							<SidebarGroupLabel className="sidebar-group-layout">
 								<div className="flex flex-row justify-between items-center w-full">

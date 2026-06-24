@@ -9,6 +9,7 @@ import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interf
 import { ApiPaths } from "@/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
+import { FEATURE } from "@/features/feature-flag/const.ts"
 
 const envoyeWorkspace = {
 	code: WorkspaceCode.ENVOYE,
@@ -153,6 +154,32 @@ describe("Workspace Test", () => {
 
 		await waitFor(() => {
 			expect(screen.queryByText("tumise@useenvoye.io")).not.toBeInTheDocument()
+		})
+	})
+
+	describe("support sidebar", () => {
+		test("hides support section when feature flag is disabled", async () => {
+			await navigateToWorkspacePage(envoyeWorkspace)
+
+			await waitFor(() => {
+				expect(screen.queryByText("support")).not.toBeInTheDocument()
+				expect(screen.queryByText("DMs")).not.toBeInTheDocument()
+				expect(screen.queryByText("Assigned")).not.toBeInTheDocument()
+			})
+		})
+
+		test("shows support section when feature flag is enabled", async () => {
+			await navigateToWorkspacePage(
+				envoyeWorkspace,
+				teammateFactory.build(),
+				[],
+				[],
+				[FEATURE.SUPPORT_WORKSPACE],
+			)
+
+			expect(await screen.findByText("support")).toBeInTheDocument()
+			expect(screen.getByText("DMs")).toBeInTheDocument()
+			expect(screen.getByText("Assigned")).toBeInTheDocument()
 		})
 	})
 })

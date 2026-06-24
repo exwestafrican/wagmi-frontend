@@ -14,6 +14,7 @@ export async function navigateToWorkspacePage(
 	teammate: Teammate = teammateFactory.build(),
 	workspaceTeammates: Teammate[] = [],
 	conversations: ConversationApiResponse[] = [],
+	enabledFeatures: string[] = [],
 ) {
 	return await act(async () => {
 		useAuthStore.getState().setAuthToken("fake-token")
@@ -22,6 +23,7 @@ export async function navigateToWorkspacePage(
 			teammate,
 			workspaceTeammates,
 			conversations,
+			enabledFeatures,
 		)
 		return await navigateToTestPage({
 			to: "/workspace",
@@ -57,6 +59,7 @@ export function mockWorkspaceAndCurrentTeammate(
 	teammate: Teammate = teammateFactory.build(),
 	otherTeammates: Teammate[] = [],
 	conversations: ConversationApiResponse[] = [],
+	enabledFeatures: string[] = [],
 ) {
 	const teammates = [teammate, ...otherTeammates]
 
@@ -72,6 +75,9 @@ export function mockWorkspaceAndCurrentTeammate(
 		}
 		if (url === ApiPaths.CONVERSATIONS) {
 			return Promise.resolve({ data: conversations })
+		}
+		if (url === ApiPaths.FEATURE_FLAGS_ENABLED) {
+			return Promise.resolve({ data: enabledFeatures })
 		}
 		return Promise.reject(new Error(`Unexpected GET ${url}`))
 	})
