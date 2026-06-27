@@ -233,8 +233,8 @@ export function NewConversationPage() {
 									newMessage,
 								)
 							} else {
-                                setNewMessageContents((previous) => [...previous, newMessage])
-                            }
+								setNewMessageContents((previous) => [...previous, newMessage])
+							}
 						}
 						requestAnimationFrame(() => {
 							requestAnimationFrame(() => {

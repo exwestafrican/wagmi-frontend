@@ -1,4 +1,4 @@
-import {describe, expect, test } from "vitest"
+import { describe, expect, test } from "vitest"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { WorkspaceCode } from "@/test/constants.ts"
@@ -17,7 +17,6 @@ const envoyeWorkspace = {
 }
 
 describe("Conversation page display name", () => {
-
 	test("conversation header shows counterparty display name", async () => {
 		const you = teammateFactory.build({
 			id: 7,
@@ -197,7 +196,7 @@ describe("Conversation page display name", () => {
 		const composer = screen.getByRole("textbox", { name: /message-composer/i })
 		await user.type(composer, message)
 		await user.click(screen.getByRole("button", { name: /send-message/i }))
-        expect(await screen.findByText(message)).toBeInTheDocument()
+		expect(await screen.findByText(message)).toBeInTheDocument()
 
 		await user.click(
 			screen.getByRole("button", { name: /new-direct-message/i }),
