@@ -232,7 +232,9 @@ export function NewConversationPage() {
 									[selectedTeammate],
 									newMessage,
 								)
-							}
+							} else {
+                                setNewMessageContents((previous) => [...previous, newMessage])
+                            }
 						}
 						requestAnimationFrame(() => {
 							requestAnimationFrame(() => {
