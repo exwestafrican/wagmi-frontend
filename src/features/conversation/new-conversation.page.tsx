@@ -21,6 +21,15 @@ import ConversationParticipant from "@/features/conversation/components/conversa
 import useConversationInfoRegistry from "@/features/conversation/hooks/conversation-info-registry.ts"
 import { counterpartyTeammates } from "@/features/conversation/utils/participants.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
+import useSendNewMessage from "@/features/conversation/api/new-message.ts"
+import {
+	addConversationToQueryCache,
+	TEAMMATE_CONVERSATION_LIST,
+} from "@/features/conversation/api/list-conversation.ts"
+import { useQueryClient } from "@tanstack/react-query"
+import useChatHistory, {
+	addChatHistoryToQueryCache,
+} from "@/features/conversation/api/chat-history.ts"
 
 export function NewConversationPage() {
 	const { code, conversationId } = useSearch({
@@ -31,13 +40,27 @@ export function NewConversationPage() {
 	const composerRef = useRef<EnvoyeComposerRef>(null)
 	const chatBodyRef = useRef<ChatBodyRef>(null)
 
-	const [messageContents, setMessageContents] = useState<MessageContent[]>([])
+	const [newMessageContents, setNewMessageContents] = useState<
+		MessageContent[]
+	>([])
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
 
 	const { setOpenMobile } = useSidebar()
+	const { mutate: sendNewMessage, isPending: isSendingNewMessage } =
+		useSendNewMessage()
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
+	const [mostRecentChatHistory] = useState<MessageContent | undefined>(
+		undefined,
+	)
+
+	const { data: chatHistory } = useChatHistory(
+		code,
+		conversationId,
+		mostRecentChatHistory?.createdAt,
+	)
+
 	const currentTeammateId = currentTeammate?.id ?? 0
 	const placeholderName = usePlaceholderName()
 	const conversationRegistry = useConversationInfoRegistry(
@@ -45,10 +68,9 @@ export function NewConversationPage() {
 		currentTeammateId,
 	)
 	const registry = useTeammateInfoRegistry(code)
-
 	const navigate = useNavigate()
+	const queryClient = useQueryClient()
 
-	const prevMessageContent: MessageContent[] = [] // use the URL  to fetch this -> pass in conversationId
 	const conversationInfo = conversationRegistry.find(conversationId)
 	const counterparty = conversationInfo
 		? counterpartyTeammates(registry, conversationInfo)[0]
@@ -61,17 +83,76 @@ export function NewConversationPage() {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft state when conversationId changes
 	useEffect(() => {
 		setSelectedTeammate(undefined)
-		setMessageContents([])
+		setNewMessageContents([])
 	}, [conversationId])
-	//clear message content and selected teammate
 
 	const noTeammateSelected = selectedTeammate === undefined
 	const isNewConversation = conversationId === 0
 
 	const introTeammate = isNewConversation ? selectedTeammate : counterparty
-	// if conversation exists navigate user to existing conversation
-	// filter out people we have alteady sent
-	// on send, add text to ui -> sendNewText -> navigate to new conversation page
+
+	const messageContents = [
+		...(chatHistory ?? []),
+		...newMessageContents.filter(
+			(pending) => !chatHistory?.some((saved) => saved.id === pending.id),
+		),
+	]
+
+	function openNewConversationOrNavigateToExistingConversation(
+		sender: Teammate,
+		recipients: Teammate[],
+		message: MessageContent,
+	) {
+		const hasContent = message.nodes.some((node) =>
+			node.content.join("").trim(),
+		)
+		if (!hasContent) return
+
+		const prevConversation = conversationRegistry.findIfExists(
+			sender.id,
+			recipients.map((recipient) => recipient.id),
+		)
+
+		if (prevConversation) {
+			//TODO: move this to an on select teammate operation.
+			navigate({
+				from: "/workspace/conversation",
+				search: { code: code, conversationId: prevConversation.id },
+
+				replace: true,
+			})
+		} else {
+			setNewMessageContents((previous) => [...previous, message])
+			sendNewMessage(
+				{
+					recipientTeammateId: recipients[0].id,
+					workspaceCode: code,
+					openingMessage: message.nodes.flatMap((n) => n.content.join(" ")),
+					sentAt: message.createdAt,
+				},
+				{
+					onSuccess: ({ data }) => {
+						addConversationToQueryCache(queryClient, code, sender.id, {
+							id: data.id,
+							authorId: sender.id,
+							counterParties: [recipients[0].id],
+						})
+						addChatHistoryToQueryCache(queryClient, code, data.id, [
+							{ ...message, sent: true },
+						])
+						navigate({
+							from: "/workspace/conversation",
+							search: { code: code, conversationId: data.id },
+							replace: true,
+						})
+						queryClient.invalidateQueries({
+							queryKey: [TEAMMATE_CONVERSATION_LIST, code],
+						})
+					},
+				},
+			)
+		}
+	}
 
 	return (
 		<Chat>
@@ -105,7 +186,8 @@ export function NewConversationPage() {
 				</Chat.Header>
 			)}
 
-			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
+			<Chat.Body ref={chatBodyRef} scrollKey={newMessageContents.length}>
+                {/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
 					{introTeammate && (
 						<ConversationIntro
@@ -117,16 +199,17 @@ export function NewConversationPage() {
 					{messageContents.length > 0 && (
 						<>
 							<Separator />
-							<MessageList
-								messages={[...prevMessageContent, ...messageContents]}
-							/>
+							<MessageList workspaceCode={code} messages={messageContents} />
 						</>
 					)}
 				</div>
 			</Chat.Body>
 			<Chat.Composer>
 				<EnvoyeComposer
-					disabled={isNewConversation && noTeammateSelected}
+					disableInput={isSendingNewMessage}
+					disableSend={
+						(isNewConversation && noTeammateSelected) || isSendingNewMessage
+					}
 					ref={composerRef}
 					placeholder={
 						introTeammate == null
@@ -135,37 +218,21 @@ export function NewConversationPage() {
 					}
 					onSend={(nodes) => {
 						if (currentTeammate) {
-							setMessageContents((prev) => [
-								...prev,
-								{
-									author: currentTeammate,
-									nodes: nodes,
-								},
-							])
-
-							if (selectedTeammate) {
-								const prevConversation = conversationRegistry.findIfExists(
-									currentTeammate.id,
-									[selectedTeammate.id],
-								)
-
-								if (prevConversation) {
-									// fetch conversation
-
-									navigate({
-										from: "/workspace",
-										to: "/workspace/conversation",
-										search: {
-											code: code,
-											conversationId: prevConversation.id,
-										},
-									})
-								}
+							const newMessage: MessageContent = {
+								id: crypto.randomUUID(),
+								authorId: currentTeammate.id,
+								nodes: nodes,
+								sent: false,
+								createdAt: Date.now(),
 							}
 
-							// disable conversation picker
-							// create new conversation
-							// navigate user.
+							if (isNewConversation && selectedTeammate) {
+								openNewConversationOrNavigateToExistingConversation(
+									currentTeammate,
+									[selectedTeammate],
+									newMessage,
+								)
+							}
 						}
 						requestAnimationFrame(() => {
 							requestAnimationFrame(() => {

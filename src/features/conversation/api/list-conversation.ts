@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { type QueryClient, useQuery } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 
@@ -31,12 +31,33 @@ export function toConversationSummary(
 
 export const TEAMMATE_CONVERSATION_LIST = "teammate-conversation-list"
 
+export function conversationListQueryKey(
+	workspaceCode: string,
+	teammateId: number,
+) {
+	return [TEAMMATE_CONVERSATION_LIST, workspaceCode, teammateId] as const
+}
+
+export function addConversationToQueryCache(
+	queryClient: QueryClient,
+	workspaceCode: string,
+	teammateId: number,
+	conversation: ConversationSummary,
+) {
+	queryClient.setQueryData<ConversationSummary[]>(
+		conversationListQueryKey(workspaceCode, teammateId),
+		(previous) => {
+			return [...(previous ?? []), conversation]
+		},
+	)
+}
+
 export default function useTeammateConversations(
 	workspaceCode: string,
 	currentTeammateId: number,
 ) {
 	return useQuery<ConversationSummary[]>({
-		queryKey: [TEAMMATE_CONVERSATION_LIST, workspaceCode, currentTeammateId],
+		queryKey: conversationListQueryKey(workspaceCode, currentTeammateId),
 		queryFn: async () => {
 			const res = await apiClient.get<ConversationApiResponse[]>(
 				ApiPaths.CONVERSATIONS,

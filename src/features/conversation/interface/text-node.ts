@@ -1,4 +1,4 @@
-import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
+import { SPACE } from "@/features/conversation/hooks/text-node.tsx"
 
 export type TextStyle = "bold" | "italic" | "underline" | "strike"
 
@@ -12,6 +12,23 @@ export type TextNode = {
 }
 
 export type MessageContent = {
-	author: Teammate
+	id: string
+	authorId: number
 	nodes: TextNode[]
+	sent: boolean
+	createdAt: number
+}
+
+export function makeDefaultTextNode(text: string, type = "p" as NodeType) {
+	return {
+		id: crypto.randomUUID(),
+		node: type,
+		content: text.split(SPACE),
+		styles: {
+			bold: [],
+			italic: [],
+			underline: [],
+			strike: [],
+		},
+	}
 }
