@@ -8,6 +8,7 @@ type ConversationCreatedResponse = {
 }
 
 //TODO: take in message also for this. i.e text node.
+// for new conversation
 export default function useSendNewMessage() {
 	return useMutation({
 		mutationFn: (data: {

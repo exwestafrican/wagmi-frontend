@@ -19,6 +19,7 @@ export const ApiPaths = {
 	ACTIVE_TEAMMATES: "/teammates",
 	CONVERSATIONS: "/conversations",
 	SEND_NEW_MESSAGE: "/conversations/direct-message",
+	SEND_REPLY: "/conversations/send-text",
 	CONVERSATION_CHAT_HISTORY: "conversations/chat-history",
 } as const
 
