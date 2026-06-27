@@ -32,3 +32,14 @@ export function buildTeammateRole(teammate: Teammate) {
 export function formatRole(role: Role) {
 	return `${role.emoji} ${role.name}`
 }
+
+export function buildUnknownTeammate(): Teammate {
+	return {
+		id: 0,
+		email: "unkownTeammate@unkown.com",
+		username: "unknown",
+		firstName: "john",
+		lastName: "doe",
+		role: "unknown",
+	}
+}

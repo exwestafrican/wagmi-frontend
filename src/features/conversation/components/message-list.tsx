@@ -1,6 +1,7 @@
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import TextPart from "@/features/conversation/components/text-part.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
+import { buildUnknownTeammate } from "@/features/directory/utils/teammate.ts"
 
 export function MessageList({
 	workspaceCode,
@@ -16,7 +17,7 @@ export function MessageList({
 			{messages.map((content) => (
 				<TextPart
 					key={content.nodes.map((n) => n.id).join("-")}
-					author={registry.find(content.authorId)!}
+					author={registry.find(content.authorId) ?? buildUnknownTeammate()}
 					nodes={content.nodes}
 				/>
 			))}
