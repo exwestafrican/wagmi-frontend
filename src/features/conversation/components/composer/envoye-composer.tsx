@@ -16,7 +16,8 @@ import { DESKTOP_KEYS } from "@/constants.ts"
 const MAX_TEXT_INPUT = 2000
 
 type EnvoyeComposerProps = {
-	disabled: boolean
+	disableInput?: boolean
+	disableSend: boolean
 	placeholder: string
 	onSend: (nodes: TextNode[]) => void
 }
@@ -27,7 +28,12 @@ export type EnvoyeComposerRef = {
 
 const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 	function EnvoyeComposer(
-		{ disabled, placeholder, onSend }: EnvoyeComposerProps,
+		{
+			disableInput = false,
+			disableSend,
+			placeholder,
+			onSend,
+		}: EnvoyeComposerProps,
 		ref: ForwardedRef<EnvoyeComposerRef>,
 	) {
 		const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -46,7 +52,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 		const exceedsTextInput = textInput.length > MAX_TEXT_INPUT
 
 		const invalidInput = textInput.length > MAX_TEXT_INPUT
-		const disableSend = hasNoInput || exceedsTextInput || disabled
+		const disableSendBtn = hasNoInput || exceedsTextInput || disableSend
 
 		function sendMessageIfEnabled() {
 			if (!disableSend) {
@@ -66,6 +72,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 			>
 				<textarea
 					aria-label="message-composer"
+					disabled={disableInput}
 					ref={textareaRef}
 					value={textInput}
 					maxLength={MAX_TEXT_INPUT}
@@ -103,7 +110,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 						aria-label="send-message"
 						size="icon-sm"
 						className="rounded-full bg-[#c15f3c] text-white hover:bg-[#c15f3c]/90"
-						disabled={disableSend}
+						disabled={disableSendBtn}
 						onClick={(e) => {
 							e.preventDefault()
 							textareaRef?.current?.focus()

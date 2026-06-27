@@ -1,6 +1,7 @@
-import type {
-	NodeType,
-	TextNode,
+import {
+	makeDefaultTextNode,
+	type NodeType,
+	type TextNode,
 } from "@/features/conversation/interface/text-node.ts"
 import { useRef } from "react"
 
@@ -19,17 +20,7 @@ export default function useTextNodeParser(type = "p" as NodeType) {
 	}
 
 	function makeTextNode(text: string) {
-		return {
-			id: crypto.randomUUID(),
-			node: type,
-			content: text.split(SPACE),
-			styles: {
-				bold: [],
-				italic: [],
-				underline: [],
-				strike: [],
-			},
-		}
+		return makeDefaultTextNode(text, type)
 	}
 
 	function build(): TextNode[] {

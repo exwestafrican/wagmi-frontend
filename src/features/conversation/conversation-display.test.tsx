@@ -196,7 +196,6 @@ describe("Conversation page display name", () => {
 		const composer = screen.getByRole("textbox", { name: /message-composer/i })
 		await user.type(composer, message)
 		await user.click(screen.getByRole("button", { name: /send-message/i }))
-
 		expect(await screen.findByText(message)).toBeInTheDocument()
 
 		await user.click(
