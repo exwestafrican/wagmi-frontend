@@ -30,6 +30,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import useChatHistory, {
 	addChatHistoryToQueryCache,
 } from "@/features/conversation/api/chat-history.ts"
+import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 
 export function NewConversationPage() {
 	const { code, conversationId } = useSearch({
@@ -60,6 +61,8 @@ export function NewConversationPage() {
 		conversationId,
 		mostRecentChatHistory?.createdAt,
 	)
+
+	const { mutate: reply } = useSendReply()
 
 	const currentTeammateId = currentTeammate?.id ?? 0
 	const placeholderName = usePlaceholderName()
@@ -234,6 +237,12 @@ export function NewConversationPage() {
 								)
 							} else {
 								setNewMessageContents((previous) => [...previous, newMessage])
+								reply({
+									workspaceCode: code,
+									conversationId,
+									message: newMessage.nodes.flatMap((n) => n.content.join(" ")),
+									sentAt: newMessage.createdAt,
+								})
 							}
 						}
 						requestAnimationFrame(() => {
@@ -244,9 +253,6 @@ export function NewConversationPage() {
 								})
 							})
 						})
-						// sendNewMessage
-						// create conversation => with opening line.
-						// navigate user to new conversation screen
 					}}
 				/>
 			</Chat.Composer>

@@ -1,6 +1,8 @@
-import { describe, expect, test } from "vitest"
-import { screen } from "@testing-library/react"
+import { describe, expect, test, vi } from "vitest"
+import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { ApiPaths } from "@/constants.ts"
+import { apiClient } from "@/lib/api-client.ts"
 import { WorkspaceCode } from "@/test/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import {
@@ -208,5 +210,52 @@ describe("Conversation page display name", () => {
 		)
 
 		expect(screen.queryByText(message)).not.toBeInTheDocument()
+	})
+
+	test("calls send reply endpoint when user replies in an existing conversation", async () => {
+		vi.mocked(apiClient.post).mockResolvedValue({ data: {} })
+
+		const user = userEvent.setup()
+		const message = "How far, Raymond?"
+		const you = teammateFactory.build({
+			id: 7,
+			firstName: "Tochukwu",
+			lastName: "Gbubemi",
+			username: "odumodublvck",
+		})
+		const raymond = teammateFactory.build({
+			id: 1,
+			firstName: "Raymond",
+			lastName: "Omon",
+			username: "raymond.omon",
+		})
+
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			you,
+			[raymond],
+			[{ id: 1, authorId: you.id, participantIds: [raymond.id] }],
+		)
+
+		await screen.findByText(/direct messages/i)
+		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+
+		const composer = screen.getByRole("textbox", { name: /message-composer/i })
+		await user.type(composer, message)
+		await user.click(screen.getByRole("button", { name: /send-message/i }))
+
+		expect(await screen.findByText(message)).toBeInTheDocument()
+
+		await waitFor(() => {
+			expect(apiClient.post).toHaveBeenCalledWith(
+				ApiPaths.SEND_REPLY,
+				expect.objectContaining({
+					workspaceCode: envoyeWorkspace.code,
+					conversationId: 1,
+					message: [message],
+					sentAt: expect.any(String),
+				}),
+			)
+		})
 	})
 })
