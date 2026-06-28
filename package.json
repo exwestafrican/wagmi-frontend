@@ -10,7 +10,8 @@
     "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "clean": "rm -rf node_modules pnpm-lock.yaml"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
