@@ -14,7 +14,10 @@ import {
 	type ChatBodyRef,
 } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
-import { ConversationIntro } from "@/features/conversation/components/conversation-intro.tsx"
+import {
+	ConversationIntro,
+	ConversationIntroSkeleton,
+} from "@/features/conversation/components/conversation-intro.tsx"
 import RecipientPicker from "@/features/conversation/components/recipient-picker.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import ConversationParticipant from "@/features/conversation/components/conversation-participant.tsx"
@@ -192,11 +195,29 @@ export function NewConversationPage() {
 			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
 				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
-					{introTeammate && (
+					{isNewConversation && selectedTeammate && (
 						<ConversationIntro
-							teammate={introTeammate}
-							isWithSelf={introTeammate.id === currentTeammateId}
+							teammate={selectedTeammate}
+							isWithSelf={selectedTeammate.id === currentTeammateId}
 						/>
+					)}
+
+					{/*if is new and teammate was selected we either want to display intro or not*/}
+					{isNewConversation && selectedTeammate && (
+						<ConversationIntro
+							teammate={selectedTeammate}
+							isWithSelf={selectedTeammate.id === currentTeammateId}
+						/>
+					)}
+
+					{/*if is existing, we want to display intro or load it*/}
+					{!isNewConversation && counterparty ? (
+						<ConversationIntro
+							teammate={counterparty}
+							isWithSelf={counterparty.id === currentTeammateId}
+						/>
+					) : (
+						<ConversationIntroSkeleton />
 					)}
 
 					{messageContents.length > 0 && (

@@ -1,6 +1,7 @@
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils.ts"
+import { Skeleton } from "@/components/ui/skeleton.tsx"
 
 const fallbackAvatarVariants = cva(
 	"rounded-md  text-base font-semibold flex items-center justify-center w-fit ",
@@ -37,4 +38,11 @@ export default function FallbackAvatar({
 			{teammate.firstName.charAt(0).toUpperCase()}
 		</div>
 	)
+}
+
+export function FallbackAvatarSkeleton({
+	size = "m",
+	variant = "outline",
+}: VariantProps<typeof fallbackAvatarVariants>) {
+	return <Skeleton className={cn(fallbackAvatarVariants({ size, variant }))} />
 }
