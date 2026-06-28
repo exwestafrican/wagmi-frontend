@@ -236,7 +236,11 @@ export function NewConversationPage() {
 									newMessage,
 								)
 							} else {
-								setNewMessageContents((previous) => [...previous, newMessage])
+								addChatHistoryToQueryCache(queryClient, code, conversationId, [
+									...messageContents,
+									{ ...newMessage, sent: true },
+								])
+								//TODO: on success invalidate messages cache
 								reply({
 									workspaceCode: code,
 									conversationId,
