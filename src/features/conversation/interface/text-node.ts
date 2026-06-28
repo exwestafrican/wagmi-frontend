@@ -19,9 +19,9 @@ export type MessageContent = {
 	createdAt: number
 }
 
-export function makeDefaultTextNode(text: string, type = "p" as NodeType) {
+export function makeDefaultTextNode(id: string, text: string, type = "p" as NodeType) {
 	return {
-		id: crypto.randomUUID(),
+		id: id,
 		node: type,
 		content: text.split(SPACE),
 		styles: {

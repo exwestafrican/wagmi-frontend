@@ -14,16 +14,17 @@ function ChatHeader({ children }: { children: ReactNode }) {
 }
 
 export type ChatBodyRef = {
-	scrollIntoView: (options: ScrollIntoViewOptions) => void
+	scrollIntoView: (options?: ScrollIntoViewOptions) => void
 }
 
 type ChatBodyProps = {
 	children: ReactNode
 	scrollKey: number
+	sendScrollToken: number
 }
 
 const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
-	{ children, scrollKey }: ChatBodyProps,
+	{ children, scrollKey, sendScrollToken }: ChatBodyProps,
 	ref: ForwardedRef<ChatBodyRef>,
 ) {
 	const viewportRef = useRef<HTMLDivElement | null>(null)
@@ -40,17 +41,22 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 	}, [])
 
 	useImperativeHandle(ref, () => ({
-		scrollIntoView(options: ScrollIntoViewOptions) {
-			bottomRef.current?.scrollIntoView(options)
+		scrollIntoView(options: ScrollIntoViewOptions = {}) {
+			bottomRef.current?.scrollIntoView({
+				block: "end",
+				behavior: "auto",
+				...options,
+			})
 		},
 	}))
 
 	useLayoutEffect(() => {
+		if (sendScrollToken === 0) return
+		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
+	}, [sendScrollToken])
+
+	useLayoutEffect(() => {
 		if (scrollKey === 0) return
-		// Only auto-scroll when user is already near bottom.
-		// Sending a message force-scrolls via the imperative call in onSend.
-		// Tumise: if a new message came in, this might trigger <=======
-		// if this annoys user, take it out.
 		if (!wasNearBottomRef.current) return
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
@@ -117,8 +123,8 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 			>
 				<div className="min-h-full flex flex-col justify-end gap-3 pb-3">
 					{children}
-					<div ref={bottomRef} aria-hidden className="h-px shrink-0" />
 				</div>
+				<div ref={bottomRef} aria-hidden className="h-px shrink-0" />
 			</div>
 		</div>
 	)

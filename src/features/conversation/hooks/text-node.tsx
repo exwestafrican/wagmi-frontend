@@ -20,7 +20,7 @@ export default function useTextNodeParser(type = "p" as NodeType) {
 	}
 
 	function makeTextNode(text: string) {
-		return makeDefaultTextNode(text, type)
+		return makeDefaultTextNode(crypto.randomUUID(), text, type)
 	}
 
 	function build(): TextNode[] {

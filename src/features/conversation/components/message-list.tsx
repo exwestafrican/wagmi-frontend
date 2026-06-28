@@ -16,7 +16,7 @@ export function MessageList({
 		<div className="flex flex-col gap-3">
 			{messages.map((content) => (
 				<TextPart
-					key={content.nodes.map((n) => n.id).join("-")}
+					key={content.id}
 					author={registry.find(content.authorId) ?? buildUnknownTeammate()}
 					nodes={content.nodes}
 				/>

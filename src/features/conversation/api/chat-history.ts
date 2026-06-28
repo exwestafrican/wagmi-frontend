@@ -23,7 +23,7 @@ export function addChatHistoryToQueryCache(
 ) {
 	queryClient.setQueryData<MessageContent[]>(
 		chatHistoryQueryKey(workspaceCode, conversationId),
-		messages,
+		dedupeMessageContents(messages),
 	)
 }
 
@@ -36,11 +36,44 @@ export type ChatHistoryApiResponse = {
 	type: string
 }
 
+function messageFingerprint(message: MessageContent): string {
+	return `${message.authorId}:${message.createdAt}`
+}
+
+function isServerMessageId(id: string): boolean {
+	return /^\d+$/.test(id)
+}
+
+/** Collapses optimistic (client) and server copies of the same message. */
+export function dedupeMessageContents(
+	messages: MessageContent[],
+): MessageContent[] {
+	const byFingerprint = new Map<string, MessageContent>()
+
+	for (const message of messages) {
+		const fingerprint = messageFingerprint(message)
+		const existing = byFingerprint.get(fingerprint)
+
+		if (
+			!existing ||
+			(isServerMessageId(message.id) && !isServerMessageId(existing.id))
+		) {
+			byFingerprint.set(fingerprint, message)
+		}
+	}
+
+	return [...byFingerprint.values()].sort(
+		(a, b) => a.createdAt - b.createdAt,
+	)
+}
+
 function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
 	return {
-		id: crypto.randomUUID(),
+		id: chatHistory.id.toString(),
 		authorId: chatHistory.authorId,
-		nodes: chatHistory.content.map((c) => makeDefaultTextNode(c)),
+		nodes: chatHistory.content.map((c, index) =>
+			makeDefaultTextNode(`${chatHistory.id}-${index}`, c),
+		),
 		sent: true,
 		createdAt: chatHistory.sentAt,
 	}

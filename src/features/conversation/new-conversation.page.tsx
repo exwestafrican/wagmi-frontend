@@ -29,6 +29,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import useChatHistory, {
 	addChatHistoryToQueryCache,
+	dedupeMessageContents,
 } from "@/features/conversation/api/chat-history.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 
@@ -47,6 +48,7 @@ export function NewConversationPage() {
 	const [selectedTeammate, setSelectedTeammate] = useState<
 		Teammate | undefined
 	>(undefined)
+	const [sendScrollToken, setSendScrollToken] = useState(0)
 
 	const { setOpenMobile } = useSidebar()
 	const { mutate: sendNewMessage, isPending: isSendingNewMessage } =
@@ -94,12 +96,12 @@ export function NewConversationPage() {
 
 	const introTeammate = isNewConversation ? selectedTeammate : counterparty
 
-	const messageContents = [
+	const messageContents = dedupeMessageContents([
 		...(chatHistory ?? []),
 		...newMessageContents.filter(
 			(pending) => !chatHistory?.some((saved) => saved.id === pending.id),
 		),
-	]
+	])
 
 	function openNewConversationOrNavigateToExistingConversation(
 		sender: Teammate,
@@ -189,7 +191,11 @@ export function NewConversationPage() {
 				</Chat.Header>
 			)}
 
-			<Chat.Body ref={chatBodyRef} scrollKey={newMessageContents.length}>
+			<Chat.Body
+				ref={chatBodyRef}
+				scrollKey={messageContents.length}
+				sendScrollToken={sendScrollToken}
+			>
 				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
 					{introTeammate && (
@@ -235,7 +241,7 @@ export function NewConversationPage() {
 									[selectedTeammate],
 									newMessage,
 								)
-							} else {
+							} else if (!isNewConversation) {
 								addChatHistoryToQueryCache(queryClient, code, conversationId, [
 									...messageContents,
 									{ ...newMessage, sent: true },
@@ -248,15 +254,8 @@ export function NewConversationPage() {
 									sentAt: newMessage.createdAt,
 								})
 							}
+							setSendScrollToken((token) => token + 1)
 						}
-						requestAnimationFrame(() => {
-							requestAnimationFrame(() => {
-								chatBodyRef.current?.scrollIntoView({
-									block: "end",
-									behavior: "auto",
-								})
-							})
-						})
 					}}
 				/>
 			</Chat.Composer>
