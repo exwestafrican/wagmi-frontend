@@ -36,7 +36,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		const height = clientHeight ?? viewport.clientHeight
 		const distanceFromBottom =
 			viewport.scrollHeight - (viewport.scrollTop + height)
-		return distanceFromBottom <= 60
+		return distanceFromBottom <= 120
 	}, [])
 
 	useImperativeHandle(ref, () => ({
@@ -51,7 +51,6 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		// Sending a message force-scrolls via the imperative call in onSend.
 		// Tumise: if a new message came in, this might trigger <=======
 		// if this annoys user, take it out.
-		if (!wasNearBottomRef.current) return
 		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
 

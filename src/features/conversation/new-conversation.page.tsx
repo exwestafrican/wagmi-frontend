@@ -189,7 +189,7 @@ export function NewConversationPage() {
 				</Chat.Header>
 			)}
 
-			<Chat.Body ref={chatBodyRef} scrollKey={newMessageContents.length}>
+			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
 				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
 					{introTeammate && (
