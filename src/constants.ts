@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-	import.meta.env.VITE_API_URL || "http://localhost:3001"
+	import.meta.env.VITE_API_URL || "http://localhost"
 
 export const ApiPaths = {
 	MAGIC_LINK_REQUEST: "/auth/magic-link/request",
