@@ -240,6 +240,7 @@ export function NewConversationPage() {
                                     ...messageContents,
                                     { ...newMessage, sent: true },
                                 ])
+                                //TODO: on success invalidate messages cache
 								reply({
 									workspaceCode: code,
 									conversationId,
