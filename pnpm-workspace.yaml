@@ -1,4 +1,5 @@
 allowBuilds:
   '@biomejs/biome': false
   '@tailwindcss/oxide': false
+  're2@1.25.0': true
   esbuild:  false
