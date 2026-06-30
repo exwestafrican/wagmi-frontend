@@ -38,8 +38,8 @@ export default function toJSX(node: TextNode) {
 			)
 		}
 		//the space here is important
-        // biome-ignore lint/suspicious/noArrayIndexKey: static word tokens, never reordered
-        return <Fragment key={`${start}-${end}-${index}`}>{c} </Fragment>
+		// biome-ignore lint/suspicious/noArrayIndexKey: static word tokens, never reordered
+		return <Fragment key={`${start}-${end}-${index}`}>{c} </Fragment>
 	})
 
 	return <p className="text-sm font-normal tracking-tight">{annotatedText}</p>
