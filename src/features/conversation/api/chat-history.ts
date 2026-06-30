@@ -75,5 +75,6 @@ export default function useChatHistory(
 		queryFn: async () =>
 			fetchChatHistory(workspaceCode, conversationId, lastMessageSentAt),
 		enabled: Boolean(workspaceCode) && Boolean(conversationId),
+		staleTime: Number.POSITIVE_INFINITY,
 	})
 }
