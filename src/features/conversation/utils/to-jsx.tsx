@@ -35,7 +35,7 @@ export default function toJSX(node: TextNode) {
 				</a>
 			)
 		} else {
-            //the space here is important
+			//the space here is important
 			return <>{c} </>
 		}
 	})
