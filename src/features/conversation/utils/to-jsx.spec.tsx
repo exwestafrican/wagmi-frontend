@@ -23,11 +23,11 @@ describe("toJsx", () => {
 
 	it("adds anchor tags where url is present ", () => {
 		const node = {
-			...baseNode(["https://github.com/exwestafrican/wagmi-frontend/pull/110"]),
+			...baseNode(["https://github.com/exwestafrican/wagmi-frontend/pull/1"]),
 			annotations: [
 				makeLinkAnnotation(
 					[0, 0],
-					"https://github.com/exwestafrican/wagmi-frontend/pull/110",
+					"https://github.com/exwestafrican/wagmi-frontend/pull/1",
 				),
 			],
 		}
@@ -35,7 +35,7 @@ describe("toJsx", () => {
 		render(toJSX(node))
 		expect(screen.getByRole("link")).toHaveAttribute(
 			"href",
-			"https://github.com/exwestafrican/wagmi-frontend/pull/110",
+			"https://github.com/exwestafrican/wagmi-frontend/pull/1",
 		)
 	})
 
