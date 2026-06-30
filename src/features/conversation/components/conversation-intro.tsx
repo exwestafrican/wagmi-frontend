@@ -1,7 +1,10 @@
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
-import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
+import FallbackAvatar, {
+	FallbackAvatarSkeleton,
+} from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import { Badge } from "@/components/ui/badge.tsx"
+import { Skeleton } from "@/components/ui/skeleton.tsx"
 
 export function ConversationIntro({
 	teammate,
@@ -37,6 +40,19 @@ export function ConversationIntro({
 					</p>
 				)}
 			</div>
+		</div>
+	)
+}
+
+export function ConversationIntroSkeleton() {
+	return (
+		<div className="flex flex-col gap-2">
+			<FallbackAvatarSkeleton />
+			<div className="flex flex-col gap-1">
+				<Skeleton className={"h-4 w-[100px]"} />
+				<Skeleton className={"h-3 w-[100px]"} />
+			</div>
+			<Skeleton className={"h-4 w-[450px]"} />
 		</div>
 	)
 }

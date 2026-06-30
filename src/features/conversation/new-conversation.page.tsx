@@ -14,7 +14,10 @@ import {
 	type ChatBodyRef,
 } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
-import { ConversationIntro } from "@/features/conversation/components/conversation-intro.tsx"
+import {
+	ConversationIntro,
+	ConversationIntroSkeleton,
+} from "@/features/conversation/components/conversation-intro.tsx"
 import RecipientPicker from "@/features/conversation/components/recipient-picker.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import ConversationParticipant from "@/features/conversation/components/conversation-participant.tsx"
@@ -192,11 +195,13 @@ export function NewConversationPage() {
 			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
 				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
-					{introTeammate && (
+					{introTeammate ? (
 						<ConversationIntro
 							teammate={introTeammate}
 							isWithSelf={introTeammate.id === currentTeammateId}
 						/>
+					) : (
+						<ConversationIntroSkeleton />
 					)}
 
 					{messageContents.length > 0 && (
