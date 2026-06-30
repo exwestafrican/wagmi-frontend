@@ -2,7 +2,8 @@ import type { Teammate } from "@/features/workspace/interface/teammate.interface
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import type { TextNode } from "@/features/conversation/interface/text-node.ts"
-import { SPACE } from "@/features/conversation/hooks/text-node.tsx"
+import toJSX from "@/features/conversation/utils/to-jsx.tsx"
+import { Fragment } from "react"
 
 export default function TextPart({
 	author,
@@ -20,11 +21,11 @@ export default function TextPart({
 					</span>
 				</div>
 
-				{nodes.map((node) => (
-					<p key={node.id} className="text-sm font-normal tracking-tight">
-						{node.content.join(SPACE)}
-					</p>
-				))}
+				<div className="flex flex-col gap-2">
+					{nodes.map((node) => (
+						<Fragment key={node.id}>{toJSX(node)}</Fragment>
+					))}
+				</div>
 			</div>
 		</div>
 	)

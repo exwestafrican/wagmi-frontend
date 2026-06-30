@@ -25,6 +25,7 @@ beforeEach(() => {
 	localStorage.clear()
 	window.location.hash = ""
 	window.HTMLElement.prototype.scrollIntoView = vi.fn()
+	window.scrollTo = vi.fn()
 })
 
 afterEach(() => {

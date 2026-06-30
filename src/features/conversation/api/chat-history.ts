@@ -2,7 +2,7 @@ import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 import { type QueryClient, useQuery } from "@tanstack/react-query"
 import {
-	makeDefaultTextNode,
+	makeTextNode,
 	type MessageContent,
 } from "@/features/conversation/interface/text-node.ts"
 
@@ -40,7 +40,7 @@ function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
 	return {
 		id: crypto.randomUUID(),
 		authorId: chatHistory.authorId,
-		nodes: chatHistory.content.map((c) => makeDefaultTextNode(c)),
+		nodes: chatHistory.content.map((c) => makeTextNode(c)),
 		sent: true,
 		createdAt: chatHistory.sentAt,
 	}
