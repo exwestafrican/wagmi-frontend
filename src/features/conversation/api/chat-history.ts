@@ -75,5 +75,10 @@ export default function useChatHistory(
 		queryFn: async () =>
 			fetchChatHistory(workspaceCode, conversationId, lastMessageSentAt),
 		enabled: Boolean(workspaceCode) && Boolean(conversationId),
+		//:-) we did this because when user navigates around the between conversation
+		// we lost old loaded paginated pages, because we do a clean refresh
+		// plus the page scrolls to top.
+		// if you change this click around in the ui to be sure things are fine.
+		staleTime: Number.POSITIVE_INFINITY,
 	})
 }

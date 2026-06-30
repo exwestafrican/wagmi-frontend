@@ -34,6 +34,7 @@ import useChatHistory, {
 	addChatHistoryToQueryCache,
 } from "@/features/conversation/api/chat-history.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
+import { Spinner } from "@/components/ui/spinner.tsx"
 
 export function NewConversationPage() {
 	const { code, conversationId } = useSearch({
@@ -59,7 +60,7 @@ export function NewConversationPage() {
 		undefined,
 	)
 
-	const { data: chatHistory } = useChatHistory(
+	const { data: chatHistory, isLoading: isLoadingChatHistory } = useChatHistory(
 		code,
 		conversationId,
 		mostRecentChatHistory?.createdAt,
@@ -204,11 +205,17 @@ export function NewConversationPage() {
 						<ConversationIntroSkeleton />
 					)}
 
-					{messageContents.length > 0 && (
-						<>
-							<Separator />
-							<MessageList workspaceCode={code} messages={messageContents} />
-						</>
+					{isLoadingChatHistory ? (
+						<div className="w-full justify-center flex">
+							<Spinner className="size-8" />
+						</div>
+					) : (
+						messageContents.length > 0 && (
+							<>
+								<Separator />
+								<MessageList workspaceCode={code} messages={messageContents} />
+							</>
+						)
 					)}
 				</div>
 			</Chat.Body>
