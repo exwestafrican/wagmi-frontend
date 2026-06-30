@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from "vitest"
+import { describe, expect, it, beforeEach, vi } from "vitest"
 import { screen } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { workspaceFactory } from "@/test/factory/workspace.ts"
@@ -7,6 +7,7 @@ import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 import { fullName } from "@/features/directory/utils/teammate.ts"
 import { TEST_DESKTOP_KEYS } from "@/constants.ts"
+import { apiClient } from "@/lib/api-client.ts"
 
 describe("Create A new Direct Message", () => {
 	let user: UserEvent
@@ -289,6 +290,11 @@ describe("Create A new Direct Message", () => {
 	}
 
 	describe("send new message with no previous chat history", () => {
+		const mockApiClientPost = vi.mocked(apiClient.post)
+
+		beforeEach(async () => {
+			mockApiClientPost.mockRejectedValueOnce({ data: { id: 100 } })
+		})
 		async function startNewDm(message: string) {
 			const admin = teammateFactory.build()
 			const mavo = teammateFactory.build({
