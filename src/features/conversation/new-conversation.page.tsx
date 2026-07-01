@@ -211,7 +211,7 @@ export function NewConversationPage() {
 						</div>
 					) : (
 						messageContents.length > 0 && (
-							<div className="animate-in fade-in duration-300">
+							<div className="animate-in fade-in duration-300 space-y-6">
 								<Separator />
 								<MessageList workspaceCode={code} messages={messageContents} />
 							</div>

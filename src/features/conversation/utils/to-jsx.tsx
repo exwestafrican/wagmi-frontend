@@ -31,7 +31,7 @@ export default function toJSX(node: TextNode) {
 					href={annotation.value}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-xs font-normal tracking-tight text-blue-600 underline hover:text-blue-800 cursor-pointer"
+					className="font-normal tracking-tight text-blue-600 underline hover:text-blue-800 cursor-pointer"
 				>
 					{c}
 				</a>
