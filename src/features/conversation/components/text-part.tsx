@@ -21,7 +21,7 @@ export default function TextPart({
 					</span>
 				</div>
 
-				<div className="flex flex-col gap-2">
+				<div className="flex flex-col gap-2 instrument-sans-font">
 					{nodes.map((node) => (
 						<Fragment key={node.id}>{toJSX(node)}</Fragment>
 					))}

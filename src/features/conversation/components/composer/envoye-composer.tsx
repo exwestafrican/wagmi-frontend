@@ -109,7 +109,7 @@ const EnvoyeComposer = forwardRef<EnvoyeComposerRef, EnvoyeComposerProps>(
 					<Button
 						aria-label="send-message"
 						size="icon-sm"
-						className="rounded-full bg-[#c15f3c] text-white hover:bg-[#c15f3c]/90"
+						className="rounded-sm "
 						disabled={disableSendBtn}
 						onClick={(e) => {
 							e.preventDefault()

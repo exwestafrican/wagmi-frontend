@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Monomakh&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -145,10 +146,14 @@ code {
 	@apply focus-visible:border-0 focus-visible:ring-[3px] focus-visible:ring-[#3B82F6]/35;
 }
 
+/*Add fonts*/
 .archivo-narrow-font {
 	font-family: "Archivo Narrow", sans-serif;
 }
 
+.instrument-sans-font {
+    font-family: "Instrument Sans", sans-serif;
+}
 @layer utilities {
 	.sidebar-group-layout {
 		@apply font-semibold uppercase tracking-wide;
