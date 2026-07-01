@@ -11,14 +11,14 @@ export function MessageList({
 	messages: MessageContent[]
 }) {
 	const registry = useTeammateInfoRegistry(workspaceCode)
-	//TODO add loading state
 	return (
 		<div className="flex flex-col gap-3">
-			{messages.map((content) => (
+			{messages.map((message) => (
 				<TextPart
-					key={content.nodes.map((n) => n.id).join("-")}
-					author={registry.find(content.authorId) ?? buildUnknownTeammate()}
-					nodes={content.nodes}
+					key={message.nodes.map((n) => n.id).join("-")}
+					author={registry.find(message.authorId) ?? buildUnknownTeammate()}
+					nodes={message.nodes}
+					state={message.state}
 				/>
 			))}
 		</div>

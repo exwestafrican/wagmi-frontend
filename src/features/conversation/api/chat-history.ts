@@ -4,6 +4,7 @@ import { type QueryClient, useQuery } from "@tanstack/react-query"
 import {
 	makeTextNode,
 	type MessageContent,
+	MessageState,
 } from "@/features/conversation/interface/text-node.ts"
 
 export const CONVERSATION_CHAT_HISTORY = "conversation_chat_history"
@@ -19,12 +20,35 @@ export function addChatHistoryToQueryCache(
 	queryClient: QueryClient,
 	workspaceCode: string,
 	conversationId: number,
-	messages: MessageContent[],
+	newMessage: MessageContent,
 ) {
 	queryClient.setQueryData<MessageContent[]>(
 		chatHistoryQueryKey(workspaceCode, conversationId),
-		messages,
+		(previous) => {
+			return [...(previous ?? []), newMessage]
+		},
 	)
+}
+
+export async function updateChatHistoryStateInStore(
+	queryClient: QueryClient,
+	code: string,
+	conversationId: number,
+	messageId: string,
+	state: MessageState,
+) {
+	const queryKey = chatHistoryQueryKey(code, conversationId)
+	await queryClient.cancelQueries({ queryKey })
+	const cachedMessaged = queryClient.getQueryData<MessageContent[]>(queryKey)
+
+	const messages = (cachedMessaged ?? []).map((msg) => {
+		if (msg.id === messageId) {
+			return { ...msg, state: state }
+		}
+
+		return msg
+	})
+	queryClient.setQueryData<MessageContent[]>(queryKey, messages)
 }
 
 export type ChatHistoryApiResponse = {
@@ -41,7 +65,7 @@ function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
 		id: crypto.randomUUID(),
 		authorId: chatHistory.authorId,
 		nodes: chatHistory.content.map((c) => makeTextNode(c)),
-		sent: true,
+		state: MessageState.SENT,
 		createdAt: chatHistory.sentAt,
 	}
 }
