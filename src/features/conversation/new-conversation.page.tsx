@@ -7,7 +7,10 @@ import { useSidebar } from "@/components/ui/sidebar.tsx"
 import EnvoyeComposer, {
 	type EnvoyeComposerRef,
 } from "@/features/conversation/components/composer/envoye-composer.tsx"
-import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
+import {
+	type MessageContent,
+	MessageState,
+} from "@/features/conversation/interface/text-node.ts"
 import { useCurrentWorkspaceTeammate } from "@/features/workspace/api/current-teammate.ts"
 import {
 	Chat,
@@ -32,6 +35,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import useChatHistory, {
 	addChatHistoryToQueryCache,
+	updateChatHistoryStateInStore,
 } from "@/features/conversation/api/chat-history.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
@@ -144,9 +148,10 @@ export function NewConversationPage() {
 							authorId: sender.id,
 							counterParties: [recipients[0].id],
 						})
-						addChatHistoryToQueryCache(queryClient, code, data.id, [
-							{ ...message, sent: true },
-						])
+						addChatHistoryToQueryCache(queryClient, code, data.id, {
+							...message,
+							state: MessageState.SENT,
+						})
 						navigate({
 							from: "/workspace/conversation",
 							search: { code: code, conversationId: data.id },
@@ -237,7 +242,7 @@ export function NewConversationPage() {
 								id: crypto.randomUUID(),
 								authorId: currentTeammate.id,
 								nodes: nodes,
-								sent: false,
+								state: MessageState.SENDING,
 								createdAt: Date.now(),
 							}
 
@@ -248,17 +253,34 @@ export function NewConversationPage() {
 									newMessage,
 								)
 							} else {
-								addChatHistoryToQueryCache(queryClient, code, conversationId, [
-									...messageContents,
-									{ ...newMessage, sent: true },
-								])
-								//TODO: on success invalidate messages cache
-								reply({
-									workspaceCode: code,
+								addChatHistoryToQueryCache(
+									queryClient,
+									code,
 									conversationId,
-									message: newMessage.nodes.flatMap((n) => n.content.join(" ")),
-									sentAt: newMessage.createdAt,
-								})
+									newMessage,
+								)
+								reply(
+									{
+										workspaceCode: code,
+										conversationId,
+										message: newMessage.nodes.flatMap((n) =>
+											n.content.join(" "),
+										),
+										sentAt: newMessage.createdAt,
+									},
+									{
+										onSuccess: async () => {
+											await updateChatHistoryStateInStore(
+												queryClient,
+												code,
+												conversationId,
+												newMessage.id,
+												MessageState.SENT,
+											)
+											//TODO: on success invalidate messages cache -> maybe polling is enough here
+										},
+									},
+								)
 							}
 						}
 						requestAnimationFrame(() => {

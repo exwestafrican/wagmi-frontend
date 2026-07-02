@@ -20,11 +20,17 @@ export type TextNode = {
 	annotations: Annotations[]
 }
 
+export enum MessageState {
+	SENDING = "sending",
+	SENT = "sent",
+	FAILED = "failed",
+}
+
 export type MessageContent = {
 	id: string
 	authorId: number
 	nodes: TextNode[]
-	sent: boolean
+	state: MessageState
 	createdAt: number
 }
 
