@@ -295,14 +295,6 @@ export function NewConversationPage() {
 								)
 							}
 						}
-						requestAnimationFrame(() => {
-							requestAnimationFrame(() => {
-								chatBodyRef.current?.scrollIntoView({
-									block: "end",
-									behavior: "auto",
-								})
-							})
-						})
 					}}
 				/>
 			</Chat.Composer>
