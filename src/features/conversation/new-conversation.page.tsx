@@ -218,7 +218,11 @@ export function NewConversationPage() {
 						messageContents.length > 0 && (
 							<div className="animate-in fade-in duration-300 space-y-6">
 								<Separator />
-								<MessageList workspaceCode={code} messages={messageContents} />
+								<MessageList
+									workspaceCode={code}
+									messages={messageContents}
+									conversationId={conversationId}
+								/>
 							</div>
 						)
 					)}
@@ -263,9 +267,7 @@ export function NewConversationPage() {
 									{
 										workspaceCode: code,
 										conversationId,
-										message: newMessage.nodes.flatMap((n) =>
-											n.content.join(" "),
-										),
+										message: newMessage,
 										sentAt: newMessage.createdAt,
 									},
 									{
@@ -278,6 +280,16 @@ export function NewConversationPage() {
 												MessageState.SENT,
 											)
 											//TODO: on success invalidate messages cache -> maybe polling is enough here
+										},
+
+										onError: () => {
+											updateChatHistoryStateInStore(
+												queryClient,
+												code,
+												conversationId,
+												newMessage.id,
+												MessageState.FAILED,
+											)
 										},
 									},
 								)
