@@ -63,7 +63,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 			if (delta < 10) return // ignore tiny layout jitter
 			if (!wasNearBottomRef.current) return // don't yank user who scrolled up
 			requestAnimationFrame(() => {
-				bottomRef.current?.scrollIntoView({ block: "end", behavior: "smooth" })
+				bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 				wasNearBottomRef.current = isNearBottom()
 			})
 		})
@@ -77,7 +77,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		// Sending a message force-scrolls via the imperative call in onSend.
 		// Tumise: if a new message came in, this might trigger <=======
 		// if this annoys user, take it out.
-		bottomRef.current?.scrollIntoView({ block: "end", behavior: "smooth" })
+		bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
 	}, [scrollKey])
 
 	useLayoutEffect(() => {
