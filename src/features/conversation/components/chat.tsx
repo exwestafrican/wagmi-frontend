@@ -29,6 +29,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 	const viewportRef = useRef<HTMLDivElement | null>(null)
 	const bottomRef = useRef<HTMLDivElement | null>(null)
 	const wasNearBottomRef = useRef(false)
+	const contentRef = useRef<HTMLDivElement | null>(null) // this checks if the content size has changed and scrolls to bottom useful for when state changes and ui reflect e.g message failed.
 
 	const isNearBottom = useCallback((clientHeight?: number) => {
 		const viewport = viewportRef.current
@@ -44,6 +45,31 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 			bottomRef.current?.scrollIntoView(options)
 		},
 	}))
+
+	// NEW: pin to bottom when content grows (failed UI, retry state, etc.)
+	useLayoutEffect(() => {
+		// This is AI generated code. But we need it because when message fails to send
+		// we display a Failed to send message state. Without this, we don't scroll to the very buttom
+		// so user won't see the failed message.
+		const content = contentRef.current
+		if (!content) return
+		let lastHeight = content.offsetHeight
+		const observer = new ResizeObserver(() => {
+			const el = contentRef.current
+			if (!el) return
+			const nextHeight = el.offsetHeight
+			const delta = nextHeight - lastHeight
+			lastHeight = nextHeight
+			if (delta < 10) return // ignore tiny layout jitter
+			if (!wasNearBottomRef.current) return // don't yank user who scrolled up
+			requestAnimationFrame(() => {
+				bottomRef.current?.scrollIntoView({ block: "end", behavior: "auto" })
+				wasNearBottomRef.current = isNearBottom()
+			})
+		})
+		observer.observe(content)
+		return () => observer.disconnect()
+	}, [isNearBottom])
 
 	useLayoutEffect(() => {
 		if (scrollKey === 0) return
@@ -114,7 +140,10 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 					wasNearBottomRef.current = isNearBottom()
 				}}
 			>
-				<div className="min-h-full flex flex-col justify-end gap-3 pb-3">
+				<div
+					ref={contentRef}
+					className="min-h-full flex flex-col justify-end gap-3 pb-3"
+				>
 					{children}
 					<div ref={bottomRef} aria-hidden className="h-px shrink-0" />
 				</div>
