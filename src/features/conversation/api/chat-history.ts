@@ -2,10 +2,10 @@ import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 import { type QueryClient, useQuery } from "@tanstack/react-query"
 import {
-	makeTextNode,
 	type MessageContent,
 	MessageState,
 } from "@/features/conversation/interface/text-node.ts"
+import { toMessageContent } from "@/features/conversation/utils/to-message-content.ts"
 
 export const CONVERSATION_CHAT_HISTORY = "conversation_chat_history"
 
@@ -72,6 +72,8 @@ export function mergeChatHistory(
 		byId.set(message.id, message)
 	}
 
+	console.log("order", order)
+
 	return order.map((id) => byId.get(id)).filter((c) => c !== undefined)
 }
 
@@ -82,17 +84,6 @@ export type ChatHistoryApiResponse = {
 	content: string[]
 	url?: string | undefined
 	type: string
-}
-
-function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
-	// if collision occurs with id, ad author id and possibly state to. to form composite key
-	return {
-		id: chatHistory.sentAt + chatHistory.authorId,
-		authorId: chatHistory.authorId,
-		nodes: chatHistory.content.map((c) => makeTextNode(c)),
-		state: MessageState.SENT,
-		createdAt: chatHistory.sentAt,
-	}
 }
 
 export async function fetchChatHistory(

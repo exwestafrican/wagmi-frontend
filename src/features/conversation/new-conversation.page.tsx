@@ -68,8 +68,6 @@ export function NewConversationPage() {
 		undefined,
 	)
 
-	useMessagePolling(code, conversationId)
-
 	const { mutate: reply } = useSendReply()
 
 	const currentTeammateId = currentTeammate?.id ?? 0
@@ -86,6 +84,8 @@ export function NewConversationPage() {
 	const counterparty = conversationInfo
 		? counterpartyTeammates(registry, conversationInfo)[0]
 		: undefined
+
+	useMessagePolling(code, conversationId)
 
 	useEffect(() => {
 		setOpenMobile(false)
