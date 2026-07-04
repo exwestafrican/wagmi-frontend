@@ -1,8 +1,8 @@
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 import { type QueryClient, useQuery } from "@tanstack/react-query"
-import {
-	type MessageContent,
+import type {
+	MessageContent,
 	MessageState,
 } from "@/features/conversation/interface/text-node.ts"
 import { toMessageContent } from "@/features/conversation/utils/to-message-content.ts"

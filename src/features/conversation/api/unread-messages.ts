@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
-import { type ChatHistoryApiResponse } from "@/features/conversation/api/chat-history.ts"
+import type { ChatHistoryApiResponse } from "@/features/conversation/api/chat-history.ts"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 import { toMessageContent } from "@/features/conversation/utils/to-message-content.ts"
