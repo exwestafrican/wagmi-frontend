@@ -1,4 +1,5 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost"
+export const API_BASE_URL =
+	import.meta.env.VITE_API_URL || "http://localhost"
 
 export const ApiPaths = {
 	MAGIC_LINK_REQUEST: "/auth/magic-link/request",
@@ -20,7 +21,8 @@ export const ApiPaths = {
 	CONVERSATIONS: "/conversations",
 	SEND_NEW_MESSAGE: "/conversations/direct-message",
 	SEND_REPLY: "/conversations/send-text",
-	CONVERSATION_CHAT_HISTORY: "conversations/chat-history",
+	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
+	UNREAD_MESSAGES: "/conversations/unread-messages",
 } as const
 
 export const AdminApiPaths = {
