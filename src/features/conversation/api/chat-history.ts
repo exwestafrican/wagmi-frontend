@@ -1,11 +1,11 @@
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 import { type QueryClient, useQuery } from "@tanstack/react-query"
-import {
-	makeTextNode,
-	type MessageContent,
+import type {
+	MessageContent,
 	MessageState,
 } from "@/features/conversation/interface/text-node.ts"
+import { toMessageContent } from "@/features/conversation/utils/to-message-content.ts"
 
 export const CONVERSATION_CHAT_HISTORY = "conversation_chat_history"
 
@@ -51,6 +51,30 @@ export async function updateChatHistoryStateInStore(
 	queryClient.setQueryData<MessageContent[]>(queryKey, messages)
 }
 
+export function getLastMessageSentAt(
+	messages: MessageContent[],
+): number | undefined {
+	return messages.at(-1)?.createdAt
+}
+
+export function mergeChatHistory(
+	existing: MessageContent[],
+	incoming: MessageContent[],
+): MessageContent[] {
+	const byId = new Map<number, MessageContent>()
+	const order: number[] = []
+
+	for (const message of [...existing, ...incoming]) {
+		// we always want incoming to be last
+		if (!byId.has(message.id)) {
+			order.push(message.id)
+		}
+		byId.set(message.id, message)
+	}
+
+	return order.map((id) => byId.get(id)).filter((c) => c !== undefined)
+}
+
 export type ChatHistoryApiResponse = {
 	id: number
 	authorId: number
@@ -58,17 +82,6 @@ export type ChatHistoryApiResponse = {
 	content: string[]
 	url?: string | undefined
 	type: string
-}
-
-function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
-	// if collision occurs with id, ad author id and possibly state to. to form composite key
-	return {
-		id: chatHistory.sentAt + chatHistory.authorId,
-		authorId: chatHistory.authorId,
-		nodes: chatHistory.content.map((c) => makeTextNode(c)),
-		state: MessageState.SENT,
-		createdAt: chatHistory.sentAt,
-	}
 }
 
 export async function fetchChatHistory(

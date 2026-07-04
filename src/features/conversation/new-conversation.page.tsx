@@ -37,6 +37,7 @@ import useChatHistory, {
 	addChatHistoryToQueryCache,
 	updateChatHistoryStateInStore,
 } from "@/features/conversation/api/chat-history.ts"
+import { useMessagePolling } from "@/features/conversation/hooks/use-message-polling.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
 
@@ -60,14 +61,11 @@ export function NewConversationPage() {
 	const { mutate: sendNewMessage, isPending: isSendingNewMessage } =
 		useSendNewMessage()
 	const { data: currentTeammate } = useCurrentWorkspaceTeammate(code)
-	const [mostRecentChatHistory] = useState<MessageContent | undefined>(
-		undefined,
-	)
 
 	const { data: chatHistory, isLoading: isLoadingChatHistory } = useChatHistory(
 		code,
 		conversationId,
-		mostRecentChatHistory?.createdAt,
+		undefined,
 	)
 
 	const { mutate: reply } = useSendReply()
@@ -86,6 +84,8 @@ export function NewConversationPage() {
 	const counterparty = conversationInfo
 		? counterpartyTeammates(registry, conversationInfo)[0]
 		: undefined
+
+	useMessagePolling(code, conversationId)
 
 	useEffect(() => {
 		setOpenMobile(false)
