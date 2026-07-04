@@ -72,7 +72,7 @@ export function mergeChatHistory(
 		byId.set(message.id, message)
 	}
 
-	return order.map((id) => byId.get(id)!)
+	return order.map((id) => byId.get(id)).filter((c) => c !== undefined)
 }
 
 export type ChatHistoryApiResponse = {
