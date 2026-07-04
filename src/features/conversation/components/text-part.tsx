@@ -77,7 +77,7 @@ export default function TextPart({
 			)}
 		>
 			<FallbackAvatar teammate={author} size="sm" />
-			<div className="flex flex-col gap-0.5">
+			<div className="flex flex-col gap-0.5 min-w-0 flex-1">
 				<div className="flex flex-row gap-1 items-center">
 					<h1 className="font-semibold text-sm">{fullName(author)}</h1>
 					<span className="text-xs font-normal text-gray-400">
