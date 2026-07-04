@@ -242,12 +242,13 @@ export function NewConversationPage() {
 					}
 					onSend={(nodes) => {
 						if (currentTeammate) {
+                            const createdAt = Date.now()
 							const newMessage: MessageContent = {
-								id: crypto.randomUUID(),
+								id:  createdAt + currentTeammate.id,
 								authorId: currentTeammate.id,
 								nodes: nodes,
 								state: MessageState.SENDING,
-								createdAt: Date.now(),
+								createdAt: createdAt,
 							}
 
 							if (isNewConversation && selectedTeammate) {

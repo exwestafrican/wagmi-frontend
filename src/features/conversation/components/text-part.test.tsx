@@ -12,7 +12,7 @@ describe("Text Component", () => {
 	it("dims when message is sending", async () => {
 		const author = teammateFactory.build()
 		const message = {
-			id: "1",
+			id: 1,
 			authorId: author.id,
 			nodes: [makeTextNode("Hello")],
 			state: MessageState.SENDING,
@@ -35,7 +35,7 @@ describe("Text Component", () => {
 	it("does not dim message is sent", async () => {
 		const author = teammateFactory.build()
 		const message = {
-			id: "1",
+			id: 1,
 			authorId: author.id,
 			nodes: [makeTextNode("Hello")],
 			state: MessageState.SENT,
@@ -56,7 +56,7 @@ describe("Text Component", () => {
 	it("displays indicator when message fails to send", async () => {
 		const author = teammateFactory.build()
 		const message = {
-			id: "1",
+			id: 1,
 			authorId: author.id,
 			nodes: [makeTextNode("Hello")],
 			state: MessageState.FAILED,
