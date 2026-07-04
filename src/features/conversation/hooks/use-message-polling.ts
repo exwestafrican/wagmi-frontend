@@ -24,7 +24,8 @@ export function useMessagePolling(
 		if (!enabled) return
 
 		async function poll() {
-			if (document.hidden) return // if user navigates away, no need to pool
+			if (document.hidden) return // if user navigates away, no need to pool. Maybe it's worth considering we stop polling all together.
+            // let's see how this works in the wild
 
 			try {
 				const queryKey = chatHistoryQueryKey(workspaceCode, conversationId)
