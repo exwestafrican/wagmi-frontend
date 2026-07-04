@@ -14,7 +14,7 @@ export default function toJSX(node: TextNode) {
 
 	if (annotations.length === 0) {
 		return (
-			<p className="text-sm font-normal tracking-tight">
+			<p className="text-sm font-normal tracking-tight break-words">
 				{node.content.join(SPACE)}
 			</p>
 		)
@@ -31,7 +31,7 @@ export default function toJSX(node: TextNode) {
 					href={annotation.value}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="font-normal tracking-tight text-blue-600 underline hover:text-blue-800 cursor-pointer"
+					className="font-normal tracking-tight text-blue-600 underline hover:text-blue-800 cursor-pointer break-words"
 				>
 					{c}
 				</a>
@@ -42,5 +42,9 @@ export default function toJSX(node: TextNode) {
 		return <Fragment key={`${start}-${end}-${index}`}>{c} </Fragment>
 	})
 
-	return <p className="text-sm font-normal tracking-tight">{annotatedText}</p>
+	return (
+		<p className="text-sm font-normal tracking-tight break-words">
+			{annotatedText}
+		</p>
+	)
 }
