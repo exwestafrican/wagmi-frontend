@@ -64,7 +64,8 @@ export function mergeChatHistory(
 	const byId = new Map<number, MessageContent>()
 	const order: number[] = []
 
-	for (const message of [...existing, ...incoming]) { // we always want incoming to be last
+	for (const message of [...existing, ...incoming]) {
+		// we always want incoming to be last
 		if (!byId.has(message.id)) {
 			order.push(message.id)
 		}

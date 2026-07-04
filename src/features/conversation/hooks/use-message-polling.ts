@@ -18,9 +18,7 @@ export function useMessagePolling(
 	const queryClient = useQueryClient()
 	const intervalMs = options?.intervalMs ?? DEFAULT_POLL_INTERVAL_MS
 	const enabled =
-		conversationId > 0 &&
-		Boolean(workspaceCode) &&
-		(options?.enabled ?? true)
+		conversationId > 0 && Boolean(workspaceCode) && (options?.enabled ?? true)
 
 	useEffect(() => {
 		if (!enabled) return
@@ -47,7 +45,7 @@ export function useMessagePolling(
 				)
 			} catch {
 				// transient failures should not stop polling
-                // TODO: maybe alert
+				// TODO: maybe alert
 			}
 		}
 

@@ -3,7 +3,10 @@ import {
 	getLastMessageSentAt,
 	mergeChatHistory,
 } from "@/features/conversation/api/chat-history.ts"
-import { makeTextNode, MessageState } from "@/features/conversation/interface/text-node.ts"
+import {
+	makeTextNode,
+	MessageState,
+} from "@/features/conversation/interface/text-node.ts"
 import {
 	failedMessageContentFactory,
 	messageContentFactory,
@@ -27,7 +30,9 @@ describe("getLastMessageSentAt", () => {
 
 describe("mergeChatHistory", () => {
 	test("appends genuinely new messages", () => {
-		const existing = [messageContentFactory.build({ id: 1007, createdAt: 1_000 })]
+		const existing = [
+			messageContentFactory.build({ id: 1007, createdAt: 1_000 }),
+		]
 		const raymondReply = messageContentFactory.build({
 			id: 2001,
 			authorId: 1,
@@ -95,7 +100,9 @@ describe("mergeChatHistory", () => {
 	})
 
 	test("preserves order when appending incremental server messages", () => {
-		const existing = [messageContentFactory.build({ id: 1007, createdAt: 1_000 })]
+		const existing = [
+			messageContentFactory.build({ id: 1007, createdAt: 1_000 }),
+		]
 		const newFromServer = [
 			messageContentFactory.build({ id: 2001, authorId: 1, createdAt: 2_000 }),
 			messageContentFactory.build({ id: 3001, authorId: 1, createdAt: 3_000 }),
