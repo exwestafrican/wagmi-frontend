@@ -19,13 +19,10 @@ export function useMessagePolling(
 	const enabled =
 		conversationId > 0 && Boolean(workspaceCode) && (options?.enabled ?? true)
 
-	console.log("mounted use message polling")
 	useEffect(() => {
-		console.log("enabled", enabled, workspaceCode)
 		if (!enabled) return
 
 		async function poll() {
-			console.log("attempting to poll")
 			if (document.hidden) return // if user navigates away, no need to pool. Maybe it's worth considering we stop polling all together.
 			// 	// let's see how this works in the wild
 			try {
@@ -35,7 +32,6 @@ export function useMessagePolling(
 					conversationId,
 				)
 
-				console.log("unReadMessages", unReadMessages, unReadMessages.length > 0)
 				if (unReadMessages.length > 0) {
 					queryClient.setQueryData<MessageContent[]>(queryKey, (previous) =>
 						mergeChatHistory(previous ?? [], unReadMessages),

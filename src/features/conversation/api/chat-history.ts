@@ -72,8 +72,6 @@ export function mergeChatHistory(
 		byId.set(message.id, message)
 	}
 
-	console.log("order", order)
-
 	return order.map((id) => byId.get(id)).filter((c) => c !== undefined)
 }
 
