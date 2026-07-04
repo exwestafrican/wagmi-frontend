@@ -242,9 +242,9 @@ export function NewConversationPage() {
 					}
 					onSend={(nodes) => {
 						if (currentTeammate) {
-                            const createdAt = Date.now()
+							const createdAt = Date.now()
 							const newMessage: MessageContent = {
-								id:  createdAt + currentTeammate.id,
+								id: createdAt + currentTeammate.id,
 								authorId: currentTeammate.id,
 								nodes: nodes,
 								state: MessageState.SENDING,

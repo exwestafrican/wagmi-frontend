@@ -61,9 +61,9 @@ export type ChatHistoryApiResponse = {
 }
 
 function toMessageContent(chatHistory: ChatHistoryApiResponse): MessageContent {
-    // if collision occurs with id, ad author id and possibly state to. to form composite key
+	// if collision occurs with id, ad author id and possibly state to. to form composite key
 	return {
-		id: chatHistory.sentAt + chatHistory.authorId ,
+		id: chatHistory.sentAt + chatHistory.authorId,
 		authorId: chatHistory.authorId,
 		nodes: chatHistory.content.map((c) => makeTextNode(c)),
 		state: MessageState.SENT,
