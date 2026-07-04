@@ -51,6 +51,29 @@ export async function updateChatHistoryStateInStore(
 	queryClient.setQueryData<MessageContent[]>(queryKey, messages)
 }
 
+export function getLastMessageSentAt(
+	messages: MessageContent[],
+): number | undefined {
+	return messages.at(-1)?.createdAt
+}
+
+export function mergeChatHistory(
+	existing: MessageContent[],
+	incoming: MessageContent[],
+): MessageContent[] {
+	const byId = new Map<number, MessageContent>()
+	const order: number[] = []
+
+	for (const message of [...existing, ...incoming]) { // we always want incoming to be last
+		if (!byId.has(message.id)) {
+			order.push(message.id)
+		}
+		byId.set(message.id, message)
+	}
+
+	return order.map((id) => byId.get(id)!)
+}
+
 export type ChatHistoryApiResponse = {
 	id: number
 	authorId: number
