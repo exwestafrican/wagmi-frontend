@@ -26,7 +26,6 @@ export function ConversationParticipantInfo({
 	participants,
 	authorId,
 }: { participants: Teammate[]; authorId: number }) {
-	//TODO: isWithSelf
 	const lastParticipantIdx = participants.length - 1
 	const isSingleParticipant = participants.length === 1
 
