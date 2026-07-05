@@ -145,34 +145,34 @@ export default function RecipientPicker({
 						const isSelected = recipientHash.has(teammate.id)
 
 						return (
-						<button
-							type="button"
-							data-testid="teammate-suggestions"
-							key={teammate.id}
-							onClick={() => {
-								if (!isSelected) {
-									select(teammate)
-								}
-							}}
-							className={cn(
-								"text-xs px-3 py-2 text-black flex flex-row flex-1 items-center justify-between gap-2 w-full",
-								isSelected
-									? "opacity-60 cursor-default"
-									: "cursor-pointer hover:bg-chestnut-brown/70",
-							)}
-							aria-label={`suggested teammate=${teammate.id}${isSelected ? ", selected" : ""}`}
-						>
-							<div className="flex items-center gap-2 min-w-0">
-								<FallbackAvatar size="xs" teammate={teammate} />
-								<div className="flex items-center gap-1">
-									<span>{fullName(teammate)}</span> ~
-									<span>{teammate.username}</span>
+							<button
+								type="button"
+								data-testid="teammate-suggestions"
+								key={teammate.id}
+								onClick={() => {
+									if (!isSelected) {
+										select(teammate)
+									}
+								}}
+								className={cn(
+									"text-xs px-3 py-2 text-black flex flex-row flex-1 items-center justify-between gap-2 w-full",
+									isSelected
+										? "opacity-60 cursor-default"
+										: "cursor-pointer hover:bg-chestnut-brown/70",
+								)}
+								aria-label={`suggested teammate=${teammate.id}${isSelected ? ", selected" : ""}`}
+							>
+								<div className="flex items-center gap-2 min-w-0">
+									<FallbackAvatar size="xs" teammate={teammate} />
+									<div className="flex items-center gap-1">
+										<span>{fullName(teammate)}</span> ~
+										<span>{teammate.username}</span>
+										{isSelected && (
+											<Check className="size-3.5 shrink-0 text-violet-700" />
+										)}
+									</div>
 								</div>
-							</div>
-							{isSelected && (
-								<Check className="size-3.5 shrink-0 text-violet-700" />
-							)}
-						</button>
+							</button>
 						)
 					})}
 				</ScrollArea>
