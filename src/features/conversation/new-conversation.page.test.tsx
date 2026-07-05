@@ -146,15 +146,19 @@ describe("Create A new Direct Message", () => {
 		expect(screen.getByTestId("teammate-suggestions")).toBeInTheDocument()
 	})
 
-	it("closes suggestion box and picks user on click enter", async () => {
+	it("user can pick multiple recipients", async () => {
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
 			firstName: "Marvin",
 			lastName: "Ukanigbe",
 			username: "mavo",
 		})
+		const olu = teammateFactory.build({
+			firstName: "olumide",
+			username: "olu",
+		})
 		const otherTeammates = teammateFactory.buildList(20)
-		await openNewDmPage(admin, [mavo, ...otherTeammates])
+		await openNewDmPage(admin, [mavo, olu, ...otherTeammates])
 
 		const input = screen.getByRole("textbox", {
 			name: /recipient-search/i,
@@ -169,7 +173,18 @@ describe("Create A new Direct Message", () => {
 			screen.queryByRole("textbox", {
 				name: /recipient-search/i,
 			}),
-		).not.toBeInTheDocument()
+		).toBeInTheDocument()
+
+		await user.type(input, "olu")
+		await user.keyboard(TEST_DESKTOP_KEYS.ENTER)
+
+		expect(screen.getByLabelText(`badge-${mavo.id}`)).toHaveTextContent(
+			mavo.username,
+		)
+
+		expect(screen.getByLabelText(`badge-${olu.id}`)).toHaveTextContent(
+			olu.username,
+		)
 	})
 
 	it("removes selected teammate when user hits enter", async () => {
@@ -285,7 +300,7 @@ describe("Create A new Direct Message", () => {
 	})
 
 	async function composeMessage(msg: string) {
-		const composer = screen.getByRole("textbox")
+		const composer = screen.getByLabelText("message-composer")
 		await user.type(composer, msg)
 	}
 
