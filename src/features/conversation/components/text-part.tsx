@@ -6,6 +6,7 @@ import {
 	MessageState,
 } from "@/features/conversation/interface/text-node.ts"
 import toJSX from "@/features/conversation/utils/to-jsx.tsx"
+import { formatMessageTimestamp } from "@/features/conversation/utils/message-date.ts"
 import { Fragment } from "react"
 import { cn } from "@/lib/utils.ts"
 import { AlertCircle, RotateCcw } from "lucide-react"
@@ -81,8 +82,7 @@ export default function TextPart({
 				<div className="flex flex-row gap-1 items-center">
 					<h1 className="font-semibold text-sm">{fullName(author)}</h1>
 					<span className="text-xs font-normal text-gray-400">
-						{" "}
-						Today at 9:15pm{" "}
+						{formatMessageTimestamp(message.createdAt)}
 					</span>
 				</div>
 
