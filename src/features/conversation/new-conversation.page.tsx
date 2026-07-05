@@ -35,7 +35,7 @@ import useChatHistory, {
 import { useMessagePolling } from "@/features/conversation/hooks/use-message-polling.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 import { ConversationParticipantInfo } from "@/features/conversation/components/conversation-participant-info.tsx"
-import MultipleConversationParticipants from "@/features/conversation/components/multiple-conversation-participants.tsx"
+import ConversationParticipants from "@/features/conversation/components/conversation-participants.tsx"
 
 export function NewConversationPage() {
 	const { code, conversationId } = useSearch({
@@ -189,7 +189,7 @@ export function NewConversationPage() {
 				</Chat.Header>
 			) : (
 				<Chat.Header>
-					<MultipleConversationParticipants
+					<ConversationParticipants
 						workspaceCode={code}
 						conversationId={conversationId}
 						teammateId={currentTeammateId}

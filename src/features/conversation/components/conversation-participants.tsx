@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton.tsx"
 import ConversationHeader from "@/features/conversation/components/header.tsx"
 import { Fragment } from "react"
 
-export default function MultipleConversationParticipants({
+export default function ConversationParticipants({
 	workspaceCode,
 	conversationId,
 	teammateId,
