@@ -8,7 +8,8 @@ export const WORKSPACE = "workspace"
 export function workspaceQueryOptions(code: string) {
 	return queryOptions({
 		queryKey: [WORKSPACE, code],
-		queryFn: () => apiClient.get<Workspace>(ApiPaths.WORKSPACE, { params: { code } }),
+		queryFn: () =>
+			apiClient.get<Workspace>(ApiPaths.WORKSPACE, { params: { code } }),
 		staleTime: Number.POSITIVE_INFINITY,
 	})
 }

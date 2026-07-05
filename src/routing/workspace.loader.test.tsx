@@ -36,7 +36,9 @@ describe("workspaceLayoutRoute loader", () => {
 		name: "Envoye",
 		status: WorkspaceStatus.ACTIVE,
 	}
-	const sidebarTeammate = teammateFactory.build({ username: "loader.test.user" })
+	const sidebarTeammate = teammateFactory.build({
+		username: "loader.test.user",
+	})
 	const enabledFeatures = ["can_integrate_whatsapp"]
 
 	beforeEach(() => {
@@ -85,9 +87,14 @@ describe("workspaceLayoutRoute loader", () => {
 			}),
 		)
 
-		expect(queryClient.getQueryData([WORKSPACE, envoyeWorkspace.code])).toBeDefined()
 		expect(
-			queryClient.getQueryData([CURRENT_TEAMMATE_QUERY_KEY, envoyeWorkspace.code]),
+			queryClient.getQueryData([WORKSPACE, envoyeWorkspace.code]),
+		).toBeDefined()
+		expect(
+			queryClient.getQueryData([
+				CURRENT_TEAMMATE_QUERY_KEY,
+				envoyeWorkspace.code,
+			]),
 		).toEqual(sidebarTeammate)
 		expect(
 			queryClient.getQueryData([ENABLED_FEATURES, envoyeWorkspace.code]),
@@ -100,7 +107,9 @@ describe("workspaceLayoutRoute loader", () => {
 			{ queryClient },
 		)
 
-		expect(await screen.findByText(sidebarTeammate.username)).toBeInTheDocument()
+		expect(
+			await screen.findByText(sidebarTeammate.username),
+		).toBeInTheDocument()
 
 		const workspaceCalls = vi
 			.mocked(apiClient.get)

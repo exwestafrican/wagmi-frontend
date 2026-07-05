@@ -8,11 +8,14 @@ export function featureFlagsQueryOptions(workspaceCode: string) {
 	return queryOptions({
 		queryKey: [ENABLED_FEATURES, workspaceCode],
 		queryFn: async () => {
-			const res = await apiClient.get<string[]>(ApiPaths.FEATURE_FLAGS_ENABLED, {
-				params: {
-					workspaceCode: workspaceCode,
+			const res = await apiClient.get<string[]>(
+				ApiPaths.FEATURE_FLAGS_ENABLED,
+				{
+					params: {
+						workspaceCode: workspaceCode,
+					},
 				},
-			})
+			)
 			return res.data
 		},
 		staleTime: Number.POSITIVE_INFINITY,
