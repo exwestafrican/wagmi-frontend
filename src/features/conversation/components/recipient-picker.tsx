@@ -16,12 +16,14 @@ import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 
 export default function RecipientPicker({
 	inputRef,
+    authorId,
 	placeholder,
 	workspaceCode,
 	onSelect,
 	isEditable,
 }: {
 	inputRef: RefObject<HTMLInputElement | null>
+    authorId: number
 	placeholder: string
 	workspaceCode: string
 	onSelect: (teammate: Teammate[]) => void
@@ -32,7 +34,12 @@ export default function RecipientPicker({
 	const [queryText, setQueryText] = useState<string>("")
 
 	const query = useTeammateFullNameSearch(workspaceCode)
-	const queryResult = query(queryText)
+	const queryResult = query(queryText).filter( result => {
+        if (recipients.length > 0) {
+            return result.id !== authorId
+        }
+        return true
+    })
 
 	const resultFound = queryResult.length > 0
 

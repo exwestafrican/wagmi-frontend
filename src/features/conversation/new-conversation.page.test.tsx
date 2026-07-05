@@ -222,6 +222,51 @@ describe("Create A new Direct Message", () => {
 		).not.toBeInTheDocument()
 	})
 
+	it("does not show current user in suggestions after a recipient is selected", async () => {
+		const admin = teammateFactory.build({
+			firstName: "Tochukwu",
+			lastName: "Gbubemi",
+			username: "odumodublvck",
+		})
+		const mavo = teammateFactory.build({
+			firstName: "Marvin",
+			lastName: "Ukanigbe",
+			username: "mavo",
+		})
+		const otherTeammates = teammateFactory.buildList(5)
+		await openNewDmPage(admin, [mavo, ...otherTeammates])
+
+		expect(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${admin.id}`, "i"),
+			}),
+		).toBeInTheDocument()
+
+		await user.click(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+			}),
+		)
+
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
+		await user.click(input)
+
+		expect(
+			screen.queryByRole("button", {
+				name: new RegExp(`suggested teammate=${admin.id}`, "i"),
+			}),
+		).not.toBeInTheDocument()
+
+		await user.type(input, admin.firstName)
+		expect(
+			screen.queryByRole("button", {
+				name: new RegExp(`suggested teammate=${admin.id}`, "i"),
+			}),
+		).not.toBeInTheDocument()
+	})
+
 	it("selects teammate on click", async () => {
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
