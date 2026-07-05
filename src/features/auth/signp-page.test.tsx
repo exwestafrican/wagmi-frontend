@@ -43,9 +43,12 @@ describe("Signup page", () => {
 
 	async function setupSignupPage() {
 		const queryClient = createTestQueryClient()
-		const router = makeAuthTestRouter()
+		const router = makeAuthTestRouter(queryClient)
 		await router.navigate({ to: Pages.SIGNUP })
-		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		renderWithQueryClient(
+			<RouterProvider router={router} context={{ queryClient }} />,
+			{ queryClient },
+		)
 		return { router }
 	}
 
@@ -196,10 +199,13 @@ describe("Signup page", () => {
 			mockApiClientPost.mockResolvedValueOnce({} as never)
 
 			const queryClient = createTestQueryClient()
-			const router = makeAuthTestRouter()
+			const router = makeAuthTestRouter(queryClient)
 			const navigateSpy = vi.spyOn(router, "navigate")
 			await router.navigate({ to: Pages.SIGNUP })
-			renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+			renderWithQueryClient(
+				<RouterProvider router={router} context={{ queryClient }} />,
+				{ queryClient },
+			)
 
 			const signupDetails = makeSignupDetails({
 				firstName: "john",
@@ -239,12 +245,13 @@ describe("Signup page", () => {
 			})
 			test("when user is unauthorized we transition to waitlist page", async () => {
 				const queryClient = createTestQueryClient()
-				const router = makeAuthTestRouter()
+				const router = makeAuthTestRouter(queryClient)
 				const navigateSpy = vi.spyOn(router, "navigate")
 				await router.navigate({ to: Pages.SIGNUP })
-				renderWithQueryClient(<RouterProvider router={router} />, {
-					queryClient,
-				})
+				renderWithQueryClient(
+					<RouterProvider router={router} context={{ queryClient }} />,
+					{ queryClient },
+				)
 
 				await userInput.enterSignUpDetails({})
 

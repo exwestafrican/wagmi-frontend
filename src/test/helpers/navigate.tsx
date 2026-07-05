@@ -2,6 +2,7 @@ import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
 import { vi } from "vitest"
+import type { QueryClient } from "@tanstack/react-query"
 import {
 	createRootRoute,
 	createRoute,
@@ -24,7 +25,7 @@ function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
 }
 
-export function makeAuthTestRouter() {
+export function makeAuthTestRouter(queryClient: QueryClient) {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
@@ -64,11 +65,11 @@ export function makeAuthTestRouter() {
 			loginRoute,
 			checkEmailRoute,
 		]),
-		context: {},
+		context: { queryClient },
 	})
 }
 
-export function makeTestRouter() {
+export function makeTestRouter(queryClient: QueryClient) {
 	const rootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
@@ -127,7 +128,7 @@ export function makeTestRouter() {
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),
-		context: {},
+		context: { queryClient },
 	})
 }
 
@@ -141,7 +142,7 @@ export async function navigateToTestPage({
 	hash?: string
 }) {
 	const queryClient = createTestQueryClient()
-	const router = makeTestRouter()
+	const router = makeTestRouter(queryClient)
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
 
 	if (Object.values(search).length > 0) {
@@ -154,7 +155,7 @@ export async function navigateToTestPage({
 	}
 	renderWithQueryClient(
 		<LanguageProvider>
-			<RouterProvider router={router} />
+			<RouterProvider router={router} context={{ queryClient }} />
 		</LanguageProvider>,
 		{ queryClient },
 	)

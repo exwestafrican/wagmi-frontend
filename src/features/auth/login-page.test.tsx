@@ -22,9 +22,12 @@ describe("Login page", () => {
 
 	async function setupLoginPage() {
 		const queryClient = createTestQueryClient()
-		const router = makeAuthTestRouter()
+		const router = makeAuthTestRouter(queryClient)
 		await router.navigate({ to: Pages.LOGIN })
-		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		renderWithQueryClient(
+			<RouterProvider router={router} context={{ queryClient }} />,
+			{ queryClient },
+		)
 		return { router }
 	}
 

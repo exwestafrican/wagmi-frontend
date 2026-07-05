@@ -73,6 +73,9 @@ export function mockWorkspaceAndCurrentTeammate(
 		if (url === ApiPaths.CONVERSATIONS) {
 			return Promise.resolve({ data: conversations })
 		}
+		if (url === ApiPaths.FEATURE_FLAGS_ENABLED) {
+			return Promise.resolve({ data: [] })
+		}
 		return Promise.reject(new Error(`Unexpected GET ${url}`))
 	})
 }

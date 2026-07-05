@@ -1,4 +1,5 @@
-import { createRootRoute, createRoute } from "@tanstack/react-router"
+import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
+import type { RouterContext } from "@/routing/router-context.ts"
 import WaitListPage from "@/features/waitlist/waitlist-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { z } from "zod"
@@ -10,7 +11,7 @@ import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 
-export const rootRoute = createRootRoute({
+export const rootRoute = createRootRouteWithContext<RouterContext>()({
 	component: RootRouteComponent,
 	notFoundComponent: NotFound,
 })

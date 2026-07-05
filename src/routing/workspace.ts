@@ -7,6 +7,8 @@ import { rootRoute } from "@/routing/root.ts"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import { ensureWorkspaceSession } from "@/features/workspace/api/ensure-workspace-session.ts"
+import { WorkspacePending } from "@/features/workspace/components/workspace-pending.tsx"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -19,6 +21,11 @@ export const workspaceLayoutRoute = createRoute({
 			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
 		}
 	},
+	loaderDeps: ({ search: { code } }) => ({ code }),
+	loader: async ({ context: { queryClient }, deps: { code } }) => {
+		await ensureWorkspaceSession(queryClient, code)
+	},
+	pendingComponent: WorkspacePending,
 	component: WorkspacePage,
 })
 
