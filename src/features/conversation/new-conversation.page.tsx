@@ -17,13 +17,8 @@ import {
 	type ChatBodyRef,
 } from "@/features/conversation/components/chat.tsx"
 import { MessageList } from "@/features/conversation/components/message-list.tsx"
-import {
-	ConversationIntro,
-	ConversationIntroSkeleton,
-} from "@/features/conversation/components/conversation-intro.tsx"
 import RecipientPicker from "@/features/conversation/components/recipient-picker.tsx"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
-import ConversationParticipant from "@/features/conversation/components/conversation-participant.tsx"
 import useConversationInfoRegistry from "@/features/conversation/hooks/conversation-info-registry.ts"
 import { counterpartyTeammates } from "@/features/conversation/utils/participants.ts"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
@@ -39,7 +34,8 @@ import useChatHistory, {
 } from "@/features/conversation/api/chat-history.ts"
 import { useMessagePolling } from "@/features/conversation/hooks/use-message-polling.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
-import { Spinner } from "@/components/ui/spinner.tsx"
+import { ConversationParticipantInfo } from "@/features/conversation/components/conversation-participant-info.tsx"
+import ConversationParticipants from "@/features/conversation/components/conversation-participants.tsx"
 
 export function NewConversationPage() {
 	const { code, conversationId } = useSearch({
@@ -53,9 +49,8 @@ export function NewConversationPage() {
 	const [newMessageContents, setNewMessageContents] = useState<
 		MessageContent[]
 	>([])
-	const [selectedTeammate, setSelectedTeammate] = useState<
-		Teammate | undefined
-	>(undefined)
+
+	const [selectedRecipients, setSelectedRecipients] = useState<Teammate[]>([])
 
 	const { setOpenMobile } = useSidebar()
 	const { mutate: sendNewMessage, isPending: isSendingNewMessage } =
@@ -82,8 +77,8 @@ export function NewConversationPage() {
 
 	const conversationInfo = conversationRegistry.find(conversationId)
 	const counterparty = conversationInfo
-		? counterpartyTeammates(registry, conversationInfo)[0]
-		: undefined
+		? counterpartyTeammates(registry, conversationInfo)
+		: []
 
 	useMessagePolling(code, conversationId)
 
@@ -93,14 +88,17 @@ export function NewConversationPage() {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft state when conversationId changes
 	useEffect(() => {
-		setSelectedTeammate(undefined)
+		setSelectedRecipients([])
 		setNewMessageContents([])
 	}, [conversationId])
 
-	const noTeammateSelected = selectedTeammate === undefined
+	const noTeammateSelected = selectedRecipients.length === 0
 	const isNewConversation = conversationId === 0
 
-	const introTeammate = isNewConversation ? selectedTeammate : counterparty
+	// const introTeammate = isNewConversation ? selectedTeammate : counterparty
+	const participants = (
+		isNewConversation ? selectedRecipients : counterparty
+	).filter((p) => p !== undefined)
 
 	const messageContents = [
 		...(chatHistory ?? []),
@@ -136,7 +134,7 @@ export function NewConversationPage() {
 			setNewMessageContents((previous) => [...previous, message])
 			sendNewMessage(
 				{
-					recipientTeammateId: recipients[0].id,
+					recipientTeammateIds: recipients.map((r) => r.id),
 					workspaceCode: code,
 					openingMessage: message.nodes.flatMap((n) => n.content.join(" ")),
 					sentAt: message.createdAt,
@@ -178,53 +176,51 @@ export function NewConversationPage() {
 
 					<RecipientPicker
 						inputRef={inputRef}
+						authorId={currentTeammateId}
 						placeholder={placeholderName}
 						workspaceCode={code}
-						onSubmit={(teammate) => {
-							setSelectedTeammate(teammate)
+						onSelect={(recipients) => {
+							setSelectedRecipients(recipients)
 							requestAnimationFrame(() => {
 								composerRef.current?.focus()
 							})
 						}}
+						isEditable={!isSendingNewMessage} // We add this so user cannot edit selected teammate while sending
 					/>
 				</Chat.Header>
 			) : (
 				<Chat.Header>
-					<ConversationParticipant
-						conversationId={conversationId}
+					<ConversationParticipants
 						workspaceCode={code}
-						teammateId={currentTeammate?.id ?? 0}
+						conversationId={conversationId}
+						teammateId={currentTeammateId}
 					/>
 				</Chat.Header>
 			)}
 
-			<Chat.Body ref={chatBodyRef} scrollKey={messageContents.length}>
+			<Chat.Body
+				ref={chatBodyRef}
+				isLoading={isLoadingChatHistory}
+				scrollKey={messageContents.length}
+			>
 				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-6">
-					{introTeammate ? (
-						<ConversationIntro
-							teammate={introTeammate}
-							isWithSelf={introTeammate.id === currentTeammateId}
+					{participants.length > 0 && (
+						<ConversationParticipantInfo
+							participants={participants}
+							authorId={currentTeammateId}
 						/>
-					) : (
-						<ConversationIntroSkeleton />
 					)}
 
-					{isLoadingChatHistory ? (
-						<div className="w-full justify-center flex">
-							<Spinner className="size-8" />
+					{messageContents.length > 0 && (
+						<div className="animate-in fade-in duration-300 space-y-6">
+							<Separator />
+							<MessageList
+								workspaceCode={code}
+								messages={messageContents}
+								conversationId={conversationId}
+							/>
 						</div>
-					) : (
-						messageContents.length > 0 && (
-							<div className="animate-in fade-in duration-300 space-y-6">
-								<Separator />
-								<MessageList
-									workspaceCode={code}
-									messages={messageContents}
-									conversationId={conversationId}
-								/>
-							</div>
-						)
 					)}
 				</div>
 			</Chat.Body>
@@ -236,9 +232,9 @@ export function NewConversationPage() {
 					}
 					ref={composerRef}
 					placeholder={
-						introTeammate == null
+						participants.length === 0
 							? "Start a new message"
-							: `Message ${introTeammate.username}`
+							: `Message ${participants.map((t) => t?.username).join(", ")}`
 					}
 					onSend={(nodes) => {
 						if (currentTeammate) {
@@ -251,10 +247,10 @@ export function NewConversationPage() {
 								createdAt: createdAt,
 							}
 
-							if (isNewConversation && selectedTeammate) {
+							if (isNewConversation) {
 								openNewConversationOrNavigateToExistingConversation(
 									currentTeammate,
-									[selectedTeammate],
+									selectedRecipients,
 									newMessage,
 								)
 							} else {

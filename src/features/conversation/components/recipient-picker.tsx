@@ -16,29 +16,41 @@ import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
 
 export default function RecipientPicker({
 	inputRef,
+	authorId,
 	placeholder,
 	workspaceCode,
-	onSubmit,
+	onSelect,
+	isEditable,
 }: {
 	inputRef: RefObject<HTMLInputElement | null>
+	authorId: number
 	placeholder: string
 	workspaceCode: string
-	onSubmit: (teammate: Teammate | undefined) => void
+	onSelect: (teammate: Teammate[]) => void
+	isEditable: boolean
 }) {
-	const [open, setOpen] = useState(false)
-	const [recipient, setRecipient] = useState<Teammate | undefined>(undefined)
+	const [open, setOpen] = useState(true)
+	const [recipients, setRecipients] = useState<Teammate[]>([])
 	const [queryText, setQueryText] = useState<string>("")
 
 	const query = useTeammateFullNameSearch(workspaceCode)
-	const queryResult = query(queryText)
+	const queryResult = query(queryText).filter((result) => {
+		if (recipients.length > 0) {
+			return result.id !== authorId
+		}
+		return true
+	})
 
 	const resultFound = queryResult.length > 0
 
-	function submit(teammate: Teammate | undefined) {
+	const hasRecipients = recipients.length > 0
+	const recipientHash = new Set(recipients.map((recipient) => recipient.id))
+
+	function select(recipient: Teammate) {
 		setQueryText("")
-		setRecipient(teammate)
+		setRecipients((prev) => [...prev, recipient])
 		setOpen(false)
-		onSubmit(teammate)
+		onSelect([...recipients, recipient])
 	}
 
 	const focusInput = useCallback(() => {
@@ -46,68 +58,75 @@ export default function RecipientPicker({
 	}, [inputRef])
 
 	useEffect(() => {
-		if (!recipient) {
+		if (recipients.length === 0) {
 			focusInput()
 		}
-	}, [recipient, focusInput])
+	}, [recipients, focusInput])
 
 	useEffect(() => {
-		if (recipient) {
-			setOpen(false)
-		}
-
 		if (!resultFound) setOpen(false)
 
 		if (resultFound && queryText.trim().length > 0) setOpen(true)
-	}, [recipient, resultFound, queryText])
+	}, [resultFound, queryText])
 
 	return (
 		<Popover open={open}>
 			<PopoverAnchor asChild>
 				<div className="px-4 p-1 text-gray-600 flex items-center gap-2">
 					<span className="text-xs"> To:</span>
-					{recipient ? (
-						<Badge className="bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200  text-xs shrink-0 max-w-48 truncate rounded-sm">
+					{recipients.map((recipient) => (
+						<Badge
+							key={recipient.id}
+							className="bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200  text-xs shrink-0 max-w-48 truncate rounded-sm"
+						>
 							{fullName(recipient)}
-							<button
-								type="button"
-								onClick={() => setRecipient(undefined)}
-								aria-label={`Remove ${recipient.id}`}
-								className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
-							>
-								<X className="size-3.5" />
-							</button>
+							{isEditable && (
+								<button
+									type="button"
+									onClick={() => {
+										const newRecipients = recipients.filter(
+											(savedRecipient) => savedRecipient.id !== recipient.id,
+										)
+										setRecipients(newRecipients)
+										onSelect(newRecipients)
+										//TODO mark as selected
+									}}
+									aria-label={`Remove ${recipient.id}`}
+									className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
+								>
+									<X className="size-3.5" />
+								</button>
+							)}
 						</Badge>
-					) : (
-						<input
-							aria-label="recipient-search"
-							ref={inputRef}
-							onFocus={() => setOpen(true)}
-							value={queryText}
-							type="text"
-							className="outline-none text-xs text-black px-2 w-full capitalize"
-							placeholder={placeholder}
-							onChange={(e) => {
-								const value = e.target.value
-								setQueryText(value)
-								setRecipient(undefined)
-							}}
-							onKeyDown={(e) => {
-								switch (e.key) {
-									case DESKTOP_KEYS.ENTER:
-										e.preventDefault()
-										submit(queryResult[0])
-										break
-									case DESKTOP_KEYS.ESCAPE:
-										e.preventDefault()
-										setOpen(false)
-										break
-									default:
-										break
-								}
-							}}
-						/>
-					)}
+					))}
+					<input
+						id={"recipient-search"}
+						aria-label="recipient-search"
+						ref={inputRef}
+						onFocus={() => setOpen(true)}
+						value={queryText}
+						type="text"
+						className="outline-none text-xs text-black px-0 w-full capitalize"
+						placeholder={hasRecipients ? "" : placeholder}
+						onChange={(e) => {
+							const value = e.target.value
+							setQueryText(value)
+						}}
+						onKeyDown={(e) => {
+							switch (e.key) {
+								case DESKTOP_KEYS.ENTER:
+									e.preventDefault()
+									select(queryResult[0])
+									break
+								case DESKTOP_KEYS.ESCAPE:
+									e.preventDefault()
+									setOpen(false)
+									break
+								default:
+									break
+							}
+						}}
+					/>
 				</div>
 			</PopoverAnchor>
 			<Separator />
@@ -119,12 +138,15 @@ export default function RecipientPicker({
 			>
 				<ScrollArea>
 					{queryResult.slice(0, 10).map((teammate) => (
+						//TODO: add checkmark if teammate is already a recepient
 						<button
 							type="button"
 							data-testid="teammate-suggestions"
 							key={teammate.id}
 							onClick={() => {
-								submit(teammate)
+								if (!recipientHash.has(teammate.id)) {
+									select(teammate)
+								}
 							}}
 							className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full"
 							aria-label={`suggested teammate=${teammate.id}`}

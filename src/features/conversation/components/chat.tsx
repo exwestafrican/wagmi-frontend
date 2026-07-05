@@ -1,5 +1,6 @@
 import { type ForwardedRef, type ReactNode, useCallback } from "react"
 import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react"
+import { Spinner } from "@/components/ui/spinner.tsx"
 
 function ChatRoot({ children }: { children: ReactNode }) {
 	return (
@@ -19,11 +20,12 @@ export type ChatBodyRef = {
 
 type ChatBodyProps = {
 	children: ReactNode
+	isLoading: boolean
 	scrollKey: number
 }
 
 const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
-	{ children, scrollKey }: ChatBodyProps,
+	{ children, isLoading, scrollKey }: ChatBodyProps,
 	ref: ForwardedRef<ChatBodyRef>,
 ) {
 	const viewportRef = useRef<HTMLDivElement | null>(null)
@@ -131,7 +133,11 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 		}
 	}, [isNearBottom])
 
-	return (
+	return isLoading ? (
+		<div className="justify-center items-center  flex  flex-1  min-h-0 px-4 pt-4">
+			<Spinner className="size-8" />
+		</div>
+	) : (
 		<div className="flex flex-col flex-1 min-h-0 px-4 pt-4">
 			<div
 				ref={viewportRef}
@@ -153,7 +159,7 @@ const ChatBody = forwardRef<ChatBodyRef, ChatBodyProps>(function ChatBody(
 })
 
 function ChatComposer({ children }: { children: ReactNode }) {
-	return <div className="shrink-0 px-4 pt-4 pb-6">{children}</div>
+	return <div className="shrink-0 px-4 pt-2 pb-6">{children}</div>
 }
 
 export const Chat = Object.assign(ChatRoot, {

@@ -45,7 +45,7 @@ import MainMenuItem from "@/features/workspace/components/main-menu-item.tsx"
 import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Info-registry.ts"
 import {
 	counterpartyTeammates,
-	displayName,
+	displayCounterParty,
 } from "@/features/conversation/utils/participants.ts"
 import useTeammateConversations, {
 	type ConversationSummary,
@@ -298,7 +298,7 @@ export default function WorkspacePage() {
 
 							<SidebarMenu className="px-3 gap-0">
 								{conversations?.map((conversation: ConversationSummary) => {
-									const name = displayName(
+									const names = displayCounterParty(
 										counterpartyTeammates(registry, conversation),
 									)
 
@@ -321,7 +321,7 @@ export default function WorkspacePage() {
 												isActive={isActivePath(route)}
 											>
 												<div className="h-2 w-2 rounded-full bg-green-500" />
-												{name}
+												<span className="truncate">{names}</span>
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 									)

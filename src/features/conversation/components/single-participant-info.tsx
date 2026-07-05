@@ -6,19 +6,19 @@ import { fullName } from "@/features/directory/utils/teammate.ts"
 import { Badge } from "@/components/ui/badge.tsx"
 import { Skeleton } from "@/components/ui/skeleton.tsx"
 
-export function ConversationIntro({
-	teammate,
+export function SingleParticipantInfo({
+	participant,
 	isWithSelf,
-}: { teammate: Teammate; isWithSelf: boolean }) {
+}: { participant: Teammate; isWithSelf: boolean }) {
 	return (
 		<div className="flex flex-col gap-2">
-			<FallbackAvatar size={"m"} variant={"stone"} teammate={teammate} />
+			<FallbackAvatar size={"m"} variant={"stone"} teammate={participant} />
 			<div className="flex flex-col gap-0 justify-start ">
 				<h1 aria-label="intro-fullname" className="text-sm font-semibold">
-					{fullName(teammate)}
+					{fullName(participant)}
 				</h1>
 				<span aria-label="intro-username" className="text-xs text-muted-brown">
-					@{teammate.username}
+					@{participant.username}
 				</span>
 			</div>
 
@@ -34,7 +34,7 @@ export function ConversationIntro({
 					<p className="text-sm leading-relaxed flex flex-wrap gap-1">
 						<span>This conversation is just between</span>
 						<Badge className="bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 text-xs font-medium px-1 shrink-0 max-w-48 truncate rounded-xs">
-							@{teammate.username}
+							@{participant.username}
 						</Badge>
 						<span> and you. </span>
 					</p>
