@@ -14,5 +14,9 @@ export function counterpartyTeammates(
 }
 
 export function displayName(counterParties: Teammate[]): string {
-	return fullNameWithFallback(counterParties[0])
+	return counterParties.map((c) => fullNameWithFallback(c)).join(", ")
+}
+
+export function displayCounterParty(counterParties: Teammate[]): string {
+	return counterParties.map((c) => fullNameWithFallback(c)).join(", ")
 }

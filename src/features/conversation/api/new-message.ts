@@ -12,7 +12,7 @@ type ConversationCreatedResponse = {
 export default function useSendNewMessage() {
 	return useMutation({
 		mutationFn: (data: {
-			recipientTeammateId: number
+			recipientTeammateIds: number[]
 			workspaceCode: string
 			openingMessage: string[]
 			sentAt: number
