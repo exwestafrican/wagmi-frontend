@@ -202,7 +202,6 @@ export function NewConversationPage() {
 				isLoading={isLoadingChatHistory}
 				scrollKey={messageContents.length}
 			>
-				{/*TODO: add loading state for chat body*/}
 				<div className="space-y-1">
 					{participants.length > 0 && (
 						<ConversationParticipantInfo
