@@ -176,7 +176,7 @@ export function NewConversationPage() {
 
 					<RecipientPicker
 						inputRef={inputRef}
-                        authorId={currentTeammateId}
+						authorId={currentTeammateId}
 						placeholder={placeholderName}
 						workspaceCode={code}
 						onSelect={(recipients) => {
