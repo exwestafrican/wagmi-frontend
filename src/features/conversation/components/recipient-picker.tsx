@@ -51,7 +51,7 @@ export default function RecipientPicker({
 	}, [inputRef])
 
 	useEffect(() => {
-		if (recipients.length == 0) {
+		if (recipients.length === 0) {
 			focusInput()
 		}
 	}, [recipients, focusInput])
