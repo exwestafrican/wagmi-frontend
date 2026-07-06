@@ -1,5 +1,4 @@
 import ConversationHeader from "@/features/conversation/components/header.tsx"
-import { Separator } from "@/components/ui/separator.tsx"
 import usePlaceholderName from "@/common/hooks/placeholder-names.ts"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
@@ -203,8 +202,7 @@ export function NewConversationPage() {
 				isLoading={isLoadingChatHistory}
 				scrollKey={messageContents.length}
 			>
-				{/*TODO: add loading state for chat body*/}
-				<div className="space-y-6">
+				<div className="space-y-1">
 					{participants.length > 0 && (
 						<ConversationParticipantInfo
 							participants={participants}
@@ -213,8 +211,7 @@ export function NewConversationPage() {
 					)}
 
 					{messageContents.length > 0 && (
-						<div className="animate-in fade-in duration-300 space-y-6">
-							<Separator />
+						<div className="animate-in fade-in duration-300">
 							<MessageList
 								workspaceCode={code}
 								messages={messageContents}
