@@ -1,10 +1,4 @@
-import {
-	differenceInCalendarDays,
-	format,
-	isSameYear,
-	isToday,
-	isYesterday,
-} from "date-fns"
+import { differenceInCalendarDays, format, isSameYear } from "date-fns"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 
 function toDate(createdAt: number): Date {
@@ -14,9 +8,11 @@ function toDate(createdAt: number): Date {
 type DateLabelTier = "today" | "yesterday" | "weekday" | "monthDay" | "fullDate"
 
 function getDateLabelTier(date: Date, now: Date): DateLabelTier {
-	if (isToday(date)) return "today"
-	if (isYesterday(date)) return "yesterday"
-	if (differenceInCalendarDays(now, date) <= 7) return "weekday"
+	const daysAgo = differenceInCalendarDays(now, date)
+
+	if (daysAgo === 0) return "today"
+	if (daysAgo === 1) return "yesterday"
+	if (daysAgo <= 7) return "weekday"
 	if (isSameYear(date, now)) return "monthDay"
 	return "fullDate"
 }
