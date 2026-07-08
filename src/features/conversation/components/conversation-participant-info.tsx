@@ -13,7 +13,7 @@ function ParticipantBadge({
 		<Badge
 			aria-label={`badge-${participant.id}`}
 			className={cn(
-				"bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 text-xs font-medium px-1 shrink-0 max-w-48 truncate rounded-xs",
+				"bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 text-xs font-medium px-1 shrink-0 max-w-48 truncate rounded-xs inline",
 				className,
 			)}
 		>
@@ -38,6 +38,7 @@ export function ConversationParticipantInfo({
 		)
 	}
 
+	// @ts-ignore
 	return (
 		<div className="flex flex-wrap flex-col gap-4">
 			<div className="flex flex-row gap-2">
@@ -50,30 +51,24 @@ export function ConversationParticipantInfo({
 					/>
 				))}
 			</div>
-			<div className="flex flex-col gap-1">
-				<p className="text-sm leading-relaxed flex flex-row gap-1">
+			<div className="flex flex-col gap-3">
+				<p className="text-sm leading-relaxed space-y-4">
 					<Fragment>
 						{" "}
-						This is the very beginning of your direct message history with{" "}
-					</Fragment>
-					<span className="flex flex-row gap-2">
-						{participants.slice(0, lastParticipantIdx).map((participant) => (
-							<ParticipantBadge
-								key={participant.id}
-								participant={participant}
-							/>
-						))}
-					</span>
-
-					{participants.length > 1 && (
-						<span>
-							{" "}
-							and{" "}
+						This is the very beginning of your direct message history with
+						<span className="pl-1 inline-flex gap-1">
+							{participants.slice(0, lastParticipantIdx).map((participant) => (
+								<ParticipantBadge
+									key={participant.id}
+									participant={participant}
+								/>
+							))}
+							and
 							<ParticipantBadge
 								participant={participants[lastParticipantIdx]}
-							/>{" "}
+							/>
 						</span>
-					)}
+					</Fragment>
 				</p>
 				<p className="text-sm leading-relaxed">
 					{" "}

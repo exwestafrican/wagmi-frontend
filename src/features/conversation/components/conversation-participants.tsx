@@ -44,30 +44,18 @@ export default function ConversationParticipants({
 
 	return (
 		<ConversationHeader>
-			{/*todo fix this !!*/}
-			{counterparties.length > 1 ? (
-				<Fragment>
-					<FallbackAvatar teammate={counterparties[0]} />
-					<h1 className="truncate text-md font-semibold">
-						{" "}
-						{displayCounterParty(
-							counterpartyTeammates(registry, conversationInfo),
-						)}{" "}
-					</h1>
-				</Fragment>
-			) : (
-				<Fragment>
-					<FallbackAvatar teammate={counterparties[0]} />
-					<h1
-						aria-label="conversation-participant-fullname"
-						className="text-md md:text-md font-semibold"
-					>
-						{displayCounterParty(
-							counterpartyTeammates(registry, conversationInfo),
-						)}
-					</h1>
-				</Fragment>
-			)}
+			<Fragment>
+				<FallbackAvatar teammate={counterparties[0]} />
+				<h1
+					aria-label="conversation-participant-fullname"
+					className="truncate text-md font-semibold max-w-3/5"
+				>
+					{" "}
+					{displayCounterParty(
+						counterpartyTeammates(registry, conversationInfo),
+					)}{" "}
+				</h1>
+			</Fragment>
 		</ConversationHeader>
 	)
 }
