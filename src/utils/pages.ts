@@ -6,6 +6,8 @@ export const Pages = {
 	SIGNUP: "/signup",
 	ACCEPT_INVITE: "/workspace-invite",
 	CHECK_EMAIL: "/check-email",
+	DIRECTORY: "/workspace/directory",
+	SETUP_WORKSPACE: "/setup/workspace",
 }
 
 export const AdminPages = {

@@ -1,15 +1,20 @@
 import { Pages } from "@/utils/pages.ts"
 import { ChevronLeft } from "lucide-react"
+import { useState } from "react"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 import { Button } from "@/components/ui/button.tsx"
+import { OtpInput } from "@/components/ui/otp-input.tsx"
+import useVerifyOtp from "./api/otp"
+
+const OTP_LENGTH = 6
 
 function LoginSuccessMessage({ email }: { email: string }) {
 	return (
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
-			We sent you a magic link to{" "}
-			<span className="font-semibold text-neutral-900">{email}</span> so you can
-			get into your workspace.
+			We sent a 6-digit code to{" "}
+			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
+			below to get into your workspace.
 		</p>
 	)
 }
@@ -17,9 +22,9 @@ function LoginSuccessMessage({ email }: { email: string }) {
 function SignupSuccessMessage({ email }: { email: string }) {
 	return (
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
-			We sent you a confirmation email to{" "}
-			<span className="font-semibold text-neutral-900">{email}</span>. Follow
-			the link inside to get started.
+			We sent a 6-digit code to{" "}
+			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
+			below to get started.
 		</p>
 	)
 }
@@ -27,15 +32,19 @@ function SignupSuccessMessage({ email }: { email: string }) {
 function InviteSuccessMessage({ email }: { email: string }) {
 	return (
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
-			We sent you a confirmation email to{" "}
-			<span className="font-semibold text-neutral-900">{email}</span>. Follow
-			the link to join the conversation.
+			We sent a 6-digit code to{" "}
+			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
+			below to join the conversation.
 		</p>
 	)
 }
 export function CheckEmail() {
 	const navigate = useNavigate()
 	const { email, type } = useSearch({ from: "/check-email" })
+	const [otp, setOtp] = useState("")
+	const isComplete = otp.length === OTP_LENGTH
+	const { mutate: verifyOtp } = useVerifyOtp()
+	const search = useSearch({ strict: false })
 
 	const renderMessage = () => {
 		switch (type) {
@@ -49,7 +58,29 @@ export function CheckEmail() {
 				return null
 		}
 	}
-
+	const onSubmit = () => {
+		verifyOtp({ otp: otp, email: email }, {
+			onSuccess: (response) => {
+				console.log("OTP verified successfully:", response.data);
+				if(search.redirect) {
+					navigate({
+						to: search.redirect,
+					}).then()
+				} else {
+					navigate({
+						to: Pages.SETUP_WORKSPACE,
+						search: { code: response.data.workspaceCode},
+						hash: new URLSearchParams({
+							access_token: response.data.accessToken,
+						}).toString(),
+					}).then()
+				}
+			},
+			onError: () => {
+				// Handle error
+			},
+		})
+	}
 	return (
 		<div className="flex flex-1 flex-col min-h-screen justify-center items-center px-6 py-10 sm:px-10 md:px-12 lg:px-14 gap-10">
 			<div className="w-full max-w-md text-center">
@@ -61,9 +92,26 @@ export function CheckEmail() {
 				/>
 
 				<h1 className="text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
-					You've got mail!
+					Check your email
 				</h1>
 				{renderMessage()}
+
+				<div className="mt-8 flex flex-col items-center gap-6">
+					<OtpInput
+						length={OTP_LENGTH}
+						value={otp}
+						onChange={setOtp}
+						autoFocus
+					/>
+					<Button
+						size="lg"
+						disabled={!isComplete}
+						className="w-full cursor-pointer"
+						onClick={() => onSubmit()}
+					>
+						Verify
+					</Button>
+				</div>
 			</div>
 			<div>
 				<Button
@@ -78,7 +126,7 @@ export function CheckEmail() {
 					<ChevronLeft />
 					<p className="font-medium tracking-tight text-neutral-900 ">
 						{" "}
-						Resend Email
+						Resend Code
 					</p>
 				</Button>
 			</div>

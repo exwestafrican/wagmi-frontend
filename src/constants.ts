@@ -22,6 +22,7 @@ export const ApiPaths = {
 	SEND_REPLY: "/conversations/send-text",
 	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
 	UNREAD_MESSAGES: "/conversations/unread-messages",
+	VERIFY_OTP: "/auth/verify-otp",
 } as const
 
 export const AdminApiPaths = {
