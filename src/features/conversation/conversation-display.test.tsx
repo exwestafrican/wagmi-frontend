@@ -84,7 +84,9 @@ describe("Conversation page display name", () => {
 		)
 
 		await screen.findByText(/direct messages/i)
-		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+		await user.click(
+			screen.getByRole("button", { name: new RegExp(fullName(raymond), "i") }),
+		)
 
 		expect(
 			await screen.findByText(/This conversation is just between/i),
@@ -94,7 +96,9 @@ describe("Conversation page display name", () => {
 		)
 		expect(screen.getByText(/and you\./i)).toBeInTheDocument()
 
-		await user.click(screen.getByRole("button", { name: fullName(abbas) }))
+		await user.click(
+			screen.getByRole("button", { name: new RegExp(fullName(abbas), "i") }),
+		)
 
 		expect(screen.getByLabelText("intro-username")).toHaveTextContent(
 			`@${abbas.username}`,
@@ -147,7 +151,9 @@ describe("Conversation page display name", () => {
 		)
 		expect(screen.getByText(/and you\./i)).toBeInTheDocument()
 
-		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+		await user.click(
+			screen.getByRole("button", { name: new RegExp(fullName(raymond), "i") }),
+		)
 
 		expect(screen.getByLabelText("intro-username")).toHaveTextContent(
 			`@${raymond.username}`,
@@ -193,7 +199,10 @@ describe("Conversation page display name", () => {
 		)
 
 		await screen.findByText(/direct messages/i)
-		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+
+		await user.click(
+			screen.getByRole("button", { name: new RegExp(fullName(raymond), "i") }),
+		)
 
 		const composer = screen.getByRole("textbox", { name: /message-composer/i })
 		await user.type(composer, message)
@@ -238,7 +247,10 @@ describe("Conversation page display name", () => {
 		)
 
 		await screen.findByText(/direct messages/i)
-		await user.click(screen.getByRole("button", { name: fullName(raymond) }))
+
+		await user.click(
+			screen.getByRole("button", { name: new RegExp(fullName(raymond), "i") }),
+		)
 
 		const composer = screen.getByRole("textbox", { name: /message-composer/i })
 		await user.type(composer, message)
