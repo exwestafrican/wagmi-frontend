@@ -6,13 +6,14 @@ import {
 } from "@/components/ui/popover.tsx"
 import { Badge } from "@/components/ui/badge.tsx"
 import { fullName } from "@/features/directory/utils/teammate.ts"
-import { X } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { type RefObject, useCallback, useEffect, useState } from "react"
 import { DESKTOP_KEYS } from "@/constants.ts"
 import useTeammateFullNameSearch from "@/features/directory/hooks/teammate-search.ts"
 import { Separator } from "@/components/ui/separator.tsx"
 import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import FallbackAvatar from "@/features/directory/component/fallback-avatar.tsx"
+import { cn } from "@/lib/utils.ts"
 
 export default function RecipientPicker({
 	inputRef,
@@ -89,7 +90,6 @@ export default function RecipientPicker({
 										)
 										setRecipients(newRecipients)
 										onSelect(newRecipients)
-										//TODO mark as selected
 									}}
 									aria-label={`Remove ${recipient.id}`}
 									className="rounded p-0.5 hover:bg-muted-foreground/20 -mr-0.5 cursor-pointer text-black"
@@ -114,10 +114,14 @@ export default function RecipientPicker({
 						}}
 						onKeyDown={(e) => {
 							switch (e.key) {
-								case DESKTOP_KEYS.ENTER:
+								case DESKTOP_KEYS.ENTER: {
 									e.preventDefault()
-									select(queryResult[0])
+									const first = queryResult[0]
+									if (first && !recipientHash.has(first.id)) {
+										select(first)
+									}
 									break
+								}
 								case DESKTOP_KEYS.ESCAPE:
 									e.preventDefault()
 									setOpen(false)
@@ -137,28 +141,40 @@ export default function RecipientPicker({
 				className="p-0 flex space-y-0 flex-col  w-[calc(var(--radix-popover-trigger-width)-36px)]"
 			>
 				<ScrollArea>
-					{queryResult.slice(0, 10).map((teammate) => (
-						//TODO: add checkmark if teammate is already a recepient
-						<button
-							type="button"
-							data-testid="teammate-suggestions"
-							key={teammate.id}
-							onClick={() => {
-								if (!recipientHash.has(teammate.id)) {
-									select(teammate)
-								}
-							}}
-							className="text-xs px-3 py-2  text-black cursor-pointer hover:bg-chestnut-brown/70 flex flex-row flex-1 items-center gap-2 w-full"
-							aria-label={`suggested teammate=${teammate.id}`}
-						>
-							{" "}
-							<FallbackAvatar size="xs" teammate={teammate} />
-							<div className="flex items-center gap-1">
-								<span>{fullName(teammate)}</span> ~
-								<span>{teammate.username}</span>
-							</div>
-						</button>
-					))}
+					{queryResult.slice(0, 10).map((teammate) => {
+						const isSelected = recipientHash.has(teammate.id)
+
+						return (
+							<button
+								type="button"
+								data-testid="teammate-suggestions"
+								key={teammate.id}
+								onClick={() => {
+									if (!isSelected) {
+										select(teammate)
+									}
+								}}
+								className={cn(
+									"text-xs px-3 py-2 text-black flex flex-row flex-1 items-center justify-between gap-2 w-full",
+									isSelected
+										? "opacity-60 cursor-default"
+										: "cursor-pointer hover:bg-chestnut-brown/70",
+								)}
+								aria-label={`suggested teammate=${teammate.id}${isSelected ? ", selected" : ""}`}
+							>
+								<div className="flex items-center gap-2 min-w-0">
+									<FallbackAvatar size="xs" teammate={teammate} />
+									<div className="flex items-center gap-1">
+										<span>{fullName(teammate)}</span> ~
+										<span>{teammate.username}</span>
+										{isSelected && (
+											<Check className="size-3.5 shrink-0 text-violet-700" />
+										)}
+									</div>
+								</div>
+							</button>
+						)
+					})}
 				</ScrollArea>
 			</PopoverContent>
 		</Popover>

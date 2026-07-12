@@ -267,6 +267,45 @@ describe("Create A new Direct Message", () => {
 		).not.toBeInTheDocument()
 	})
 
+	it("shows selected indicator on already chosen teammate in suggestions", async () => {
+		const admin = teammateFactory.build({ firstName: "Tochukwu" })
+		const mavo = teammateFactory.build({
+			firstName: "Marvin",
+			lastName: "Ukanigbe",
+			username: "mavo",
+		})
+		const olu = teammateFactory.build({
+			firstName: "Olamide",
+			lastName: "Adedeji",
+			username: "badoo",
+		})
+		const otherTeammates = teammateFactory.buildList(5)
+		await openNewDmPage(admin, [mavo, olu, ...otherTeammates])
+
+		await user.click(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${mavo.id}`, "i"),
+			}),
+		)
+
+		const input = screen.getByRole("textbox", {
+			name: /recipient-search/i,
+		})
+		await user.click(input)
+
+		expect(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${mavo.id}, selected`, "i"),
+			}),
+		).toBeInTheDocument()
+
+		expect(
+			screen.getByRole("button", {
+				name: new RegExp(`suggested teammate=${olu.id}`, "i"),
+			}),
+		).toHaveAttribute("aria-label", `suggested teammate=${olu.id}`)
+	})
+
 	it("selects teammate on click", async () => {
 		const admin = teammateFactory.build({ firstName: "Tochukwu" })
 		const mavo = teammateFactory.build({
