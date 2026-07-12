@@ -14,6 +14,11 @@ export type ConversationSummary = {
 	counterParties: number[]
 }
 
+export const ConversationType = {
+	PRIVATE: "private",
+	COLLABORATIVE: "collaborative",
+}
+
 export function toConversationSummary(
 	raw: ConversationApiResponse,
 	currentTeammateId: number,
@@ -34,35 +39,54 @@ export const TEAMMATE_CONVERSATION_LIST = "teammate-conversation-list"
 export function conversationListQueryKey(
 	workspaceCode: string,
 	teammateId: number,
+	conversationType: string,
 ) {
-	return [TEAMMATE_CONVERSATION_LIST, workspaceCode, teammateId] as const
+	return [
+		TEAMMATE_CONVERSATION_LIST,
+		workspaceCode,
+		teammateId,
+		conversationType,
+	] as const
 }
 
 export function addConversationToQueryCache(
 	queryClient: QueryClient,
 	workspaceCode: string,
 	teammateId: number,
+	conversationType: string,
 	conversation: ConversationSummary,
 ) {
 	queryClient.setQueryData<ConversationSummary[]>(
-		conversationListQueryKey(workspaceCode, teammateId),
+		conversationListQueryKey(workspaceCode, teammateId, conversationType),
 		(previous) => {
 			return [...(previous ?? []), conversation]
 		},
 	)
 }
 
+export function getConversationType(participantCount: number) {
+	if (participantCount <= 2) {
+		return ConversationType.PRIVATE
+	}
+	return ConversationType.COLLABORATIVE
+}
+
 export default function useTeammateConversations(
 	workspaceCode: string,
 	currentTeammateId: number,
+	conversationType: string,
 ) {
 	return useQuery<ConversationSummary[]>({
-		queryKey: conversationListQueryKey(workspaceCode, currentTeammateId),
+		queryKey: conversationListQueryKey(
+			workspaceCode,
+			currentTeammateId,
+			conversationType,
+		),
 		queryFn: async () => {
 			const res = await apiClient.get<ConversationApiResponse[]>(
 				ApiPaths.CONVERSATIONS,
 				{
-					params: { workspaceCode },
+					params: { workspaceCode, conversationType },
 				},
 			)
 			return res.data.map((raw) =>

@@ -24,6 +24,7 @@ import useTeammateInfoRegistry from "@/features/directory/hooks/use-teammate-Inf
 import useSendNewMessage from "@/features/conversation/api/new-message.ts"
 import {
 	addConversationToQueryCache,
+	getConversationType,
 	TEAMMATE_CONVERSATION_LIST,
 } from "@/features/conversation/api/list-conversation.ts"
 import { useQueryClient } from "@tanstack/react-query"
@@ -140,11 +141,17 @@ export function NewConversationPage() {
 				},
 				{
 					onSuccess: ({ data }) => {
-						addConversationToQueryCache(queryClient, code, sender.id, {
-							id: data.id,
-							authorId: sender.id,
-							counterParties: [recipients[0].id],
-						})
+						addConversationToQueryCache(
+							queryClient,
+							code,
+							sender.id,
+							getConversationType([sender.id, ...recipients].length),
+							{
+								id: data.id,
+								authorId: sender.id,
+								counterParties: [recipients[0].id],
+							},
+						)
 						addChatHistoryToQueryCache(queryClient, code, data.id, {
 							...message,
 							state: MessageState.SENT,
