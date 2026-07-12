@@ -49,7 +49,11 @@ import {
 } from "@/features/conversation/utils/participants.ts"
 import useTeammateConversations, {
 	type ConversationSummary,
+	ConversationType,
 } from "@/features/conversation/api/list-conversation.ts"
+import FallbackAvatar, {
+	FakeAvatar,
+} from "@/features/directory/component/fallback-avatar.tsx"
 
 type SideNavWithSeparatorProp = {
 	className?: string
@@ -99,9 +103,16 @@ export default function WorkspacePage() {
 	const { code } = useSearch({ from: "/workspace" })
 	const { data: workspaceDataResponse } = useWorkspace(code)
 	const { data: teammate } = useCurrentWorkspaceTeammate(code)
-	const { data: conversations } = useTeammateConversations(
+	const { data: privateConversations } = useTeammateConversations(
 		code,
 		teammate?.id ?? 0,
+		ConversationType.PRIVATE,
+	)
+
+	const { data: collaborativeConversation } = useTeammateConversations(
+		code,
+		teammate?.id ?? 0,
+		ConversationType.COLLABORATIVE,
 	)
 
 	const isMobile = useIsMobile()
@@ -273,6 +284,56 @@ export default function WorkspacePage() {
 								))}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
+						{collaborativeConversation &&
+							collaborativeConversation.length > 0 && (
+								<SideNavGroupWithTopSeparator>
+									<SidebarGroupLabel className="sidebar-group-layout">
+										collaborate
+									</SidebarGroupLabel>
+									<SidebarMenu className="px-3 gap-0">
+										{collaborativeConversation.map(
+											(conversation: ConversationSummary) => {
+												const counterparties = counterpartyTeammates(
+													registry,
+													conversation,
+												)
+												const names = displayCounterParty(counterparties)
+
+												const route = conversationRoute(conversation.id)
+												return (
+													<SidebarMenuItem key={conversation.id}>
+														<SidebarMenuButton
+															size="sm"
+															className="text-muted-brown text-xs cursor-pointer tracking-wide"
+															onClick={() =>
+																navigate({
+																	from: "/workspace",
+																	to: "/workspace/conversation",
+																	search: {
+																		code: code,
+																		conversationId: conversation.id,
+																	},
+																})
+															}
+															isActive={isActivePath(route)}
+														>
+															<FakeAvatar
+																key={counterparties[0].id}
+																size={"xxs"}
+																variant={"stone"}
+																displayCharacter={counterparties.length.toString()}
+															/>
+															<span className="truncate">{names}</span>
+															<div className="h-2 w-2 rounded-full bg-green-500" />
+														</SidebarMenuButton>
+													</SidebarMenuItem>
+												)
+											},
+										)}
+									</SidebarMenu>
+								</SideNavGroupWithTopSeparator>
+							)}
+
 						<SideNavGroupWithTopSeparator>
 							<SidebarGroupLabel className="sidebar-group-layout">
 								<div className="flex flex-row justify-between items-center w-full">
@@ -297,35 +358,45 @@ export default function WorkspacePage() {
 							</SidebarGroupLabel>
 
 							<SidebarMenu className="px-3 gap-0">
-								{conversations?.map((conversation: ConversationSummary) => {
-									const names = displayCounterParty(
-										counterpartyTeammates(registry, conversation),
-									)
+								{privateConversations?.map(
+									(conversation: ConversationSummary) => {
+										const counterparties = counterpartyTeammates(
+											registry,
+											conversation,
+										)
+										const names = displayCounterParty(counterparties)
 
-									const route = conversationRoute(conversation.id)
-									return (
-										<SidebarMenuItem key={conversation.id}>
-											<SidebarMenuButton
-												size="sm"
-												className="text-muted-brown text-xs cursor-pointer tracking-wide"
-												onClick={() =>
-													navigate({
-														from: "/workspace",
-														to: "/workspace/conversation",
-														search: {
-															code: code,
-															conversationId: conversation.id,
-														},
-													})
-												}
-												isActive={isActivePath(route)}
-											>
-												<div className="h-2 w-2 rounded-full bg-green-500" />
-												<span className="truncate">{names}</span>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-									)
-								})}
+										const route = conversationRoute(conversation.id)
+										return (
+											<SidebarMenuItem key={conversation.id}>
+												<SidebarMenuButton
+													size="sm"
+													className="text-muted-brown text-xs cursor-pointer tracking-wide"
+													onClick={() =>
+														navigate({
+															from: "/workspace",
+															to: "/workspace/conversation",
+															search: {
+																code: code,
+																conversationId: conversation.id,
+															},
+														})
+													}
+													isActive={isActivePath(route)}
+												>
+													<FallbackAvatar
+														key={counterparties[0].id}
+														size={"xxs"}
+														variant={"stone"}
+														teammate={counterparties[0]}
+													/>
+
+													<span className="truncate">{names}</span>
+												</SidebarMenuButton>
+											</SidebarMenuItem>
+										)
+									},
+								)}
 							</SidebarMenu>
 						</SideNavGroupWithTopSeparator>
 					</SidebarContent>

@@ -4,17 +4,19 @@ import { cn } from "@/lib/utils.ts"
 import { Skeleton } from "@/components/ui/skeleton.tsx"
 
 const fallbackAvatarVariants = cva(
-	"rounded-md  text-base font-semibold flex items-center justify-center w-fit ",
+	"rounded-md  text-base font-semibold flex items-center justify-center w-fit",
 	{
 		variants: {
 			size: {
+				xxs: "min-w-4 min-h-4 text-xs rounded-sm font-semibold shrink-0",
 				xs: "min-w-6 min-h-6 text-xs",
 				sm: "min-w-8 min-h-8 text-sm",
-				m: "min-w-10 min-h-10 text-base",
+				m: "min-w-10 min-h-10 text-base ",
 			},
 			variant: {
 				outline: "border-2 border-solid",
 				stone: "bg-stone-200 text-stone-800",
+				none: "",
 			},
 		},
 		defaultVariants: {
@@ -36,6 +38,23 @@ export default function FallbackAvatar({
 		<div className={cn(fallbackAvatarVariants({ size, variant }))}>
 			{" "}
 			{teammate.firstName.charAt(0).toUpperCase()}
+		</div>
+	)
+}
+
+type FakeAvatarProps = {
+	displayCharacter: string
+} & VariantProps<typeof fallbackAvatarVariants>
+
+export function FakeAvatar({
+	displayCharacter,
+	size = "m",
+	variant = "outline",
+}: FakeAvatarProps) {
+	return (
+		<div className={cn(fallbackAvatarVariants({ size, variant }))}>
+			{" "}
+			{displayCharacter}
 		</div>
 	)
 }

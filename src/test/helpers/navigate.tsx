@@ -1,6 +1,7 @@
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
+import type { QueryClient } from "@tanstack/react-query"
 import { vi } from "vitest"
 import {
 	createRootRoute,
@@ -135,12 +136,15 @@ export async function navigateToTestPage({
 	to,
 	search,
 	hash,
+	seedQueryCache,
 }: {
 	to: string
 	search: Record<string, string | number>
 	hash?: string
+	seedQueryCache?: (queryClient: QueryClient) => void
 }) {
 	const queryClient = createTestQueryClient()
+	seedQueryCache?.(queryClient)
 	const router = makeTestRouter()
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
 
