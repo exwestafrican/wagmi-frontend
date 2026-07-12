@@ -1,3 +1,3 @@
 export const FEATURE = {
-	ADMINISTRATIVE_WORKSPACE: "feature_administrative_workspace",
+	CAN_USE_SUPPORT: "can-use-support",
 }
