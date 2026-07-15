@@ -1,11 +1,12 @@
 import { Pages } from "@/utils/pages.ts"
 import { ChevronLeft } from "lucide-react"
-import { useState } from "react"
+import { useRef } from "react"
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 import { Button } from "@/components/ui/button.tsx"
-import { OtpInput } from "@/components/ui/otp-input.tsx"
+import { OtpInput, type OtpInputHandle } from "@/components/ui/otp-input.tsx"
 import useVerifyOtp from "./api/otp"
+import { toast } from "sonner"
 
 const OTP_LENGTH = 6
 
@@ -41,10 +42,10 @@ function InviteSuccessMessage({ email }: { email: string }) {
 export function CheckEmail() {
 	const navigate = useNavigate()
 	const { email, type } = useSearch({ from: "/check-email" })
-	const [otp, setOtp] = useState("")
-	const isComplete = otp.length === OTP_LENGTH
-	const { mutate: verifyOtp } = useVerifyOtp()
+	const { mutate: verifyOtp, isPending } = useVerifyOtp()
 	const search = useSearch({ strict: false })
+	const isUserLogin = type === CHECK_MAIL_REASON.LOGIN_SUCCESS;
+	const otpRef = useRef<OtpInputHandle>(null)
 
 	const renderMessage = () => {
 		switch (type) {
@@ -58,10 +59,11 @@ export function CheckEmail() {
 				return null
 		}
 	}
-	const onSubmit = () => {
-		verifyOtp({ otp: otp, email: email }, {
+
+	const onSubmit = (otp: string) => {
+		verifyOtp({ otp, email }, {
 			onSuccess: (response) => {
-				console.log("OTP verified successfully:", response.data);
+				//write test to check that the redirect query param is passed to the setup workspace page and that the access token is passed in the hash params
 				if(search.redirect) {
 					navigate({
 						to: search.redirect,
@@ -77,10 +79,14 @@ export function CheckEmail() {
 				}
 			},
 			onError: () => {
-				// Handle error
+				toast.error("Invalid OTP", {
+					description: "Please check the code and try again.",
+				})
+				otpRef.current?.clear()
 			},
 		})
 	}
+
 	return (
 		<div className="flex flex-1 flex-col min-h-screen justify-center items-center px-6 py-10 sm:px-10 md:px-12 lg:px-14 gap-10">
 			<div className="w-full max-w-md text-center">
@@ -96,22 +102,16 @@ export function CheckEmail() {
 				</h1>
 				{renderMessage()}
 
-				<div className="mt-8 flex flex-col items-center gap-6">
+				{isUserLogin && (
 					<OtpInput
+						ref={otpRef}
+						className="mt-8"
 						length={OTP_LENGTH}
-						value={otp}
-						onChange={setOtp}
+						onSubmit={onSubmit}
+						disabled={isPending}
 						autoFocus
 					/>
-					<Button
-						size="lg"
-						disabled={!isComplete}
-						className="w-full cursor-pointer"
-						onClick={() => onSubmit()}
-					>
-						Verify
-					</Button>
-				</div>
+				)}
 			</div>
 			<div>
 				<Button
@@ -126,10 +126,11 @@ export function CheckEmail() {
 					<ChevronLeft />
 					<p className="font-medium tracking-tight text-neutral-900 ">
 						{" "}
-						Resend Code
+						Resend {isUserLogin ? "Code" : "Email"}
 					</p>
 				</Button>
 			</div>
 		</div>
 	)
 }
+
