@@ -1,4 +1,4 @@
 export type OtpVerification = {
-    otp: string
-    email: string
+	otp: string
+	email: string
 }

@@ -3,23 +3,24 @@ import { useState } from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button.tsx"
+import useSpinnerVerbs from "@/common/hooks/spinner-verb.ts";
 
 export interface OtpInputHandle {
 	clear: () => void
 }
 
 interface OtpInputProps {
-	ref?: React.Ref<OtpInputHandle>
-	length?: number
+	ref: React.Ref<OtpInputHandle>
+	length: number
 	onSubmit: (value: string) => void
-	disabled?: boolean
-	autoFocus?: boolean
+	isPending: boolean
 	className?: string
 }
 
-function OtpInput({ ref, length = 6, onSubmit, disabled, autoFocus, className}: OtpInputProps) {
+function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputProps) {
 	const [digits, setDigits] = useState(() => Array(length).fill(""))
 	const inputsRef = React.useRef<Array<HTMLInputElement | null>>([])
+    const spinnerVerb = useSpinnerVerbs()
 
 	const value = digits.join("")
 	const isComplete = value.length === length
@@ -106,13 +107,16 @@ function OtpInput({ ref, length = 6, onSubmit, disabled, autoFocus, className}: 
 		focusInput(Math.min(cursor, length - 1))
 	}
 
+    function submit(value: string) {
+        onSubmit(value)
+    }
+
 	return (
 		<div className={cn("flex flex-col items-center gap-6", className)}>
 			<div className="flex items-center justify-center gap-2 sm:gap-3">
 				{digits.map((digit, index) => (
 					<input
-						// eslint-disable-next-line react/no-array-index-key
-						key={index}
+						key={digit+index}
 						ref={(el) => {
 							inputsRef.current[index] = el
 						}}
@@ -120,8 +124,8 @@ function OtpInput({ ref, length = 6, onSubmit, disabled, autoFocus, className}: 
 						inputMode="numeric"
 						autoComplete={index === 0 ? "one-time-code" : "off"}
 						maxLength={1}
-						disabled={disabled}
-						autoFocus={autoFocus && index === 0}
+						disabled={isPending}
+						autoFocus={index === 0}
 						value={digit}
 						aria-label={`Digit ${index + 1}`}
 						onChange={(event) => handleChange(index, event)}
@@ -137,13 +141,13 @@ function OtpInput({ ref, length = 6, onSubmit, disabled, autoFocus, className}: 
 				))}
 			</div>
 			<Button
-			//button needs to show loading state when isPending i.e. "cooking..."
 				size="lg"
-				disabled={disabled || !isComplete}
+				disabled={isPending || !isComplete}
 				className="w-full cursor-pointer"
-				onClick={() => onSubmit(value)}
+				onClick={() => submit(value)}
 			>
-				Verify
+
+                {isPending ? `${spinnerVerb}...` : "Verify" }
 			</Button>
 		</div>
 	)

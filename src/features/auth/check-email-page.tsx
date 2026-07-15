@@ -44,7 +44,7 @@ export function CheckEmail() {
 	const { email, type } = useSearch({ from: "/check-email" })
 	const { mutate: verifyOtp, isPending } = useVerifyOtp()
 	const search = useSearch({ strict: false })
-	const isUserLogin = type === CHECK_MAIL_REASON.LOGIN_SUCCESS;
+	const isUserLogin = type === CHECK_MAIL_REASON.LOGIN_SUCCESS
 	const otpRef = useRef<OtpInputHandle>(null)
 
 	const renderMessage = () => {
@@ -61,30 +61,33 @@ export function CheckEmail() {
 	}
 
 	const onSubmit = (otp: string) => {
-		verifyOtp({ otp, email }, {
-			onSuccess: (response) => {
-				//write test to check that the redirect query param is passed to the setup workspace page and that the access token is passed in the hash params
-				if(search.redirect) {
-					navigate({
-						to: search.redirect,
-					}).then()
-				} else {
-					navigate({
-						to: Pages.SETUP_WORKSPACE,
-						search: { code: response.data.workspaceCode},
-						hash: new URLSearchParams({
-							access_token: response.data.accessToken,
-						}).toString(),
-					}).then()
-				}
+		verifyOtp(
+			{ otp, email },
+			{
+				onSuccess: (response) => {
+					//write test to check that the redirect query param is passed to the setup workspace page and that the access token is passed in the hash params
+					if (search.redirect) {
+						navigate({
+							to: search.redirect,
+						}).then()
+					} else {
+						navigate({
+							to: Pages.SETUP_WORKSPACE,
+							search: { code: response.data.workspaceCode },
+							hash: new URLSearchParams({
+								access_token: response.data.accessToken,
+							}).toString(),
+						}).then()
+					}
+				},
+				onError: () => {
+					toast.error("Invalid OTP", {
+						description: "Please check the code and try again.",
+					})
+					otpRef.current?.clear()
+				},
 			},
-			onError: () => {
-				toast.error("Invalid OTP", {
-					description: "Please check the code and try again.",
-				})
-				otpRef.current?.clear()
-			},
-		})
+		)
 	}
 
 	return (
@@ -108,8 +111,7 @@ export function CheckEmail() {
 						className="mt-8"
 						length={OTP_LENGTH}
 						onSubmit={onSubmit}
-						disabled={isPending}
-						autoFocus
+						isPending={isPending}
 					/>
 				)}
 			</div>
@@ -133,4 +135,3 @@ export function CheckEmail() {
 		</div>
 	)
 }
-

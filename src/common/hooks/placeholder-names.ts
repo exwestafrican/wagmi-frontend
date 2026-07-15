@@ -1,4 +1,5 @@
 import { useState } from "react"
+import pickRandomName from "@/common/pick-random-number.ts";
 
 const PLACEHOLDER_NAMES = [
 	"Ahmed Ololade",
@@ -22,11 +23,6 @@ const PLACEHOLDER_NAMES = [
 	"Jacques Webster",
 	"Beyoncé Knowles",
 ] as const
-
-function pickRandomName(names: readonly string[]): string {
-	const index = Math.floor(Math.random() * names.length)
-	return names[index] ?? names[0]
-}
 
 export default function usePlaceholderName(): string {
 	const [name] = useState(() => pickRandomName(PLACEHOLDER_NAMES))
