@@ -95,7 +95,9 @@ describe("Login page", () => {
 				email,
 			})
 			expect(router.state.location.pathname).toBe(Pages.SETUP_WORKSPACE)
-			expect(router.state.location.search).toMatchObject({ code: workspaceCode })
+			expect(router.state.location.search).toMatchObject({
+				code: workspaceCode,
+			})
 			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
 		})
 	})
