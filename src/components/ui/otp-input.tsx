@@ -9,18 +9,15 @@ export interface OtpInputHandle {
 }
 
 interface OtpInputProps {
+	ref?: React.Ref<OtpInputHandle>
 	length?: number
 	onSubmit: (value: string) => void
 	disabled?: boolean
 	autoFocus?: boolean
 	className?: string
-	submitLabel?: string
 }
 
-const OtpInput = React.forwardRef<OtpInputHandle, OtpInputProps>(function OtpInput(
-	{ length = 6, onSubmit, disabled, autoFocus, className, submitLabel = "Verify" },
-	ref,
-) {
+function OtpInput({ ref, length = 6, onSubmit, disabled, autoFocus, className}: OtpInputProps) {
 	const [digits, setDigits] = useState(() => Array(length).fill(""))
 	const inputsRef = React.useRef<Array<HTMLInputElement | null>>([])
 
@@ -33,18 +30,12 @@ const OtpInput = React.forwardRef<OtpInputHandle, OtpInputProps>(function OtpInp
 		inputRef?.select()
 	}
 
-	// The parent owns the network call, so error handling (clearing the boxes)
-	// is exposed imperatively — the reset lives next to the state it resets.
 	React.useImperativeHandle(ref, () => ({
 		clear: () => {
 			setDigits(Array(length).fill(""))
 			focusInput(0)
 		},
 	}))
-
-	const submit = () => {
-		if (value.length === length) onSubmit(value)
-	}
 
 	const handleChange = (
 		index: number,
@@ -62,6 +53,11 @@ const OtpInput = React.forwardRef<OtpInputHandle, OtpInputProps>(function OtpInp
 
 		setDigits(nextDigits)
 		focusInput(Math.min(cursor, length - 1))
+		//want to call onSubmit when all digits are filled
+		//still a bit buggy
+		// if (isComplete) {
+		// 	onSubmit(value)
+		// }
 	}
 
 	const handleKeyDown = (
@@ -87,7 +83,7 @@ const OtpInput = React.forwardRef<OtpInputHandle, OtpInputProps>(function OtpInp
 			focusInput(index + 1)
 		} else if (event.key === "Enter") {
 			event.preventDefault()
-			submit()
+			if (isComplete) onSubmit(value)
 		}
 	}
 
@@ -141,15 +137,16 @@ const OtpInput = React.forwardRef<OtpInputHandle, OtpInputProps>(function OtpInp
 				))}
 			</div>
 			<Button
+			//button needs to show loading state when isPending i.e. "cooking..."
 				size="lg"
 				disabled={disabled || !isComplete}
 				className="w-full cursor-pointer"
-				onClick={submit}
+				onClick={() => onSubmit(value)}
 			>
-				{submitLabel}
+				Verify
 			</Button>
 		</div>
 	)
-})
+}
 
 export { OtpInput }
