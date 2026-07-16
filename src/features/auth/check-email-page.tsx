@@ -65,7 +65,6 @@ export function CheckEmail() {
 			{ otp, email },
 			{
 				onSuccess: (response) => {
-					//write test to check that the redirect query param is passed to the setup workspace page and that the access token is passed in the hash params
 					if (search.redirect) {
 						navigate({
 							to: search.redirect,
