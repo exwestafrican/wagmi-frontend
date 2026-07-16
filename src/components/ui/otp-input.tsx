@@ -54,11 +54,6 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 
 		setDigits(nextDigits)
 		focusInput(Math.min(cursor, length - 1))
-		//want to call onSubmit when all digits are filled
-		//still a bit buggy
-		// if (isComplete) {
-		// 	onSubmit(value)
-		// }
 	}
 
 	const handleKeyDown = (
@@ -116,7 +111,8 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 			<div className="flex items-center justify-center gap-2 sm:gap-3">
 				{digits.map((digit, index) => (
 					<input
-						key={digit+index}
+						// eslint-disable-next-line react/no-array-index-key
+						key={index}
 						ref={(el) => {
 							inputsRef.current[index] = el
 						}}
