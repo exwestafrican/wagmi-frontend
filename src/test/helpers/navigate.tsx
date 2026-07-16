@@ -58,12 +58,20 @@ export function makeAuthTestRouter() {
 		component: CheckEmail,
 	})
 
+	const setupWorkspaceRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/setup/workspace",
+		validateSearch: z.object({ code: z.string() }),
+		component: () => <div data-testid="setup-workspace-route">Setup</div>,
+	})
+
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			indexRoute,
 			signupRoute,
 			loginRoute,
 			checkEmailRoute,
+			setupWorkspaceRoute,
 		]),
 		context: {},
 	})

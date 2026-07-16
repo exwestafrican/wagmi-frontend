@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, vi, test } from "vitest"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
-import { ApiPaths } from "@/constants"
+import { ApiPaths, CHECK_MAIL_REASON } from "@/constants"
 import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
@@ -43,22 +43,62 @@ describe("Login page", () => {
 	}
 
 	test("user can login", async () => {
-		await setupLoginPage()
+		const { router } = await setupLoginPage()
 		assertSubmitButtonIsDisabled()
 
 		await enterEmail("sam@useenvoye.co")
 		const emailInput = screen.getByRole("textbox")
 		expect(emailInput).toHaveValue("sam@useenvoye.co")
 
-		await user.click(screen.getByRole("button"))
+		await submit()
 
 		await waitFor(() => {
 			expect(mockApiClientPost).toHaveBeenCalledWith(
 				ApiPaths.MAGIC_LINK_REQUEST,
 				{ email: "sam@useenvoye.co" },
 			)
-			expect(screen.getByTestId("toaster")).toBeInTheDocument()
-			expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+			expect(router.state.location.pathname).toBe(Pages.CHECK_EMAIL)
+			expect(router.state.location.search).toMatchObject({
+				email: "sam@useenvoye.co",
+				type: CHECK_MAIL_REASON.LOGIN_SUCCESS,
+			})
+		})
+	})
+
+	test("user can enter otp and verify", async () => {
+		const email = "sam@useenvoye.co"
+		const otp = "847291"
+		const workspaceCode = "e8r4z7"
+		const accessToken = "tok_envoye_sam"
+
+		const { router } = await setupLoginPage()
+		await enterEmail(email)
+		await submit()
+
+		await waitFor(() => {
+			expect(router.state.location.pathname).toBe(Pages.CHECK_EMAIL)
+		})
+
+		mockApiClientPost.mockResolvedValueOnce({
+			data: { workspaceCode, accessToken },
+		})
+
+		for (const [index, digit] of [...otp].entries()) {
+			await user.type(screen.getByLabelText(`Digit ${index + 1}`), digit)
+		}
+
+		await user.click(screen.getByRole("button", { name: "Verify" }))
+
+		await waitFor(() => {
+			expect(mockApiClientPost).toHaveBeenCalledWith(ApiPaths.VERIFY_OTP, {
+				otp,
+				email,
+			})
+			expect(router.state.location.pathname).toBe(Pages.SETUP_WORKSPACE)
+			expect(router.state.location.search).toMatchObject({
+				code: workspaceCode,
+			})
+			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
 		})
 	})
 
