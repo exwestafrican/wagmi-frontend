@@ -120,7 +120,6 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 						inputMode="numeric"
 						autoComplete={index === 0 ? "one-time-code" : "off"}
 						maxLength={1}
-						disabled={isPending}
 						autoFocus={index === 0}
 						value={digit}
 						aria-label={`Digit ${index + 1}`}
