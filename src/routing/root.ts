@@ -66,6 +66,7 @@ export const checkEmailRoute = createRoute({
 	validateSearch: z.object({
 		email: z.email(),
 		type: z.string(),
+		redirect: z.string().optional(),
 	}),
 	component: CheckEmail,
 })

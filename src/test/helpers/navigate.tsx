@@ -20,6 +20,9 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import { redirect } from "@tanstack/react-router"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { Pages } from "@/utils/pages.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -45,6 +48,8 @@ export function makeAuthTestRouter() {
 	const loginRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "login",
+		validateSearch: (search) =>
+			z.object({ redirect: z.string().optional() }).parse(search),
 		component: LoginPage,
 	})
 
@@ -54,6 +59,7 @@ export function makeAuthTestRouter() {
 		validateSearch: z.object({
 			email: z.email(),
 			type: z.string(),
+			redirect: z.string().optional(),
 		}),
 		component: CheckEmail,
 	})
@@ -65,6 +71,31 @@ export function makeAuthTestRouter() {
 		component: () => <div data-testid="setup-workspace-route">Setup</div>,
 	})
 
+	const workspaceLayoutRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "workspace",
+		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
+		beforeLoad: ({ location }) => {
+			const token = useAuthStore.getState().token
+			if (!token) {
+			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
+			}
+		},
+		component: () => <Outlet />,
+	})
+
+	const conversationRoute = createRoute({
+		getParentRoute: () => workspaceLayoutRoute,
+		path: "conversation",
+		validateSearch: z.object({
+			code: z.string(),
+			conversationId: z.coerce.number(), // query strings arrive as strings
+		}),
+		component: () => <div data-testid="conversation-route">Conversation</div>,
+	})
+
+	const workspaceRouteTree = workspaceLayoutRoute.addChildren([conversationRoute])
+
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			indexRoute,
@@ -72,6 +103,7 @@ export function makeAuthTestRouter() {
 			loginRoute,
 			checkEmailRoute,
 			setupWorkspaceRoute,
+			workspaceRouteTree,
 		]),
 		context: {},
 	})
