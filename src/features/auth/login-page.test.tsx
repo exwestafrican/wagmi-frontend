@@ -25,7 +25,9 @@ describe("Login page", () => {
 	async function setupLoginPage(search?: { redirect?: string }) {
 		const queryClient = createTestQueryClient()
 		const router = makeAuthTestRouter()
-		await router.navigate(search ? { to: Pages.LOGIN, search } : { to: Pages.LOGIN })
+		await router.navigate(
+			search ? { to: Pages.LOGIN, search } : { to: Pages.LOGIN },
+		)
 		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
 		return { router }
 	}
@@ -134,12 +136,12 @@ describe("Login page", () => {
 				otp,
 				email,
 			})
-			expect(router.state.location.pathname).toBe("/workspace/conversation")//should /workspace/conversation
+			expect(router.state.location.pathname).toBe("/workspace/conversation") //should /workspace/conversation
 			expect(router.state.location.search).toMatchObject({
 				code: workspaceCode,
 				conversationId: conversationId,
 			})
-			
+
 			expect(screen.getByTestId("conversation-route")).toBeInTheDocument()
 		})
 	})

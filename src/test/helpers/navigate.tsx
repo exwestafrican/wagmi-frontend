@@ -78,7 +78,7 @@ export function makeAuthTestRouter() {
 		beforeLoad: ({ location }) => {
 			const token = useAuthStore.getState().token
 			if (!token) {
-			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
+				throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
 			}
 		},
 		component: () => <Outlet />,
@@ -94,7 +94,9 @@ export function makeAuthTestRouter() {
 		component: () => <div data-testid="conversation-route">Conversation</div>,
 	})
 
-	const workspaceRouteTree = workspaceLayoutRoute.addChildren([conversationRoute])
+	const workspaceRouteTree = workspaceLayoutRoute.addChildren([
+		conversationRoute,
+	])
 
 	return createRouter({
 		routeTree: rootRoute.addChildren([
