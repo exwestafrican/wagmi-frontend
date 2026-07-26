@@ -37,7 +37,7 @@ const routeTree = rootRoute.addChildren([
 
 const router = createRouter({
 	routeTree,
-	context: {},
+	context: { queryClient },
 	defaultPreload: "intent",
 	scrollRestoration: true,
 	defaultStructuralSharing: true,

@@ -1,5 +1,6 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost"
 
+export const ENVOYE_WORKSPACE_CODE = "e8r4z7"
 export const ApiPaths = {
 	MAGIC_LINK_REQUEST: "/auth/magic-link/request",
 	SIGNUP_EMAIL_ONLY: "/auth/signup/email-only",
@@ -23,6 +24,11 @@ export const ApiPaths = {
 	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
 	UNREAD_MESSAGES: "/conversations/unread-messages",
 	VERIFY_OTP: "/auth/verify-otp",
+	PERMISSIONS: "/permission",
+} as const
+
+export const Permissions = {
+	MANAGE_DEVICES: "manage_devices",
 } as const
 
 export const AdminApiPaths = {
@@ -32,6 +38,7 @@ export const AdminApiPaths = {
 	DELETE_FEATURE_FLAG: "admin/feature-flag/delete",
 	FEATURE_ENROLLMENT: "admin/feature-flag/apps/enrollment",
 	ENABLE_FEATURE: "admin/feature-flag/enable-apps",
+	TRACKER_DEVICES: "admin/tracker/devices",
 } as const
 
 export const ROLES = {

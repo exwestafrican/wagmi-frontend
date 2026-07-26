@@ -2,11 +2,14 @@ import { useNavigate } from "@tanstack/react-router"
 import { type KeyboardEvent, useEffect, useMemo } from "react"
 import { getHashParams } from "@/lib/get-hash-params.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
+import { ENVOYE_WORKSPACE_CODE, Permissions } from "@/constants.ts"
+import { usePermission } from "@/features/permission/api/permissions.ts"
 
 export function AdminPage() {
 	const navigate = useNavigate()
 	const accessToken = useMemo(() => getHashParams("access_token"), [])
 	const setAuthToken = useAuthStore((state) => state.setAuthToken)
+	const { data: permissions = [] } = usePermission(ENVOYE_WORKSPACE_CODE)
 
 	useEffect(() => {
 		if (accessToken != null) {
@@ -23,6 +26,14 @@ export function AdminPage() {
 			name: "backfill",
 			path: "/admin/backfill",
 		},
+		...(permissions.includes(Permissions.MANAGE_DEVICES)
+			? [
+					{
+						name: "devices",
+						path: "/admin/devices",
+					},
+				]
+			: []),
 	]
 
 	return (
