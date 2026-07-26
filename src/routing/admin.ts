@@ -13,12 +13,19 @@ import AdminDevicesPage from "@/features/admin/features/devices/page.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 import { ENVOYE_WORKSPACE_CODE } from "@/constants.ts"
 import { permissionQueryOptions } from "@/features/permission/api/permissions.ts"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export const adminLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "admin",
 	notFoundComponent: NotFound,
 	beforeLoad: async ({ location, context }) => {
+		const hashToken = getHashParams("access_token")
+		if (hashToken && !useAuthStore.getState().token) {
+			useAuthStore.getState().setAuthToken(hashToken)
+		}
+
 		const token = getAuthToken()
 		if (!token) {
 			throw redirect({
