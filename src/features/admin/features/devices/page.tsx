@@ -28,9 +28,11 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 
 export default function AdminDevicesPage() {
-	const { data: permissions = [], isPending, isError } = usePermission(
-		ENVOYE_WORKSPACE_CODE,
-	)
+	const {
+		data: permissions = [],
+		isPending,
+		isError,
+	} = usePermission(ENVOYE_WORKSPACE_CODE)
 	const progress = useFakeProgress(isPending)
 	const { data: devices = [] } = useDevices()
 	const { mutate: updateDeviceActive } = useUpdateDeviceActive()
@@ -133,10 +135,7 @@ export default function AdminDevicesPage() {
 						</TabsList>
 						{selectedDevice && (
 							<TabsContent value="details">
-								<DeviceDetail
-									key={selectedDevice.id}
-									device={selectedDevice}
-								/>
+								<DeviceDetail key={selectedDevice.id} device={selectedDevice} />
 							</TabsContent>
 						)}
 					</Tabs>

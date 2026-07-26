@@ -1,7 +1,4 @@
-import {
-	createRootRouteWithContext,
-	createRoute,
-} from "@tanstack/react-router"
+import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
 import type { QueryClient } from "@tanstack/react-query"
 import WaitListPage from "@/features/waitlist/waitlist-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"

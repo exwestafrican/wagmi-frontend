@@ -68,10 +68,7 @@ export function CreateDeviceModal({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent
-				data-testid="create-device-modal"
-				className="sm:max-w-lg"
-			>
+			<DialogContent data-testid="create-device-modal" className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>Create device</DialogTitle>
 				</DialogHeader>

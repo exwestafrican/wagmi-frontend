@@ -1,18 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { adminApiClient } from "@/lib/admin-api-client.ts"
 import { AdminApiPaths } from "@/constants.ts"
-import {
-	TRACKER_DEVICES,
-} from "@/features/admin/features/devices/api/list-devices.ts"
+import { TRACKER_DEVICES } from "@/features/admin/features/devices/api/list-devices.ts"
 import type { Device } from "@/features/admin/features/devices/interface/device.ts"
 
 export function useUpdateDeviceActive() {
 	const queryClient = useQueryClient()
 	return useMutation({
-		mutationFn: async ({
-			id,
-			isActive,
-		}: { id: string; isActive: boolean }) => {
+		mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
 			await adminApiClient.patch(`${AdminApiPaths.TRACKER_DEVICES}/${id}`, {
 				isActive,
 			})

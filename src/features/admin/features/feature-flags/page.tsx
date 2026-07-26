@@ -47,9 +47,7 @@ export default function AdminFeatureFlagPage() {
 	const selectedFeature =
 		featureFlags.find((f) => f.key === selectedKey) ?? featureFlags[0]
 
-	const { data: featureEnrollment } = useFeatureEnrollment(
-		selectedFeature?.key,
-	)
+	const { data: featureEnrollment } = useFeatureEnrollment(selectedFeature?.key)
 
 	function deleteFeature(featureFlag: FeatureFlag) {
 		if (selectedKey === featureFlag.key) {
