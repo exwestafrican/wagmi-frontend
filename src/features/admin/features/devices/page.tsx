@@ -24,37 +24,28 @@ import {
 	TabsTrigger,
 } from "@/components/ui/tabs.tsx"
 import { toast } from "sonner"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Plus } from "lucide-react"
 
 export default function AdminDevicesPage() {
-	const { data: permissions, isPending, isError } = usePermission(
+	const { data: permissions = [], isPending, isError } = usePermission(
 		ENVOYE_WORKSPACE_CODE,
 	)
 	const progress = useFakeProgress(isPending)
-	const { data: devices, isSuccess } = useDevices()
+	const { data: devices = [] } = useDevices()
 	const { mutate: updateDeviceActive } = useUpdateDeviceActive()
 
 	const [createModalOpen, setCreateModalOpen] = useState(false)
-	const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
+	const [selectedId, setSelectedId] = useState<string | undefined>()
 
-	const selectedDevice = devices?.find((device) => device.id === selectedId)
-
-	useEffect(() => {
-		if (!isSuccess) return
-		if (selectedId) return
-
-		const hasDevices = (devices ?? []).length > 0
-		if (hasDevices) {
-			setSelectedId(devices[0].id)
-		}
-	}, [isSuccess, devices, selectedId])
+	const selectedDevice =
+		devices.find((device) => device.id === selectedId) ?? devices[0]
 
 	if (isPending) {
 		return <Loading text="Loading..." progress={progress} />
 	}
 
-	if (isError || !permissions?.includes(Permissions.MANAGE_DEVICES)) {
+	if (isError || !permissions.includes(Permissions.MANAGE_DEVICES)) {
 		return <NotFound />
 	}
 
@@ -91,7 +82,7 @@ export default function AdminDevicesPage() {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{(devices ?? []).map((device) => (
+							{devices.map((device) => (
 								<TableRow
 									key={device.id}
 									data-state={
