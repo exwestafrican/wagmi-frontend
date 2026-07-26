@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner"
 import { useState } from "react"
 import { Plus } from "lucide-react"
+import type { Device } from "@/features/admin/features/devices/interface/device.ts"
 
 export default function AdminDevicesPage() {
 	const {
@@ -40,7 +41,7 @@ export default function AdminDevicesPage() {
 	const [createModalOpen, setCreateModalOpen] = useState(false)
 	const [selectedId, setSelectedId] = useState<string | undefined>()
 
-	const selectedDevice =
+	const selectedDevice: Device | undefined =
 		devices.find((device) => device.id === selectedId) ?? devices[0]
 
 	if (isPending) {

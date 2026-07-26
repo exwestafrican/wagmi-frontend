@@ -44,7 +44,7 @@ export default function AdminFeatureFlagPage() {
 	const [createModalOpen, setCreateModalOpen] = useState(false)
 	const [selectedKey, setSelectedKey] = useState<string | undefined>()
 
-	const selectedFeature =
+	const selectedFeature: FeatureFlag | undefined =
 		featureFlags.find((f) => f.key === selectedKey) ?? featureFlags[0]
 
 	const { data: featureEnrollment } = useFeatureEnrollment(selectedFeature?.key)
