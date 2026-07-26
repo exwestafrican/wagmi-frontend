@@ -6,10 +6,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import {
-	FEATURE_FLAGS,
-	useFeatureFlags,
-} from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
+import { useFeatureFlags } from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
 import { useEffect, useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import {
@@ -18,7 +15,6 @@ import {
 } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
-import { useQueryClient } from "@tanstack/react-query"
 import { useDeleteFeatureFlag } from "@/features/admin/features/feature-flags/api/delete-feature-flag.ts"
 import FeatureFlagDetail from "@/features/admin/features/feature-flags/components/feature-flag-detail.tsx"
 
@@ -28,15 +24,13 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@/components/ui/tabs.tsx"
-import useFeatureEnrollment, {} from "@/features/admin/features/feature-flags/api/enrollment.ts"
+import useFeatureEnrollment from "@/features/admin/features/feature-flags/api/enrollment.ts"
 import { Switch } from "@/components/ui/switch.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import { cn } from "@/lib/utils.ts"
 import useUpdateEnrollment from "@/features/admin/features/feature-flags/api/update-enrollment.ts"
 
 export default function AdminFeatureFlagPage() {
-	const queryClient = useQueryClient()
-
 	const { data: featureFlags, isSuccess } = useFeatureFlags()
 	const { mutate: deleteFeatureFlag } = useDeleteFeatureFlag()
 	const { mutate: updateEnrollment } = useUpdateEnrollment()
@@ -59,17 +53,9 @@ export default function AdminFeatureFlagPage() {
 	}, [isSuccess, featureFlags, selectedKey])
 
 	function deleteFeature(featureFlag: FeatureFlag) {
-		const pervFeatureFlags: FeatureFlag[] | undefined =
-			queryClient.getQueryData([FEATURE_FLAGS])
-
-		if (pervFeatureFlags) {
-			const filtered = pervFeatureFlags.filter(
-				(prev) => prev.key !== featureFlag.key,
-			)
-			setSelectedKey(filtered.length > 0 ? filtered[0].key : undefined)
-			queryClient.setQueryData([FEATURE_FLAGS], () => filtered)
+		if (selectedKey === featureFlag.key) {
+			setSelectedKey(undefined)
 		}
-
 		deleteFeatureFlag(featureFlag.key)
 	}
 
