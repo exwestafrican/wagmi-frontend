@@ -7,6 +7,7 @@ import { rootRoute } from "@/routing/root.ts"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -14,8 +15,10 @@ export const workspaceLayoutRoute = createRoute({
 	notFoundComponent: NotFound,
 	validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 	beforeLoad: ({ location }) => {
-		const token = useAuthStore.getState().token
-		if (!token) {
+		const hashToken = getHashParams("access_token")
+		if (hashToken) {
+			useAuthStore.getState().setAuthToken(hashToken)
+		} else {
 			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
 		}
 	},

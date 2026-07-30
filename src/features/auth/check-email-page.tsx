@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button.tsx"
 import { OtpInput, type OtpInputHandle } from "@/components/ui/otp-input.tsx"
 import useVerifyOtp from "./api/otp"
 import { toast } from "sonner"
-import { useAuthStore } from "@/stores/auth.store"
 
 const OTP_LENGTH = 6
 
@@ -47,7 +46,6 @@ export function CheckEmail() {
 	const search = useSearch({ strict: false })
 	const isUserLogin = type === CHECK_MAIL_REASON.LOGIN_SUCCESS
 	const otpRef = useRef<OtpInputHandle>(null)
-	const setAuthToken = useAuthStore((state) => state.setAuthToken)
 
 	const renderMessage = () => {
 		switch (type) {
@@ -68,9 +66,11 @@ export function CheckEmail() {
 			{
 				onSuccess: (response) => {
 					if (search.redirect) {
-						setAuthToken(response.data.accessToken)
 						navigate({
 							to: search.redirect,
+							hash: new URLSearchParams({
+								access_token: response.data.accessToken,
+							}).toString(),
 						}).then()
 					} else {
 						navigate({

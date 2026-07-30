@@ -136,7 +136,7 @@ describe("Login page", () => {
 				otp,
 				email,
 			})
-			expect(router.state.location.pathname).toBe("/workspace/conversation") //should /workspace/conversation
+			expect(router.state.location.pathname).toBe("/workspace/conversation")
 			expect(router.state.location.search).toMatchObject({
 				code: workspaceCode,
 				conversationId: conversationId,

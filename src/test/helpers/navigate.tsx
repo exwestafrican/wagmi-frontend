@@ -23,6 +23,7 @@ import { NewConversationPage } from "@/features/conversation/new-conversation.pa
 import { redirect } from "@tanstack/react-router"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -76,8 +77,10 @@ export function makeAuthTestRouter() {
 		path: "workspace",
 		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 		beforeLoad: ({ location }) => {
-			const token = useAuthStore.getState().token
-			if (!token) {
+			const hashToken = location.hash;
+			if (hashToken) {
+				useAuthStore.getState().setAuthToken(hashToken)
+			} else {
 				throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
 			}
 		},

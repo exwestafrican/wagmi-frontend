@@ -6,18 +6,21 @@ import { AdminPages } from "@/utils/pages.ts"
 import { createRoute } from "@tanstack/react-router"
 import { AdminPage } from "@/features/admin/admin.page.tsx"
 import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
-import getAuthToken from "@/lib/get-auth-token.ts"
 import AdminFeatureFlagPage from "@/features/admin/features/feature-flags/page.tsx"
 import AdminBackfillPage from "@/features/admin/features/backfill/page.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export const adminLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "admin",
 	notFoundComponent: NotFound,
 	beforeLoad: ({ location }) => {
-		const token = getAuthToken()
-		if (!token) {
+		const hashToken = getHashParams("access_token")
+		if (hashToken) {
+			useAuthStore.getState().setAuthToken(hashToken)
+		} else {
 			throw redirect({
 				to: AdminPages.LOGIN,
 				search: { redirect: location.href },

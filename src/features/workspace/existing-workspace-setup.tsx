@@ -15,14 +15,13 @@ import { Progress } from "@/components/ui/progress.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { useCountDown } from "@/hooks/user-countdown.ts"
 import { InvalidLoginLink } from "@/features/workspace/invalid-login-link.tsx"
-import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export function ExistingWorkspaceSetup() {
 	const { code } = useSearch({ from: "/setup/workspace" })
-	const accessToken = useMemo(() => getHashParams("access_token"), [])
+	const accessToken = useMemo(() => useAuthStore.getState().token, [])
 	const [isCompleted, setIsCompleted] = useState(false)
 
-	const setAuthToken = useAuthStore((state) => state.setAuthToken)
+	const invalidLink = accessToken === null;// no need to use useMemo for this cuz accessToken is already wrapped in use memo so invalidLink will always be updated
 
 	const navigate = useNavigate()
 	const { count, isFinished } = useCountDown(3)
@@ -30,29 +29,33 @@ export function ExistingWorkspaceSetup() {
 
 	useEffect(() => {
 		if (invalidLink) return
-		setAuthToken(accessToken ?? "")
+		//setAuthToken(accessToken ?? "")
 		// TODO load a bunch of things
-		setTimeout(() => {
+		console.log('called', accessToken);
+		const id = setTimeout(() => {
 			setIsCompleted(true)
 			navigate({
 				to: Pages.WORKSPACE,
 				search: { code: code },
+				hash: new URLSearchParams({
+						access_token: accessToken || '',
+					}).toString(),
 			}).then()
 		}, 1000)
-	}, [accessToken, setAuthToken, code, navigate])
+
+		//in strict mode react renders component twice, this made the setTimeout call to be called twice
+		//when the second call is triggered we have already navigated to workspaceLayout page, validated the token exists in the url and cleared from the hash param.
+		//This second timeout function call triggers a new navigation again to the workspaceLayout page but when we check the url this time at onBeforeLoad of the workspaceLayout, the access_token is not present, causing redirect to login page.
+		return () => clearTimeout(id);
+	}, [accessToken, code, setIsCompleted, navigate])
 
 	useEffect(() => {
 		if (invalidLink && isFinished) {
-			setTimeout(() => {
-				setIsCompleted(true)
-				navigate({ to: Pages.LOGIN }).then()
-			}, 1000)
+			console.log("we are hitting here at some point, so token is getting invalidated")
+			setIsCompleted(true)
+			navigate({ to: Pages.LOGIN }).then()
 		}
 	}, [navigate, isFinished])
-
-	const invalidLink = useMemo(() => {
-		return accessToken == null
-	}, [accessToken])
 
 	return invalidLink ? (
 		<InvalidLoginLink

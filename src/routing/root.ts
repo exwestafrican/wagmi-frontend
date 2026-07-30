@@ -1,4 +1,4 @@
-import { createRootRoute, createRoute } from "@tanstack/react-router"
+import { createRootRoute, createRoute, redirect } from "@tanstack/react-router"
 import WaitListPage from "@/features/waitlist/waitlist-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { z } from "zod"
@@ -9,6 +9,9 @@ import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
 import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { getHashParams } from "@/lib/get-hash-params.ts"
+import { Pages } from "@/utils/pages.ts"
 
 export const rootRoute = createRootRoute({
 	component: RootRouteComponent,
@@ -48,6 +51,14 @@ export const existingWorkspaceSetupRoute = createRoute({
 		code: z.string(),
 		access_token: z.string().optional(),
 	}),
+	beforeLoad: () => {
+		const hashToken = getHashParams("access_token")
+		if (hashToken) {
+			useAuthStore.getState().setAuthToken(hashToken)
+		} else {
+			throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
+		}
+	},
 	component: ExistingWorkspaceSetup,
 })
 
