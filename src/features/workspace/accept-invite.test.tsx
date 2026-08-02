@@ -171,7 +171,7 @@ describe("AcceptInvite", () => {
 			await user.clear(screen.getByTestId("teammate-username"))
 
 			await waitFor(() => {
-                expect(screen.queryByTestId("username-error")).not.toBeInTheDocument()
+				expect(screen.queryByTestId("username-error")).not.toBeInTheDocument()
 				expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
 			})
 			expect(
