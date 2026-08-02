@@ -7,7 +7,7 @@ import { ApiPaths, CHECK_MAIL_REASON } from "@/constants.ts"
 import { Pages } from "@/utils/pages.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate.tsx"
 import { decodedInviteFactory } from "@/test/factory/invite.ts"
-import { mockError } from "@/test/helpers/mocks.ts"
+import { mockError, mockGetUrls } from "@/test/helpers/mocks.ts"
 
 vi.mock("@/hooks/use-debounce", () => ({
 	useDebounce: (value: unknown) => value,
@@ -145,8 +145,11 @@ describe("AcceptInvite", () => {
 			await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
 			await waitFor(() => {
-				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
+				expect(screen.getByTestId("username-error")).toBeInTheDocument()
 			})
+			expect(
+				screen.getByTestId("teammate-username-form-message"),
+			).toHaveTextContent("username taken, lets get creative!!")
 			expect(screen.getByTestId("submit-button")).toBeDisabled()
 		})
 
@@ -162,14 +165,36 @@ describe("AcceptInvite", () => {
 			await user.type(screen.getByTestId("teammate-username"), "john.doe")
 
 			await waitFor(() => {
-				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
+				expect(screen.getByTestId("username-error")).toBeInTheDocument()
 			})
 
 			await user.clear(screen.getByTestId("teammate-username"))
 
 			await waitFor(() => {
-				expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
+				expect(screen.queryByTestId("username-error")).not.toBeInTheDocument()
+				expect(screen.queryByText("Username taken")).not.toBeInTheDocument()
 			})
+		})
+
+		it("shows invalid username message when check-username returns BadRequest (400)", async () => {
+			mockGetUrls()
+				.url(ApiPaths.VERIFY_INVITE)
+				.respond(fakeInvite)
+				.url(ApiPaths.CHECK_USERNAME)
+				.fail(HttpStatusCode.BadRequest)
+				.apply()
+
+			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-username"), "bad.name")
+
+			await waitFor(() => {
+				expect(screen.getByTestId("username-error")).toBeInTheDocument()
+			})
+			expect(
+				screen.getByTestId("teammate-username-form-message"),
+			).toHaveTextContent(
+				'Invalid username pattern. Try something with pattern "john.doe" or just "john"',
+			)
 		})
 	})
 })

@@ -35,21 +35,31 @@ export function mockAuthedUser(token = "fake-token") {
 export function mockGetUrls({ isAuthenticated = false } = {}) {
 	if (isAuthenticated) mockAuthedUser()
 
-	const routes = new Map<string, unknown>()
+	type RouteResult =
+		| { ok: true; data: unknown }
+		| { ok: false; status: HttpStatusCode }
+
+	const routes = new Map<string, RouteResult>()
 
 	const builder = {
 		url(url: string) {
 			return {
 				respond(data: unknown) {
-					routes.set(url, data)
+					routes.set(url, { ok: true, data })
+					return builder
+				},
+				fail(status: HttpStatusCode) {
+					routes.set(url, { ok: false, status })
 					return builder
 				},
 			}
 		},
 		apply() {
 			vi.mocked(apiClient.get).mockImplementation((url: string) => {
-				if (routes.has(url)) return Promise.resolve({ data: routes.get(url) })
-				return Promise.reject(new Error(`Unexpected GET ${url}`))
+				const route = routes.get(url)
+				if (!route) return Promise.reject(new Error(`Unexpected GET ${url}`))
+				if (!route.ok) return Promise.reject(mockError(route.status))
+				return Promise.resolve({ data: route.data })
 			})
 		},
 	}
