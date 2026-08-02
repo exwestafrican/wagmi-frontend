@@ -7,33 +7,32 @@ export default function UsernameStateIcon({
 }: {
 	query: UseQueryResult<null, AxiosError<unknown, Error>>
 }) {
-	const icon = () => {
-		if (query.isSuccess) {
-			return (
-				<CircleCheckBig
-					data-testid="username-available"
-					className="size-4 text-green-600"
-				/>
-			)
-		}
-		if (
-			query.isError &&
-			(query.error?.response?.status === HttpStatusCode.Conflict ||
-				query.error?.response?.status === HttpStatusCode.BadRequest)
-		) {
-			return (
-				<CircleX
-					data-testid="username-error"
-					className="size-4 text-destructive"
-				/>
-			)
-		}
+	if (query.isSuccess) {
 		return (
-			<Loader2
-				data-testid="username-checking"
-				className="size-4 animate-spin text-neutral-400"
+			<CircleCheckBig
+				data-testid="username-available"
+				className="size-4 text-green-600"
 			/>
 		)
 	}
-	return icon()
+
+	const status = query.error?.response?.status
+	if (
+		query.isError &&
+		(status === HttpStatusCode.Conflict || status === HttpStatusCode.BadRequest)
+	) {
+		return (
+			<CircleX
+				data-testid="username-error"
+				className="size-4 text-destructive"
+			/>
+		)
+	}
+
+	return (
+		<Loader2
+			data-testid="username-checking"
+			className="size-4 animate-spin text-neutral-400"
+		/>
+	)
 }
