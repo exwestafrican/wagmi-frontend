@@ -181,7 +181,7 @@ describe("AcceptInvite", () => {
 			)
 		})
 
-		it("shows invalid username message when check-username returns BadRequest (400)", async () => {
+		it("shows invalid username message and disables submit when check-username returns BadRequest (400)", async () => {
 			mockGetUrls()
 				.url(ApiPaths.VERIFY_INVITE)
 				.respond(fakeInvite)
@@ -190,6 +190,8 @@ describe("AcceptInvite", () => {
 				.apply()
 
 			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-first-name"), "John")
+			await user.type(screen.getByTestId("teammate-last-name"), "Doe")
 			await user.type(screen.getByTestId("teammate-username"), "bad.name")
 
 			await waitFor(() => {
@@ -200,6 +202,7 @@ describe("AcceptInvite", () => {
 			).toHaveTextContent(
 				'Invalid username pattern. Try something with pattern "john.doe" or just "john"',
 			)
+			expect(screen.getByTestId("submit-button")).toBeDisabled()
 		})
 	})
 })

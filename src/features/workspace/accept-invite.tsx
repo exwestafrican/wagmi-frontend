@@ -253,7 +253,9 @@ export function AcceptInvite() {
 
 							<Button
 								disabled={
-									!form.formState.isValid || isPending || usernameQuery.isError
+									!form.formState.isValid ||
+									isPending ||
+									!usernameQuery.isSuccess
 								}
 								type="submit"
 								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
