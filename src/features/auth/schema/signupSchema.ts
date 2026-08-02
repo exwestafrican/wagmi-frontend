@@ -25,6 +25,13 @@ export const signupSchema = z.object({
 		.nonempty({ message: "Work email is required" })
 		.trim()
 		.toLowerCase(),
+
+	username: z
+		.string()
+		.trim()
+		.toLowerCase()
+		.min(2, { message: "username must contain at least 5 characters" })
+		.max(20, { message: "Username is too large" }),
 })
 
 export type SignupData = z.infer<typeof signupSchema>
