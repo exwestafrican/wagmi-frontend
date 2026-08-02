@@ -63,7 +63,8 @@ function UsernameStateIcon({
 		}
 		if (
 			query.isError &&
-			query.error?.response?.status === HttpStatusCode.Conflict
+			(query.error?.response?.status === HttpStatusCode.Conflict ||
+				query.error?.response?.status === HttpStatusCode.BadRequest)
 		) {
 			return (
 				<CircleX

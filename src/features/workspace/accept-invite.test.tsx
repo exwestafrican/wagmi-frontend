@@ -7,7 +7,7 @@ import { ApiPaths, CHECK_MAIL_REASON } from "@/constants.ts"
 import { Pages } from "@/utils/pages.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate.tsx"
 import { decodedInviteFactory } from "@/test/factory/invite.ts"
-import { mockError } from "@/test/helpers/mocks.ts"
+import { mockError, mockGetUrls } from "@/test/helpers/mocks.ts"
 
 vi.mock("@/hooks/use-debounce", () => ({
 	useDebounce: (value: unknown) => value,
@@ -169,6 +169,22 @@ describe("AcceptInvite", () => {
 
 			await waitFor(() => {
 				expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
+			})
+		})
+
+		it("shows username taken icon when check-username returns BadRequest (400)", async () => {
+			mockGetUrls()
+				.url(ApiPaths.VERIFY_INVITE)
+				.respond(fakeInvite)
+				.url(ApiPaths.CHECK_USERNAME)
+				.fail(HttpStatusCode.BadRequest)
+				.apply()
+
+			await renderAndWaitForForm()
+			await user.type(screen.getByTestId("teammate-username"), "bad.name")
+
+			await waitFor(() => {
+				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
 			})
 		})
 	})
