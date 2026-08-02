@@ -181,7 +181,7 @@ describe("AcceptInvite", () => {
 			)
 		})
 
-		it("shows username taken icon when check-username returns BadRequest (400)", async () => {
+		it("shows invalid username message when check-username returns BadRequest (400)", async () => {
 			mockGetUrls()
 				.url(ApiPaths.VERIFY_INVITE)
 				.respond(fakeInvite)
@@ -193,8 +193,13 @@ describe("AcceptInvite", () => {
 			await user.type(screen.getByTestId("teammate-username"), "bad.name")
 
 			await waitFor(() => {
-				expect(screen.getByTestId("username-taken")).toBeInTheDocument()
+				expect(screen.getByTestId("username-error")).toBeInTheDocument()
 			})
+			expect(
+				screen.getByTestId("teammate-username-form-message"),
+			).toHaveTextContent(
+				'Invalid username pattern. Try something with pattern "john.doe" or just "john"',
+			)
 		})
 	})
 })
