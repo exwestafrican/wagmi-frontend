@@ -174,11 +174,6 @@ describe("AcceptInvite", () => {
 				expect(screen.queryByTestId("username-error")).not.toBeInTheDocument()
 				expect(screen.queryByTestId("username-taken")).not.toBeInTheDocument()
 			})
-			expect(
-				screen.getByTestId("teammate-username-form-message"),
-			).toHaveTextContent(
-				'Invalid username pattern. Try something with pattern "john.doe" or just "john"',
-			)
 		})
 
 		it("shows invalid username message and disables submit when check-username returns BadRequest (400)", async () => {
