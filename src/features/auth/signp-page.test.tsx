@@ -10,9 +10,13 @@ import { HttpStatusCode } from "axios"
 import { RouterProvider } from "@tanstack/react-router"
 import { apiClient } from "@/lib/api-client"
 import { Pages } from "@/utils/pages.ts"
-import { mockError } from "@/test/helpers/mocks.ts"
+import { mockError, mockGetUrls } from "@/test/helpers/mocks.ts"
 import { makeAuthTestRouter } from "@/test/helpers/navigate"
 import { ApiPaths, CHECK_MAIL_REASON } from "@/constants.ts"
+
+vi.mock("@/hooks/use-debounce", () => ({
+	useDebounce: (value: unknown) => value,
+}))
 
 describe("Signup page", () => {
 	let user: UserEvent
@@ -25,6 +29,7 @@ describe("Signup page", () => {
 			lastName: "Doe",
 			email: "james@gmail.com",
 			companyName: "sandpaper",
+			username: "john.doe",
 			...details,
 		}
 	}
@@ -34,11 +39,16 @@ describe("Signup page", () => {
 		lastName: "last-name",
 		email: "email",
 		companyName: "company-name",
+		username: "teammate-username",
 		submit: "submit-button",
 		emailErrorMessage: "email-form-message",
 		firstNameErrorMessage: "firstname-form-message",
 		lastNameErrorMessage: "lastname-form-message",
 		companyNameErrorMessage: "companyname-form-message",
+	}
+
+	function mockUsernameAvailable() {
+		mockGetUrls().url(ApiPaths.CHECK_USERNAME).respond(null).apply()
 	}
 
 	async function setupSignupPage() {
@@ -61,6 +71,7 @@ describe("Signup page", () => {
 				await this.enterInput(signupDetails.firstName, formFields.firstName)
 				await this.enterInput(signupDetails.lastName, formFields.lastName)
 				await this.enterInput(signupDetails.email, formFields.email)
+				await this.enterInput(signupDetails.username, formFields.username)
 				await this.enterInput(signupDetails.companyName, formFields.companyName)
 			},
 			click: async (button: HTMLElement) => {
@@ -79,6 +90,7 @@ describe("Signup page", () => {
 			test.each(["invalid-email", "tum@c", " "])(
 				"should disable submit button for email %s",
 				async (email) => {
+					mockUsernameAvailable()
 					await setupSignupPage()
 
 					expect(
@@ -107,6 +119,7 @@ describe("Signup page", () => {
 			test.each([" ", "f", "d".repeat(19), "firstNameMoreThan!0Characters"])(
 				"should disable submit button for invalid first name %s",
 				async (firstName) => {
+					mockUsernameAvailable()
 					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.firstNameErrorMessage),
@@ -132,6 +145,7 @@ describe("Signup page", () => {
 			test.each([" ", "d", "d".repeat(19), "lastNameMoreThan!0Characters"])(
 				"should disable submit button for invalid last name %s",
 				async (lastName) => {
+					mockUsernameAvailable()
 					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.lastNameErrorMessage),
@@ -157,6 +171,7 @@ describe("Signup page", () => {
 			test.each([" ", "A".repeat(51)])(
 				"should disable submit button for invalid company name %s",
 				async (companyName) => {
+					mockUsernameAvailable()
 					await setupSignupPage()
 					expect(
 						screen.queryByTestId(formFields.companyNameErrorMessage),
@@ -177,10 +192,28 @@ describe("Signup page", () => {
 				},
 			)
 		})
+
+		describe("Username", () => {
+			test("should disable submit button when username is taken", async () => {
+				mockGetUrls()
+					.url(ApiPaths.CHECK_USERNAME)
+					.fail(HttpStatusCode.Conflict)
+					.apply()
+				await setupSignupPage()
+
+				await userInput.enterSignUpDetails({})
+
+				await waitFor(() => {
+					expect(screen.getByTestId("username-error")).toBeInTheDocument()
+					expect(screen.getByTestId(formFields.submit)).toBeDisabled()
+				})
+			})
+		})
 	})
 
 	describe("valid input", () => {
 		test("button is enabled when input is valid", async () => {
+			mockUsernameAvailable()
 			await setupSignupPage()
 
 			await userInput.enterSignUpDetails({})
@@ -193,6 +226,7 @@ describe("Signup page", () => {
 		})
 
 		test("successful signup navigates to check email page", async () => {
+			mockUsernameAvailable()
 			mockApiClientPost.mockResolvedValueOnce({} as never)
 
 			const queryClient = createTestQueryClient()
@@ -208,6 +242,7 @@ describe("Signup page", () => {
 			await userInput.enterSignUpDetails(signupDetails)
 
 			const submitButton = screen.getByTestId(formFields.submit)
+			await waitFor(() => expect(submitButton).toBeEnabled())
 			await userInput.click(submitButton)
 
 			await waitFor(() => {
@@ -238,6 +273,7 @@ describe("Signup page", () => {
 				)
 			})
 			test("when user is unauthorized we transition to waitlist page", async () => {
+				mockUsernameAvailable()
 				const queryClient = createTestQueryClient()
 				const router = makeAuthTestRouter()
 				const navigateSpy = vi.spyOn(router, "navigate")
@@ -249,6 +285,7 @@ describe("Signup page", () => {
 				await userInput.enterSignUpDetails({})
 
 				const submitButton = screen.getByTestId(formFields.submit)
+				await waitFor(() => expect(submitButton).toBeEnabled())
 				await userInput.click(submitButton)
 
 				await waitFor(() => {

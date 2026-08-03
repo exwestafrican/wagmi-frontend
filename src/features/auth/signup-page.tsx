@@ -22,6 +22,15 @@ import { Pages } from "@/utils/pages.ts"
 import { toast } from "sonner"
 import { SplitLayout } from "@/common/components/split-layout.tsx"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@/components/ui/input-group.tsx"
+import UsernameStateIcon from "@/features/workspace/components/username-state-icon.tsx"
+import usernameCheckMessage from "@/features/workspace/utils/username-check-message.ts"
+import { useDebounce } from "@/hooks/use-debounce.ts"
+import { useCheckUsername } from "@/features/workspace/api/check-username.ts"
 
 const SignupPage = () => {
 	const { mutate: signupUser, isPending } = useSignup()
@@ -35,8 +44,13 @@ const SignupPage = () => {
 			lastName: "",
 			email: "",
 			companyName: "",
+			username: "",
 		},
 	})
+
+	const username = form.watch("username")
+	const debouncedUsername = useDebounce(username, 300)
+	const usernameQuery = useCheckUsername(debouncedUsername)
 
 	const onSubmit = (data: SignupData) => {
 		const signUpdata = {
@@ -165,6 +179,47 @@ const SignupPage = () => {
 
 						<FormField
 							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem className="gap-2">
+									<FormLabel className="font-semibold text-neutral-800">
+										Username
+									</FormLabel>
+									<FormControl>
+										<InputGroup>
+											<InputGroupInput
+												data-testid="teammate-username"
+												placeholder="john.doe"
+												className="signup-field-input"
+												{...field}
+											/>
+											<InputGroupAddon align="inline-end">
+												{username && (
+													<UsernameStateIcon query={usernameQuery} />
+												)}
+											</InputGroupAddon>
+										</InputGroup>
+									</FormControl>
+									<FormMessage
+										className="text-xs"
+										data-testid="teammate-username-form-message"
+									>
+										{usernameCheckMessage(usernameQuery, username)}
+									</FormMessage>
+									<FormDescription className="text-xs text-neutral-500">
+										This is how teammates will see you. Keep it simple and easy
+										to find, something like{" "}
+										<code className="bg-gray-100 px-1 rounded">
+											first.lastname
+										</code>{" "}
+										works great!
+									</FormDescription>
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
 							name="companyName"
 							render={({ field }) => (
 								<FormItem className="gap-2">
@@ -185,7 +240,9 @@ const SignupPage = () => {
 						/>
 
 						<Button
-							disabled={!form.formState.isValid || isPending}
+							disabled={
+								!form.formState.isValid || isPending || !usernameQuery.isSuccess
+							}
 							type="submit"
 							className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"
 							data-testid="submit-button"
