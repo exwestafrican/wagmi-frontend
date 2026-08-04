@@ -34,7 +34,10 @@ export function AdminLoginPage() {
 				form.reset()
 				navigate({
 					to: Pages.CHECK_EMAIL,
-					search: { email: data.email, type: CHECK_MAIL_REASON.LOGIN_SUCCESS },
+					search: {
+						email: data.email,
+						type: CHECK_MAIL_REASON.ADMIN_LOGIN_SUCCESS,
+					},
 				})
 			},
 			onError: async () => {

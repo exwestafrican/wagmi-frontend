@@ -20,6 +20,7 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -65,6 +66,18 @@ export function makeAuthTestRouter() {
 		component: () => <div data-testid="setup-workspace-route">Setup</div>,
 	})
 
+	const adminLoginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/admin/login",
+		component: AdminLoginPage,
+	})
+
+	const adminHomeRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/admin",
+		component: () => <div data-testid="admin-home-route">Admin</div>,
+	})
+
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			indexRoute,
@@ -72,6 +85,8 @@ export function makeAuthTestRouter() {
 			loginRoute,
 			checkEmailRoute,
 			setupWorkspaceRoute,
+			adminLoginRoute,
+			adminHomeRoute,
 		]),
 		context: {},
 	})
