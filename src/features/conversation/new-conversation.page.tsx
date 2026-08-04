@@ -106,11 +106,7 @@ export function NewConversationPage() {
 		),
 	]
 
-	useMessagePolling(
-		code,
-		conversationId,
-		getLastReadMessageId(messageContents),
-	)
+	useMessagePolling(code, conversationId, getLastReadMessageId(messageContents))
 
 	function openNewConversationOrNavigateToExistingConversation(
 		sender: Teammate,
