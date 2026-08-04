@@ -6,6 +6,7 @@ import {
 } from "@/features/conversation/api/chat-history.ts"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
 import { fetchMessagesSince } from "@/features/conversation/api/messages-since.ts"
+import { logger } from "@/lib/logger.ts"
 
 const DEFAULT_POLL_INTERVAL_MS = 3000
 
@@ -42,7 +43,7 @@ export function useMessagePolling(
 			} catch (error) {
 				// transient failures should not stop polling
 				//  TODO: maybe alert
-				console.error(error)
+				logger.error(error)
 			}
 		}
 
