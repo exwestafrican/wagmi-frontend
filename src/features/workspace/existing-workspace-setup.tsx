@@ -21,7 +21,7 @@ export function ExistingWorkspaceSetup() {
 	const accessToken = useMemo(() => useAuthStore.getState().token, [])
 	const [isCompleted, setIsCompleted] = useState(false)
 
-	const invalidLink = accessToken === null;// no need to use useMemo for this cuz accessToken is already wrapped in use memo so invalidLink will always be updated
+	const invalidLink = accessToken === null;
 
 	const navigate = useNavigate()
 	const { count, isFinished } = useCountDown(3)
@@ -29,7 +29,6 @@ export function ExistingWorkspaceSetup() {
 
 	useEffect(() => {
 		if (invalidLink) return
-		//setAuthToken(accessToken ?? "")
 		// TODO load a bunch of things
 		console.log('called', accessToken);
 		const id = setTimeout(() => {
@@ -37,9 +36,6 @@ export function ExistingWorkspaceSetup() {
 			navigate({
 				to: Pages.WORKSPACE,
 				search: { code: code },
-				hash: new URLSearchParams({
-						access_token: accessToken || '',
-					}).toString(),
 			}).then()
 		}, 1000)
 

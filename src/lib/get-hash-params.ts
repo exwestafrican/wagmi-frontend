@@ -1,5 +1,4 @@
-export function getHashParams(key: string): string | undefined {
-	const hash = window.location.hash.substring(1)
-	const params = new URLSearchParams(hash)
+export function getHashParams(key: string, routerHash?: string): string | undefined {
+	const params = new URLSearchParams(routerHash)
 	return params.get(key) ?? undefined
 }

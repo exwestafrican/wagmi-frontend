@@ -23,7 +23,6 @@ import { NewConversationPage } from "@/features/conversation/new-conversation.pa
 import { redirect } from "@tanstack/react-router"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
-import { getHashParams } from "@/lib/get-hash-params.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
