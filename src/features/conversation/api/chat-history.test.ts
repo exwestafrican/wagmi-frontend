@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest"
 import {
 	getLastMessageSentAt,
+	getLastReadMessageId,
 	mergeChatHistory,
 } from "@/features/conversation/api/chat-history.ts"
 import {
@@ -25,6 +26,32 @@ describe("getLastMessageSentAt", () => {
 
 	test("returns undefined for an empty list", () => {
 		expect(getLastMessageSentAt([])).toBeUndefined()
+	})
+})
+
+describe("getLastReadMessageId", () => {
+	test("returns the max serverId among messages that have one", () => {
+		const messages = [
+			messageContentFactory.build({ serverId: 10 }),
+			sendingMessageContentFactory.build({}),
+			messageContentFactory.build({ serverId: 42 }),
+			messageContentFactory.build({ serverId: 25 }),
+		]
+
+		expect(getLastReadMessageId(messages)).toBe(42)
+	})
+
+	test("returns undefined when no messages have a serverId", () => {
+		const messages = [
+			sendingMessageContentFactory.build({}),
+			failedMessageContentFactory.build({}),
+		]
+
+		expect(getLastReadMessageId(messages)).toBeUndefined()
+	})
+
+	test("returns undefined for an empty list", () => {
+		expect(getLastReadMessageId([])).toBeUndefined()
 	})
 })
 

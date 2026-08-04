@@ -22,7 +22,7 @@ export const ApiPaths = {
 	SEND_NEW_MESSAGE: "/conversations/direct-message",
 	SEND_REPLY: "/conversations/send-text",
 	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
-	UNREAD_MESSAGES: "/conversations/unread-messages",
+	MESSAGES_SINCE: "/conversations/messages-since",
 	VERIFY_OTP: "/auth/verify-otp",
 	PERMISSIONS: "/permission",
 } as const

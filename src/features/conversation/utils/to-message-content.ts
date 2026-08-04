@@ -11,6 +11,7 @@ export function toMessageContent(
 	// if collision occurs with id, ad author id and possibly state to. to form composite key
 	return {
 		id: chatHistory.sentAt + chatHistory.authorId,
+		serverId: chatHistory.id,
 		authorId: chatHistory.authorId,
 		nodes: chatHistory.content.map((c) => makeTextNode(c)),
 		state: MessageState.SENT,

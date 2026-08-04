@@ -30,6 +30,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import useChatHistory, {
 	addChatHistoryToQueryCache,
+	getLastReadMessageId,
 	updateChatHistoryStateInStore,
 } from "@/features/conversation/api/chat-history.ts"
 import { useMessagePolling } from "@/features/conversation/hooks/use-message-polling.ts"
@@ -80,8 +81,6 @@ export function NewConversationPage() {
 		? counterpartyTeammates(registry, conversationInfo)
 		: []
 
-	useMessagePolling(code, conversationId)
-
 	useEffect(() => {
 		setOpenMobile(false)
 	}, [setOpenMobile])
@@ -106,6 +105,8 @@ export function NewConversationPage() {
 			(pending) => !chatHistory?.some((saved) => saved.id === pending.id),
 		),
 	]
+
+	useMessagePolling(code, conversationId, getLastReadMessageId(messageContents))
 
 	function openNewConversationOrNavigateToExistingConversation(
 		sender: Teammate,
