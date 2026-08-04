@@ -49,7 +49,7 @@ export function CheckEmail() {
 	const renderMessage = () => {
 		switch (type) {
 			case CHECK_MAIL_REASON.LOGIN_SUCCESS:
-            case CHECK_MAIL_REASON.ADMIN_LOGIN_SUCCESS:
+			case CHECK_MAIL_REASON.ADMIN_LOGIN_SUCCESS:
 				return <LoginSuccessMessage email={email} />
 			case CHECK_MAIL_REASON.SIGNUP_SUCCESS:
 				return <SignupSuccessMessage email={email} />
