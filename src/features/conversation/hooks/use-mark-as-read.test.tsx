@@ -37,7 +37,7 @@ describe("useMarkAsRead", () => {
 			({ lastReadMessageId }) =>
 				useMarkAsRead("antiworld", 12, lastReadMessageId),
 			{
-				initialProps: { lastReadMessageId: 42  },
+				initialProps: { lastReadMessageId: 42 },
 				wrapper,
 			},
 		)
