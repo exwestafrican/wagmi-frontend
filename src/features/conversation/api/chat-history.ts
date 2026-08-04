@@ -60,18 +60,11 @@ export function getLastMessageSentAt(
 export function getLastReadMessageId(
 	messages: MessageContent[],
 ): number | undefined {
-	let lastReadMessageId: number | undefined
+	const serverIds = messages
+		.map(({ serverId }) => serverId)
+		.filter((id): id is number => id !== undefined)
 
-	for (const message of messages) {
-		if (
-			message.serverId !== undefined &&
-			(lastReadMessageId === undefined || message.serverId > lastReadMessageId)
-		) {
-			lastReadMessageId = message.serverId
-		}
-	}
-
-	return lastReadMessageId
+	return serverIds.length ? Math.max(...serverIds) : undefined
 }
 
 export function mergeChatHistory(

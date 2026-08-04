@@ -28,15 +28,15 @@ export function useMessagePolling(
 			// 	// let's see how this works in the wild
 			try {
 				const queryKey = chatHistoryQueryKey(workspaceCode, conversationId)
-				const messagesSince = await fetchMessagesSince(
+				const newMessages = await fetchMessagesSince(
 					workspaceCode,
 					conversationId,
 					lastReadMessageId,
 				)
 
-				if (messagesSince.length > 0) {
+				if (newMessages.length > 0) {
 					queryClient.setQueryData<MessageContent[]>(queryKey, (previous) =>
-						mergeChatHistory(previous ?? [], messagesSince),
+						mergeChatHistory(previous ?? [], newMessages),
 					)
 				}
 			} catch (error) {
