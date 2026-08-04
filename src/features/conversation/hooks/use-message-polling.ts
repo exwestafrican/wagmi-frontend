@@ -5,13 +5,14 @@ import {
 	mergeChatHistory,
 } from "@/features/conversation/api/chat-history.ts"
 import type { MessageContent } from "@/features/conversation/interface/text-node.ts"
-import { fetchUnreadMessages } from "@/features/conversation/api/unread-messages.ts"
+import { fetchMessagesSince } from "@/features/conversation/api/messages-since.ts"
 
 const DEFAULT_POLL_INTERVAL_MS = 3000
 
 export function useMessagePolling(
 	workspaceCode: string,
 	conversationId: number,
+	lastReadMessageId: number | undefined,
 	options?: { intervalMs?: number; enabled?: boolean },
 ) {
 	const queryClient = useQueryClient()
@@ -27,14 +28,15 @@ export function useMessagePolling(
 			// 	// let's see how this works in the wild
 			try {
 				const queryKey = chatHistoryQueryKey(workspaceCode, conversationId)
-				const unReadMessages = await fetchUnreadMessages(
+				const messagesSince = await fetchMessagesSince(
 					workspaceCode,
 					conversationId,
+					lastReadMessageId,
 				)
 
-				if (unReadMessages.length > 0) {
+				if (messagesSince.length > 0) {
 					queryClient.setQueryData<MessageContent[]>(queryKey, (previous) =>
-						mergeChatHistory(previous ?? [], unReadMessages),
+						mergeChatHistory(previous ?? [], messagesSince),
 					)
 				}
 			} catch (error) {
@@ -46,5 +48,12 @@ export function useMessagePolling(
 
 		const intervalId = setInterval(poll, intervalMs)
 		return () => clearInterval(intervalId)
-	}, [workspaceCode, conversationId, enabled, intervalMs, queryClient])
+	}, [
+		workspaceCode,
+		conversationId,
+		lastReadMessageId,
+		enabled,
+		intervalMs,
+		queryClient,
+	])
 }
