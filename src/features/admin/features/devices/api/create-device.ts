@@ -10,7 +10,6 @@ export function useCreateDevice() {
 		mutationFn: (payload: RegisterDeviceFormValues) =>
 			adminApiClient.post(AdminApiPaths.TRACKER_DEVICES, {
 				imei: payload.imei,
-				isActive: false,
 			}),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: [TRACKER_DEVICES] })
