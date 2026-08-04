@@ -23,6 +23,7 @@ export const ApiPaths = {
 	SEND_REPLY: "/conversations/send-text",
 	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
 	MESSAGES_SINCE: "/conversations/messages-since",
+	MARK_AS_READ: "/conversations/mark-as-read",
 	VERIFY_OTP: "/auth/verify-otp",
 	PERMISSIONS: "/permission",
 } as const

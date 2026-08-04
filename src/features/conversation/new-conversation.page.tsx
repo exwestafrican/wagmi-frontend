@@ -34,6 +34,7 @@ import useChatHistory, {
 	updateChatHistoryStateInStore,
 } from "@/features/conversation/api/chat-history.ts"
 import { useMessagePolling } from "@/features/conversation/hooks/use-message-polling.ts"
+import { useMarkAsRead } from "@/features/conversation/hooks/use-mark-as-read.ts"
 import { useSendReply } from "@/features/conversation/api/send-reply.ts"
 import { ConversationParticipantInfo } from "@/features/conversation/components/conversation-participant-info.tsx"
 import ConversationParticipants from "@/features/conversation/components/conversation-participants.tsx"
@@ -106,7 +107,9 @@ export function NewConversationPage() {
 		),
 	]
 
-	useMessagePolling(code, conversationId, getLastReadMessageId(messageContents))
+	const lastReadMessageId = getLastReadMessageId(messageContents)
+	useMessagePolling(code, conversationId, lastReadMessageId)
+	useMarkAsRead(code, conversationId, lastReadMessageId)
 
 	function openNewConversationOrNavigateToExistingConversation(
 		sender: Teammate,
