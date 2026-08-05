@@ -3,7 +3,10 @@ import { useAuthStore } from "@/stores/auth.store.ts"
 import { getHashParams } from "@/lib/get-hash-params.ts"
 import { toast } from "sonner"
 
-export function handleAuthToken(location: { href: string; hash: string }, redirectPath: string) {
+export function handleAuthToken(
+	location: { href: string; hash: string },
+	redirectPath: string,
+) {
 	const token = useAuthStore.getState().token
 	if (token) return
 

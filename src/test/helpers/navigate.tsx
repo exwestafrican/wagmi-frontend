@@ -77,7 +77,7 @@ export function makeAuthTestRouter() {
 		path: "workspace",
 		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 		beforeLoad: ({ location }) => {
-			const hashToken = location.hash;
+			const hashToken = location.hash
 			if (hashToken) {
 				useAuthStore.getState().setAuthToken(hashToken)
 			} else {

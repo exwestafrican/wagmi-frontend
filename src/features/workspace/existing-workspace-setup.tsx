@@ -21,7 +21,7 @@ export function ExistingWorkspaceSetup() {
 	const accessToken = useMemo(() => useAuthStore.getState().token, [])
 	const [isCompleted, setIsCompleted] = useState(false)
 
-	const invalidLink = accessToken === null;
+	const invalidLink = accessToken === null
 
 	const navigate = useNavigate()
 	const { count, isFinished } = useCountDown(3)
