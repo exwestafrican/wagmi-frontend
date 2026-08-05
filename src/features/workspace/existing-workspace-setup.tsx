@@ -36,7 +36,7 @@ export function ExistingWorkspaceSetup() {
 				search: { code: code },
 			}).then()
 		}, 1000)
-	}, [accessToken, code, navigate])
+	}, [invalidLink, code, navigate])
 
 	useEffect(() => {
 		if (invalidLink && isFinished) {

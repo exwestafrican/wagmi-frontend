@@ -16,7 +16,7 @@ export const adminLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "admin",
 	notFoundComponent: NotFound,
-	beforeLoad: ({ location }) => {
+	beforeLoad: async ({ location, context}) => {
 		handleAuthToken(location, AdminPages.LOGIN)
     try {
 			await context.queryClient.ensureQueryData(
