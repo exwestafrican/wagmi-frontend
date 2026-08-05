@@ -6,6 +6,7 @@ import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-pag
 import NotFound from "@/features/not-found.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
+import { Pages } from "@/utils/pages"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -13,7 +14,7 @@ export const workspaceLayoutRoute = createRoute({
 	notFoundComponent: NotFound,
 	validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 	beforeLoad: ({ location }) => {
-		handleAuthToken(location)
+		handleAuthToken(location, Pages.LOGIN)
 		//TODO: Load a bunch things here, like feature flags, permissions, teammates, conversation summeries, etc. and then navigate to the workspace directory page
 	},
 	component: WorkspacePage,

@@ -10,6 +10,7 @@ import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
+import { Pages } from "@/utils/pages"
 
 export const rootRoute = createRootRoute({
 	component: RootRouteComponent,
@@ -50,7 +51,7 @@ export const existingWorkspaceSetupRoute = createRoute({
 		access_token: z.string().optional(),
 	}),
 	beforeLoad: ({ location }) => {
-		handleAuthToken(location)
+		handleAuthToken(location, Pages.LOGIN)
 	},
 	component: ExistingWorkspaceSetup,
 })
