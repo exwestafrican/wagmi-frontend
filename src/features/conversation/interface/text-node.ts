@@ -28,6 +28,7 @@ export enum MessageState {
 
 export type MessageContent = {
 	id: number
+	serverId?: number
 	authorId: number
 	nodes: TextNode[]
 	state: MessageState

@@ -12,4 +12,5 @@ export const Pages = {
 
 export const AdminPages = {
 	LOGIN: "/admin/login",
+	HOME: "/admin/",
 }

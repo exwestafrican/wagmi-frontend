@@ -1,0 +1,25 @@
+---
+description: Prefer the shared logger over console.log / console.error
+globs: **/*.ts,**/*.tsx
+alwaysApply: false
+---
+
+# Prefer logger over console
+
+Use [`src/lib/logger.ts`](src/lib/logger.ts) instead of calling `console.log` or `console.error` directly in application code.
+
+```ts
+import { logger } from "@/lib/logger.ts"
+
+// ❌ BAD
+console.error(error)
+console.log("poll completed")
+
+// ✅ GOOD
+logger.error(error)
+logger.info("poll completed")
+```
+
+- `logger.error` for failures / unexpected paths
+- `logger.info` for informational messages
+- Do not introduce new `console.*` call sites in `src/`

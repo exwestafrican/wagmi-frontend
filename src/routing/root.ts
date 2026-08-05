@@ -1,4 +1,5 @@
-import { createRootRoute, createRoute } from "@tanstack/react-router"
+import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
+import type { QueryClient } from "@tanstack/react-query"
 import WaitListPage from "@/features/waitlist/waitlist-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { z } from "zod"
@@ -12,7 +13,11 @@ import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
 import { Pages } from "@/utils/pages"
 
-export const rootRoute = createRootRoute({
+export type RouterContext = {
+	queryClient: QueryClient
+}
+
+export const rootRoute = createRootRouteWithContext<RouterContext>()({
 	component: RootRouteComponent,
 	notFoundComponent: NotFound,
 })

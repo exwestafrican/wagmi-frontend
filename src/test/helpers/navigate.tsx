@@ -23,6 +23,7 @@ import { NewConversationPage } from "@/features/conversation/new-conversation.pa
 import { redirect } from "@tanstack/react-router"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
+import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -100,6 +101,18 @@ export function makeAuthTestRouter() {
 		conversationRoute,
 	])
 
+	const adminLoginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/admin/login",
+		component: AdminLoginPage,
+	})
+
+	const adminHomeRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/admin",
+		component: () => <div data-testid="admin-home-route">Admin</div>,
+	})
+
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			indexRoute,
@@ -108,6 +121,8 @@ export function makeAuthTestRouter() {
 			checkEmailRoute,
 			setupWorkspaceRoute,
 			workspaceRouteTree,
+			adminLoginRoute,
+			adminHomeRoute,
 		]),
 		context: {},
 	})

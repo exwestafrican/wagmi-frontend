@@ -41,46 +41,10 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group"
-import { CircleCheckBig, CircleX, Loader2 } from "lucide-react"
-import { type AxiosError, HttpStatusCode } from "axios"
-import type { UseQueryResult } from "@tanstack/react-query"
+import UsernameStateIcon from "@/features/workspace/components/username-state-icon.tsx"
+import usernameCheckMessage from "@/features/workspace/utils/username-check-message.ts"
 
 const LAG_MS = 2500
-
-function UsernameStateIcon({
-	query,
-}: {
-	query: UseQueryResult<null, AxiosError<unknown, Error>>
-}) {
-	const icon = () => {
-		if (query.isSuccess) {
-			return (
-				<CircleCheckBig
-					data-testid="username-available"
-					className="size-4 text-green-600"
-				/>
-			)
-		}
-		if (
-			query.isError &&
-			query.error?.response?.status === HttpStatusCode.Conflict
-		) {
-			return (
-				<CircleX
-					data-testid="username-taken"
-					className="size-4 text-destructive"
-				/>
-			)
-		}
-		return (
-			<Loader2
-				data-testid="username-checking"
-				className="size-4 animate-spin text-neutral-400"
-			/>
-		)
-	}
-	return icon()
-}
 
 export function AcceptInvite() {
 	const { inviteCode } = useSearch({ from: "/workspace-invite" })
@@ -127,14 +91,6 @@ export function AcceptInvite() {
 	const debouncedUsername = useDebounce(username, 300)
 	const workspaceCode = inviteQuery.data?.workspaceCode ?? ""
 	const usernameQuery = useCheckUsername(debouncedUsername, workspaceCode)
-
-	function onUsernameChange(
-		e: React.ChangeEvent<HTMLInputElement>,
-		fieldOnChange: (...args: unknown[]) => void,
-	) {
-		form.clearErrors("username")
-		fieldOnChange(e)
-	}
 
 	function onSubmit(values: TeammateDetails) {
 		const decodedData = inviteQuery.data
@@ -269,7 +225,6 @@ export function AcceptInvite() {
 													placeholder="john.doe"
 													className="signup-field-input"
 													{...field}
-													onChange={(e) => onUsernameChange(e, field.onChange)}
 												/>
 												<InputGroupAddon align="inline-end">
 													{username && (
@@ -278,6 +233,12 @@ export function AcceptInvite() {
 												</InputGroupAddon>
 											</InputGroup>
 										</FormControl>
+										<FormMessage
+											className="text-xs"
+											data-testid="teammate-username-form-message"
+										>
+											{usernameCheckMessage(usernameQuery, username)}
+										</FormMessage>
 										<FormDescription className="text-xs text-neutral-500">
 											This is how teammates will see you. Keep it simple and
 											easy to find, something like{" "}
@@ -286,14 +247,15 @@ export function AcceptInvite() {
 											</code>{" "}
 											works great!
 										</FormDescription>
-										<FormMessage data-testid="teammate-username-form-message" />
 									</FormItem>
 								)}
 							/>
 
 							<Button
 								disabled={
-									!form.formState.isValid || isPending || usernameQuery.isError
+									!form.formState.isValid ||
+									isPending ||
+									!usernameQuery.isSuccess
 								}
 								type="submit"
 								className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-[#1A1C23] text-white hover:bg-[#1A1C23]/90"

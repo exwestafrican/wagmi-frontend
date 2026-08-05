@@ -1,5 +1,6 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost"
 
+export const ENVOYE_WORKSPACE_CODE = "e8r4z7"
 export const ApiPaths = {
 	MAGIC_LINK_REQUEST: "/auth/magic-link/request",
 	SIGNUP_EMAIL_ONLY: "/auth/signup/email-only",
@@ -21,8 +22,14 @@ export const ApiPaths = {
 	SEND_NEW_MESSAGE: "/conversations/direct-message",
 	SEND_REPLY: "/conversations/send-text",
 	CONVERSATION_CHAT_HISTORY: "/conversations/chat-history",
-	UNREAD_MESSAGES: "/conversations/unread-messages",
+	MESSAGES_SINCE: "/conversations/messages-since",
+	MARK_AS_READ: "/conversations/mark-as-read",
 	VERIFY_OTP: "/auth/verify-otp",
+	PERMISSIONS: "/permission",
+} as const
+
+export const Permissions = {
+	MANAGE_DEVICES: "manage_devices",
 } as const
 
 export const AdminApiPaths = {
@@ -32,6 +39,7 @@ export const AdminApiPaths = {
 	DELETE_FEATURE_FLAG: "admin/feature-flag/delete",
 	FEATURE_ENROLLMENT: "admin/feature-flag/apps/enrollment",
 	ENABLE_FEATURE: "admin/feature-flag/enable-apps",
+	TRACKER_DEVICES: "admin/tracker/devices",
 } as const
 
 export const ROLES = {
@@ -41,6 +49,7 @@ export const ROLES = {
 
 export const CHECK_MAIL_REASON = {
 	LOGIN_SUCCESS: "login-success",
+	ADMIN_LOGIN_SUCCESS: "admin-login-success",
 	SIGNUP_SUCCESS: "signup-success",
 	INVITE_ACCEPTED_SUCCESS: "invite-accepted-success",
 }

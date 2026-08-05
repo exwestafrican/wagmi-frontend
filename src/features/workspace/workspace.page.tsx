@@ -100,6 +100,7 @@ function WorkspaceAvatar({ workspace }: { workspace: Workspace }) {
 }
 
 export default function WorkspacePage() {
+	//TODO: before loading this ensure teammates are loaded.
 	const [openTeammateInviteModal, setOpenTeammateInviteModal] = useState(false)
 
 	const { code } = useSearch({ from: "/workspace" })

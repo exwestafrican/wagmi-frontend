@@ -6,11 +6,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table.tsx"
-import {
-	FEATURE_FLAGS,
-	useFeatureFlags,
-} from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
-import { useEffect, useState } from "react"
+import { useFeatureFlags } from "@/features/admin/features/feature-flags/api/list-feature-flags.ts"
+import { useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import {
 	type FeatureFlag,
@@ -18,7 +15,6 @@ import {
 } from "@/features/admin/interface/feature-flag.ts"
 import { CreateFeatureFlagModal } from "@/features/admin/components/create-feature-flag-modal.tsx"
 import { FeatureBadge } from "@/features/admin/components/feature-badge.tsx"
-import { useQueryClient } from "@tanstack/react-query"
 import { useDeleteFeatureFlag } from "@/features/admin/features/feature-flags/api/delete-feature-flag.ts"
 import FeatureFlagDetail from "@/features/admin/features/feature-flags/components/feature-flag-detail.tsx"
 
@@ -28,48 +24,29 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@/components/ui/tabs.tsx"
-import useFeatureEnrollment, {} from "@/features/admin/features/feature-flags/api/enrollment.ts"
+import useFeatureEnrollment from "@/features/admin/features/feature-flags/api/enrollment.ts"
 import { Switch } from "@/components/ui/switch.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import { cn } from "@/lib/utils.ts"
 import useUpdateEnrollment from "@/features/admin/features/feature-flags/api/update-enrollment.ts"
 
 export default function AdminFeatureFlagPage() {
-	const queryClient = useQueryClient()
-
-	const { data: featureFlags, isSuccess } = useFeatureFlags()
+	const { data: featureFlags = [] } = useFeatureFlags()
 	const { mutate: deleteFeatureFlag } = useDeleteFeatureFlag()
 	const { mutate: updateEnrollment } = useUpdateEnrollment()
 
 	const [createModalOpen, setCreateModalOpen] = useState(false)
-	const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
+	const [selectedKey, setSelectedKey] = useState<string | undefined>()
 
-	const selectedFeature = featureFlags?.find((f) => f.key === selectedKey)
+	const selectedFeature: FeatureFlag | undefined =
+		featureFlags.find((f) => f.key === selectedKey) ?? featureFlags[0]
 
-	const { data: featureEnrollment } = useFeatureEnrollment(selectedKey)
-
-	useEffect(() => {
-		if (!isSuccess) return
-		if (selectedKey) return
-
-		const hasFeatures = (featureFlags ?? []).length > 0
-		if (hasFeatures) {
-			setSelectedKey(featureFlags[0].key)
-		}
-	}, [isSuccess, featureFlags, selectedKey])
+	const { data: featureEnrollment } = useFeatureEnrollment(selectedFeature?.key)
 
 	function deleteFeature(featureFlag: FeatureFlag) {
-		const pervFeatureFlags: FeatureFlag[] | undefined =
-			queryClient.getQueryData([FEATURE_FLAGS])
-
-		if (pervFeatureFlags) {
-			const filtered = pervFeatureFlags.filter(
-				(prev) => prev.key !== featureFlag.key,
-			)
-			setSelectedKey(filtered.length > 0 ? filtered[0].key : undefined)
-			queryClient.setQueryData([FEATURE_FLAGS], () => filtered)
+		if (selectedKey === featureFlag.key) {
+			setSelectedKey(undefined)
 		}
-
 		deleteFeatureFlag(featureFlag.key)
 	}
 
@@ -109,13 +86,13 @@ export default function AdminFeatureFlagPage() {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{featureFlags?.map((ff, rowIdx) => (
+							{featureFlags.map((ff) => (
 								<TableRow
 									key={ff.key}
 									data-state={
 										selectedFeature?.key === ff.key ? "selected" : undefined
 									}
-									onClick={() => setSelectedKey(featureFlags[rowIdx].key)}
+									onClick={() => setSelectedKey(ff.key)}
 									className="cursor-pointer"
 								>
 									<TableCell className="whitespace-normal break-words min-w-0 max-w-md text-xs">
@@ -196,7 +173,7 @@ export default function AdminFeatureFlagPage() {
 															id={enrollment.appId}
 															disabled={canEditEnrollment}
 															aria-label={`Enable ${enrollment.name}`}
-															key={`${selectedKey}-${enrollment.appId}-${enrollment.hasFeature}`}
+															key={`${selectedFeature.key}-${enrollment.appId}-${enrollment.hasFeature}`}
 															checked={enrollment.hasFeature}
 															onCheckedChange={(checked) => {
 																const updatedEnrollment = {

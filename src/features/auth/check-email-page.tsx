@@ -1,4 +1,4 @@
-import { Pages } from "@/utils/pages.ts"
+import { AdminPages, Pages } from "@/utils/pages.ts"
 import { ChevronLeft } from "lucide-react"
 import { useRef } from "react"
 import { useNavigate, useSearch } from "@tanstack/react-router"
@@ -15,7 +15,7 @@ function LoginSuccessMessage({ email }: { email: string }) {
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
 			We sent a 6-digit code to{" "}
 			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
-			below to get into your workspace.
+			or click on link in email to get into your workspace.
 		</p>
 	)
 }
@@ -25,7 +25,7 @@ function SignupSuccessMessage({ email }: { email: string }) {
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
 			We sent a 6-digit code to{" "}
 			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
-			below to get started.
+			or click on link in email to get into your workspace.
 		</p>
 	)
 }
@@ -35,7 +35,7 @@ function InviteSuccessMessage({ email }: { email: string }) {
 		<p className="mt-3 text-sm text-neutral-600 sm:text-base">
 			We sent a 6-digit code to{" "}
 			<span className="font-semibold text-neutral-900">{email}</span>. Enter it
-			below to join the conversation.
+			or click on link in email to get into your workspace.
 		</p>
 	)
 }
@@ -44,12 +44,12 @@ export function CheckEmail() {
 	const { email, type } = useSearch({ from: "/check-email" })
 	const { mutate: verifyOtp, isPending } = useVerifyOtp()
 	const search = useSearch({ strict: false })
-	const isUserLogin = type === CHECK_MAIL_REASON.LOGIN_SUCCESS
 	const otpRef = useRef<OtpInputHandle>(null)
 
 	const renderMessage = () => {
 		switch (type) {
 			case CHECK_MAIL_REASON.LOGIN_SUCCESS:
+			case CHECK_MAIL_REASON.ADMIN_LOGIN_SUCCESS:
 				return <LoginSuccessMessage email={email} />
 			case CHECK_MAIL_REASON.SIGNUP_SUCCESS:
 				return <SignupSuccessMessage email={email} />
@@ -57,6 +57,15 @@ export function CheckEmail() {
 				return <InviteSuccessMessage email={email} />
 			default:
 				return null
+		}
+	}
+
+	const redirectPageOrDefault = () => {
+		switch (type) {
+			case CHECK_MAIL_REASON.ADMIN_LOGIN_SUCCESS:
+				return AdminPages.HOME
+			default:
+				return Pages.SETUP_WORKSPACE
 		}
 	}
 
@@ -74,7 +83,7 @@ export function CheckEmail() {
 						}).then()
 					} else {
 						navigate({
-							to: Pages.SETUP_WORKSPACE,
+							to: redirectPageOrDefault(),
 							search: { code: response.data.workspaceCode },
 							hash: new URLSearchParams({
 								access_token: response.data.accessToken,
@@ -107,15 +116,13 @@ export function CheckEmail() {
 				</h1>
 				{renderMessage()}
 
-				{isUserLogin && (
-					<OtpInput
-						ref={otpRef}
-						className="mt-8"
-						length={OTP_LENGTH}
-						onSubmit={onSubmit}
-						isPending={isPending}
-					/>
-				)}
+				<OtpInput
+					ref={otpRef}
+					className="mt-8"
+					length={OTP_LENGTH}
+					onSubmit={onSubmit}
+					isPending={isPending}
+				/>
 			</div>
 			<div>
 				<Button
@@ -130,7 +137,7 @@ export function CheckEmail() {
 					<ChevronLeft />
 					<p className="font-medium tracking-tight text-neutral-900 ">
 						{" "}
-						Resend {isUserLogin ? "Code" : "Email"}
+						Resend
 					</p>
 				</Button>
 			</div>
