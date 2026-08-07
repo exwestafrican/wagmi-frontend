@@ -24,6 +24,7 @@ import { redirect } from "@tanstack/react-router"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
 import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
+import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -136,13 +137,27 @@ export function makeTestRouter() {
 		getParentRoute: () => rootRoute,
 		path: "/setup/workspace",
 		validateSearch: z.object({ code: z.string() }),
+		beforeLoad: ({ location }) => {
+			handleAuthToken(location, Pages.LOGIN)
+		},
 		component: ExistingWorkspaceSetup,
+	})
+
+	const loginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/login",
+		validateSearch: (search) =>
+			z.object({ redirect: z.string().optional() }).parse(search),
+		component: () => <div data-testid="login-route">Login</div>,
 	})
 
 	const workspaceRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/workspace",
 		validateSearch: z.object({ code: z.string() }),
+		beforeLoad: ({ location }) => {
+			handleAuthToken(location, Pages.LOGIN)
+		},
 		component: WorkspacePage,
 	})
 
@@ -183,6 +198,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
+			loginRoute,
 			workspaceRoute.addChildren([workspaceDirectoryRoute, conversationRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
@@ -208,12 +224,9 @@ export async function navigateToTestPage({
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
 
 	if (Object.values(search).length > 0) {
-		await router.navigate({ to, search })
+		await router.navigate({ to, search, hash })
 	} else {
-		await router.navigate({ to })
-	}
-	if (hash) {
-		window.location.hash = hash
+		await router.navigate({ to, hash })
 	}
 	renderWithQueryClient(
 		<LanguageProvider>
