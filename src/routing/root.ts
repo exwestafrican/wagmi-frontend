@@ -10,6 +10,8 @@ import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
 import { CheckEmail } from "@/features/auth/check-email-page.tsx"
 import NotFound from "@/features/not-found.tsx"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
+import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
+import { Pages } from "@/utils/pages"
 
 export type RouterContext = {
 	queryClient: QueryClient
@@ -53,6 +55,9 @@ export const existingWorkspaceSetupRoute = createRoute({
 		code: z.string(),
 		access_token: z.string().optional(),
 	}),
+	beforeLoad: ({ location }) => {
+		handleAuthToken(location, Pages.LOGIN)
+	},
 	component: ExistingWorkspaceSetup,
 })
 
@@ -71,6 +76,7 @@ export const checkEmailRoute = createRoute({
 	validateSearch: z.object({
 		email: z.email(),
 		type: z.string(),
+		redirect: z.string().optional(),
 	}),
 	component: CheckEmail,
 })

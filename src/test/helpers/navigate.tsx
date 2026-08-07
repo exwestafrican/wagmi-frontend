@@ -20,7 +20,11 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
+import { redirect } from "@tanstack/react-router"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { Pages } from "@/utils/pages.ts"
 import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
+import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
@@ -46,6 +50,8 @@ export function makeAuthTestRouter() {
 	const loginRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "login",
+		validateSearch: (search) =>
+			z.object({ redirect: z.string().optional() }).parse(search),
 		component: LoginPage,
 	})
 
@@ -55,6 +61,7 @@ export function makeAuthTestRouter() {
 		validateSearch: z.object({
 			email: z.email(),
 			type: z.string(),
+			redirect: z.string().optional(),
 		}),
 		component: CheckEmail,
 	})
@@ -65,6 +72,35 @@ export function makeAuthTestRouter() {
 		validateSearch: z.object({ code: z.string() }),
 		component: () => <div data-testid="setup-workspace-route">Setup</div>,
 	})
+
+	const workspaceLayoutRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "workspace",
+		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
+		beforeLoad: ({ location }) => {
+			const hashToken = location.hash
+			if (hashToken) {
+				useAuthStore.getState().setAuthToken(hashToken)
+			} else {
+				throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
+			}
+		},
+		component: () => <Outlet />,
+	})
+
+	const conversationRoute = createRoute({
+		getParentRoute: () => workspaceLayoutRoute,
+		path: "conversation",
+		validateSearch: z.object({
+			code: z.string(),
+			conversationId: z.coerce.number(), // query strings arrive as strings
+		}),
+		component: () => <div data-testid="conversation-route">Conversation</div>,
+	})
+
+	const workspaceRouteTree = workspaceLayoutRoute.addChildren([
+		conversationRoute,
+	])
 
 	const adminLoginRoute = createRoute({
 		getParentRoute: () => rootRoute,
@@ -85,6 +121,7 @@ export function makeAuthTestRouter() {
 			loginRoute,
 			checkEmailRoute,
 			setupWorkspaceRoute,
+			workspaceRouteTree,
 			adminLoginRoute,
 			adminHomeRoute,
 		]),
@@ -100,13 +137,27 @@ export function makeTestRouter() {
 		getParentRoute: () => rootRoute,
 		path: "/setup/workspace",
 		validateSearch: z.object({ code: z.string() }),
+		beforeLoad: ({ location }) => {
+			handleAuthToken(location, Pages.LOGIN)
+		},
 		component: ExistingWorkspaceSetup,
+	})
+
+	const loginRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/login",
+		validateSearch: (search) =>
+			z.object({ redirect: z.string().optional() }).parse(search),
+		component: () => <div data-testid="login-route">Login</div>,
 	})
 
 	const workspaceRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/workspace",
 		validateSearch: z.object({ code: z.string() }),
+		beforeLoad: ({ location }) => {
+			handleAuthToken(location, Pages.LOGIN)
+		},
 		component: WorkspacePage,
 	})
 
@@ -147,6 +198,7 @@ export function makeTestRouter() {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
 			setupRoute,
+			loginRoute,
 			workspaceRoute.addChildren([workspaceDirectoryRoute, conversationRoute]),
 			acceptInviteRoute,
 			checkEmailRoute,
@@ -172,12 +224,9 @@ export async function navigateToTestPage({
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
 
 	if (Object.values(search).length > 0) {
-		await router.navigate({ to, search })
+		await router.navigate({ to, search, hash })
 	} else {
-		await router.navigate({ to })
-	}
-	if (hash) {
-		window.location.hash = hash
+		await router.navigate({ to, hash })
 	}
 	renderWithQueryClient(
 		<LanguageProvider>

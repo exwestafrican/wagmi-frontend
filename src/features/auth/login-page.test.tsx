@@ -11,6 +11,7 @@ import { mockError } from "@/test/helpers/mocks.ts"
 import { makeAuthTestRouter } from "@/test/helpers/navigate.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { RouterProvider } from "@tanstack/react-router"
+import { useAuthStore } from "@/stores/auth.store.ts"
 
 describe("Login page", () => {
 	let user: UserEvent
@@ -18,12 +19,15 @@ describe("Login page", () => {
 
 	beforeEach(() => {
 		user = userEvent.setup()
+		useAuthStore.getState().clearAuthToken()
 	})
 
-	async function setupLoginPage() {
+	async function setupLoginPage(search?: { redirect?: string }) {
 		const queryClient = createTestQueryClient()
 		const router = makeAuthTestRouter()
-		await router.navigate({ to: Pages.LOGIN })
+		await router.navigate(
+			search ? { to: Pages.LOGIN, search } : { to: Pages.LOGIN },
+		)
 		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
 		return { router }
 	}
@@ -99,6 +103,46 @@ describe("Login page", () => {
 				code: workspaceCode,
 			})
 			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
+		})
+	})
+
+	test("user is redirected to conversation after successful OTP verification", async () => {
+		const email = "sam@useenvoye.co"
+		const otp = "847291"
+		const workspaceCode = "e8r4z7"
+		const accessToken = "tok_envoye_sam"
+		const conversationId = 14
+		const redirect = `/workspace/conversation?code=${workspaceCode}&conversationId=${conversationId}`
+		const { router } = await setupLoginPage({ redirect })
+
+		await enterEmail(email)
+		await submit()
+
+		await waitFor(() => {
+			expect(router.state.location.pathname).toBe(Pages.CHECK_EMAIL)
+			expect(router.state.location.search).toMatchObject({ redirect })
+		})
+		mockApiClientPost.mockResolvedValueOnce({
+			data: { workspaceCode, accessToken },
+		})
+
+		for (const [index, digit] of [...otp].entries()) {
+			await user.type(screen.getByLabelText(`Digit ${index + 1}`), digit)
+		}
+
+		await user.click(screen.getByRole("button", { name: "Verify" }))
+		await waitFor(() => {
+			expect(mockApiClientPost).toHaveBeenCalledWith(ApiPaths.VERIFY_OTP, {
+				otp,
+				email,
+			})
+			expect(router.state.location.pathname).toBe("/workspace/conversation")
+			expect(router.state.location.search).toMatchObject({
+				code: workspaceCode,
+				conversationId: conversationId,
+			})
+
+			expect(screen.getByTestId("conversation-route")).toBeInTheDocument()
 		})
 	})
 

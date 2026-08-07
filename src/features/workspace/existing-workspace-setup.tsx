@@ -15,14 +15,13 @@ import { Progress } from "@/components/ui/progress.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { useCountDown } from "@/hooks/user-countdown.ts"
 import { InvalidLoginLink } from "@/features/workspace/invalid-login-link.tsx"
-import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export function ExistingWorkspaceSetup() {
 	const { code } = useSearch({ from: "/setup/workspace" })
-	const accessToken = useMemo(() => getHashParams("access_token"), [])
+	const accessToken = useMemo(() => useAuthStore.getState().token, [])
 	const [isCompleted, setIsCompleted] = useState(false)
 
-	const setAuthToken = useAuthStore((state) => state.setAuthToken)
+	const invalidLink = accessToken === null
 
 	const navigate = useNavigate()
 	const { count, isFinished } = useCountDown(3)
@@ -30,8 +29,6 @@ export function ExistingWorkspaceSetup() {
 
 	useEffect(() => {
 		if (invalidLink) return
-		setAuthToken(accessToken ?? "")
-		// TODO load a bunch of things
 		setTimeout(() => {
 			setIsCompleted(true)
 			navigate({
@@ -39,20 +36,14 @@ export function ExistingWorkspaceSetup() {
 				search: { code: code },
 			}).then()
 		}, 1000)
-	}, [accessToken, setAuthToken, code, navigate])
+	}, [invalidLink, code, navigate])
 
 	useEffect(() => {
 		if (invalidLink && isFinished) {
-			setTimeout(() => {
-				setIsCompleted(true)
-				navigate({ to: Pages.LOGIN }).then()
-			}, 1000)
+			setIsCompleted(true)
+			navigate({ to: Pages.LOGIN }).then()
 		}
-	}, [navigate, isFinished])
-
-	const invalidLink = useMemo(() => {
-		return accessToken == null
-	}, [accessToken])
+	}, [navigate, invalidLink, isFinished])
 
 	return invalidLink ? (
 		<InvalidLoginLink
