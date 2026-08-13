@@ -20,8 +20,6 @@ import WorkspacePage from "@/features/workspace/workspace.page.tsx"
 import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
-import { redirect } from "@tanstack/react-router"
-import { useAuthStore } from "@/stores/auth.store.ts"
 import { Pages } from "@/utils/pages.ts"
 import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
@@ -78,12 +76,7 @@ export function makeAuthTestRouter() {
 		path: "workspace",
 		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 		beforeLoad: ({ location }) => {
-			const hashToken = location.hash
-			if (hashToken) {
-				useAuthStore.getState().setAuthToken(hashToken)
-			} else {
-				throw redirect({ to: Pages.LOGIN, search: { redirect: location.href } })
-			}
+			handleAuthToken(location, Pages.LOGIN)
 		},
 		component: () => <Outlet />,
 	})
