@@ -12,6 +12,7 @@ import { RootRouteComponent } from "@/routing/root-route-component.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token"
 import { ENVOYE_WORKSPACE_CODE } from "@/constants.ts"
 import { permissionQueryOptions } from "@/features/permission/api/permissions.ts"
+
 export const adminLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "admin",

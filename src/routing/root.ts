@@ -53,7 +53,6 @@ export const existingWorkspaceSetupRoute = createRoute({
 	path: "setup/workspace",
 	validateSearch: z.object({
 		code: z.string(),
-		access_token: z.string().optional(),
 	}),
 	beforeLoad: ({ location }) => {
 		handleAuthToken(location, Pages.LOGIN)

@@ -22,12 +22,10 @@ describe("Login page", () => {
 		useAuthStore.getState().clearAuthToken()
 	})
 
-	async function setupLoginPage(search?: { redirect?: string }) {
+	async function setupLoginPage(search?: { redirect: string }) {
 		const queryClient = createTestQueryClient()
 		const router = makeAuthTestRouter()
-		await router.navigate(
-			search ? { to: Pages.LOGIN, search } : { to: Pages.LOGIN },
-		)
+		await router.navigate({ to: Pages.LOGIN, search })
 		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
 		return { router }
 	}

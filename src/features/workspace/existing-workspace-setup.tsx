@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useFakeProgress } from "@/hooks/use-fake-progress.ts"
 import { useNavigate, useSearch } from "@tanstack/react-router"
-import { useAuthStore } from "@/stores/auth.store.ts"
 import {
 	Empty,
 	EmptyContent,
@@ -13,44 +12,26 @@ import {
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { Progress } from "@/components/ui/progress.tsx"
 import { Pages } from "@/utils/pages.ts"
-import { useCountDown } from "@/hooks/user-countdown.ts"
-import { InvalidLoginLink } from "@/features/workspace/invalid-login-link.tsx"
 
 export function ExistingWorkspaceSetup() {
 	const { code } = useSearch({ from: "/setup/workspace" })
-	const accessToken = useMemo(() => useAuthStore.getState().token, [])
 	const [isCompleted, setIsCompleted] = useState(false)
 
-	const invalidLink = accessToken === null
-
 	const navigate = useNavigate()
-	const { count, isFinished } = useCountDown(3)
 	const progress = useFakeProgress(isCompleted)
 
 	useEffect(() => {
-		if (invalidLink) return
-		setTimeout(() => {
+		const timer = setTimeout(() => {
 			setIsCompleted(true)
 			navigate({
 				to: Pages.WORKSPACE,
-				search: { code: code },
+				search: { code },
 			}).then()
 		}, 1000)
-	}, [invalidLink, code, navigate])
+		return () => clearTimeout(timer)
+	}, [code, navigate])
 
-	useEffect(() => {
-		if (invalidLink && isFinished) {
-			setIsCompleted(true)
-			navigate({ to: Pages.LOGIN }).then()
-		}
-	}, [navigate, invalidLink, isFinished])
-
-	return invalidLink ? (
-		<InvalidLoginLink
-			count={count}
-			onclick={() => navigate({ to: Pages.LOGIN })}
-		/>
-	) : (
+	return (
 		<Empty className="w-full min-h-screen justify-center items-center">
 			<EmptyHeader>
 				<EmptyMedia variant="icon">

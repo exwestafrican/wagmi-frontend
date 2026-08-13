@@ -1,23 +1,14 @@
-import { describe, expect, vi, test, beforeEach } from "vitest"
+import { describe, expect, test, beforeEach } from "vitest"
 import { faker } from "@faker-js/faker"
 import { waitFor } from "@testing-library/react"
 import { Pages } from "@/utils/pages.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate"
 
-vi.mock("@/hooks/user-countdown.ts", async () => {
-	return {
-		useCountDown: vi.fn(),
-	}
-})
-
-import { useCountDown } from "@/hooks/user-countdown.ts"
-
 describe("Existing workspace setup", () => {
 	describe("Auto redirect works as expected", () => {
 		beforeEach(() => {
 			useAuthStore.getState().clearAuthToken()
-			vi.mocked(useCountDown).mockReturnValue({ count: 0, isFinished: true })
 		})
 
 		test("it redirects valid url to dashboard", async () => {
@@ -40,15 +31,13 @@ describe("Existing workspace setup", () => {
 		})
 
 		test("Invalid link redirects user to login page", async () => {
-			const { navigateSpy } = await navigateToTestPage({
+			const { router } = await navigateToTestPage({
 				to: "/setup/workspace",
 				search: { code: "e8r4z7" },
 			})
 
 			await waitFor(() => {
-				expect(navigateSpy).toHaveBeenCalledWith(
-					expect.objectContaining({ to: Pages.LOGIN }),
-				)
+				expect(router.state.location.pathname).toBe(Pages.LOGIN)
 			})
 		})
 	})

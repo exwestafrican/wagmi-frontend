@@ -7,15 +7,12 @@ export function handleAuthToken(
 	location: { href: string; hash: string },
 	redirectPath: string,
 ) {
-	const token = useAuthStore.getState().token
-	if (token) return
+	if (useAuthStore.getState().token) return
 
-	if (location.hash) {
-		const accessToken = getHashParams("access_token", location.hash)
-		if (accessToken) {
-			useAuthStore.getState().setAuthToken(accessToken)
-			return
-		}
+	const accessToken = getHashParams("access_token", location.hash)
+	if (accessToken) {
+		useAuthStore.getState().setAuthToken(accessToken)
+		return
 	}
 
 	toast.error("invalid user session")
