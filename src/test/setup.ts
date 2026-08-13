@@ -1,44 +1,6 @@
 import { afterEach, beforeEach, vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
 
-function createMemoryStorage(): Storage {
-	const store = new Map<string, string>()
-	return {
-		get length() {
-			return store.size
-		},
-		clear() {
-			store.clear()
-		},
-		getItem(key) {
-			return store.get(key) ?? null
-		},
-		key(index) {
-			return [...store.keys()][index] ?? null
-		},
-		removeItem(key) {
-			store.delete(key)
-		},
-		setItem(key, value) {
-			store.set(key, String(value))
-		},
-	}
-}
-
-const memoryStorage = createMemoryStorage()
-
-Object.defineProperty(globalThis, "localStorage", {
-	value: memoryStorage,
-	configurable: true,
-	writable: true,
-})
-
-Object.defineProperty(window, "localStorage", {
-	value: memoryStorage,
-	configurable: true,
-	writable: true,
-})
-
 vi.mock("@/lib/api-client", () => ({
 	apiClient: {
 		get: vi.fn(),
@@ -60,7 +22,7 @@ vi.mock("@/lib/admin-api-client", () => ({
 }))
 
 beforeEach(() => {
-	localStorage?.clear?.()
+	localStorage.clear()
 	window.location.hash = ""
 	window.HTMLElement.prototype.scrollIntoView = vi.fn()
 	window.scrollTo = vi.fn()
