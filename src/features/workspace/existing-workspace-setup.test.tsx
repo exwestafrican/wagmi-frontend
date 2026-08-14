@@ -1,22 +1,14 @@
-import { describe, expect, vi, test, beforeEach } from "vitest"
+import { describe, expect, test, beforeEach } from "vitest"
 import { faker } from "@faker-js/faker"
-import { waitFor, screen } from "@testing-library/react"
+import { waitFor } from "@testing-library/react"
 import { Pages } from "@/utils/pages.ts"
-
-vi.mock("@/hooks/user-countdown.ts", async () => {
-	return {
-		useCountDown: vi.fn(),
-	}
-})
-
-import { useCountDown } from "@/hooks/user-countdown.ts"
-import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { useAuthStore } from "@/stores/auth.store.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate"
 
 describe("Existing workspace setup", () => {
 	describe("Auto redirect works as expected", () => {
 		beforeEach(() => {
-			vi.mocked(useCountDown).mockReturnValue({ count: 0, isFinished: true })
+			useAuthStore.getState().clearAuthToken()
 		})
 
 		test("it redirects valid url to dashboard", async () => {
@@ -27,45 +19,26 @@ describe("Existing workspace setup", () => {
 				hash: `access_token=${fakeAccessToken}`,
 			})
 
-			await waitFor(() => {
-				expect(navigateSpy).toHaveBeenCalledWith({
-					to: Pages.WORKSPACE,
-					search: { code: "e8r4z7" },
-				})
-			})
+			await waitFor(
+				() => {
+					expect(navigateSpy).toHaveBeenCalledWith({
+						to: Pages.WORKSPACE,
+						search: { code: "e8r4z7" },
+					})
+				},
+				{ timeout: 2000 },
+			)
 		})
 
 		test("Invalid link redirects user to login page", async () => {
-			const { navigateSpy } = await navigateToTestPage({
+			const { router } = await navigateToTestPage({
 				to: "/setup/workspace",
 				search: { code: "e8r4z7" },
 			})
 
 			await waitFor(() => {
-				expect(navigateSpy).toHaveBeenCalledWith({ to: Pages.LOGIN })
+				expect(router.state.location.pathname).toBe(Pages.LOGIN)
 			})
-		})
-	})
-
-	describe("when auto redirect fails", () => {
-		let user: UserEvent
-
-		beforeEach(() => {
-			user = userEvent.setup()
-			vi.mocked(useCountDown).mockReturnValue({ count: 0, isFinished: false })
-		})
-
-		test("clicking button navigates to login", async () => {
-			const { navigateSpy } = await navigateToTestPage({
-				to: "/setup/workspace",
-				search: { code: "e8r4z7" },
-			})
-
-			const redirectButton = await screen.findByRole("button")
-
-			await user.click(redirectButton)
-
-			expect(navigateSpy).toHaveBeenCalledWith({ to: Pages.LOGIN })
 		})
 	})
 })

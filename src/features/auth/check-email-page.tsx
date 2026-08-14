@@ -77,6 +77,9 @@ export function CheckEmail() {
 					if (search.redirect) {
 						navigate({
 							to: search.redirect,
+							hash: new URLSearchParams({
+								access_token: response.data.accessToken,
+							}).toString(),
 						}).then()
 					} else {
 						navigate({

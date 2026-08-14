@@ -22,7 +22,10 @@ import { useAuthStore } from "@/stores/auth.store.ts"
 import { getHashParams } from "@/lib/get-hash-params.ts"
 
 export default function NewWorkspaceSetup() {
-	const accessToken = useMemo(() => getHashParams("access_token"), [])
+	const accessToken = useMemo(
+		() => getHashParams("access_token", window.location.hash),
+		[],
+	)
 
 	const [isCompleted, setIsCompleted] = useState(false)
 	const [hasSetupError, setHasSetupError] = useState(false)
