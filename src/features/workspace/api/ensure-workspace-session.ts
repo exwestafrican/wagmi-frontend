@@ -8,31 +8,65 @@ import {
 } from "@/features/conversation/api/list-conversation.ts"
 import { teammatesQueryOptions } from "@/features/directory/api/teammates.ts"
 
-export async function ensureWorkspaceSession(
+function loadWorkspace(queryClient: QueryClient, workspaceCode: string) {
+	return queryClient.ensureQueryData(workspaceQueryOptions(workspaceCode))
+}
+
+function loadCurrentTeammate(
 	queryClient: QueryClient,
 	workspaceCode: string,
 ) {
-	const [, teammate] = await Promise.all([
-		queryClient.ensureQueryData(workspaceQueryOptions(workspaceCode)),
-		queryClient.ensureQueryData(currentTeammateQueryOptions(workspaceCode)),
-		queryClient.ensureQueryData(featureFlagsQueryOptions(workspaceCode)),
-	])
+	return queryClient.ensureQueryData(
+		currentTeammateQueryOptions(workspaceCode),
+	)
+}
 
-	await Promise.all([
+function loadFeatureFlags(queryClient: QueryClient, workspaceCode: string) {
+	return queryClient.ensureQueryData(featureFlagsQueryOptions(workspaceCode))
+}
+
+function loadConversations(
+	queryClient: QueryClient,
+	workspaceCode: string,
+	teammateId: number,
+) {
+	return Promise.all([
 		queryClient.ensureQueryData(
 			teammateConversationsQueryOptions(
 				workspaceCode,
-				teammate.id,
+				teammateId,
 				ConversationType.PRIVATE,
 			),
 		),
 		queryClient.ensureQueryData(
 			teammateConversationsQueryOptions(
 				workspaceCode,
-				teammate.id,
+				teammateId,
 				ConversationType.COLLABORATIVE,
 			),
 		),
-		queryClient.ensureQueryData(teammatesQueryOptions(workspaceCode)),
+	])
+}
+
+function loadActiveTeammates(
+	queryClient: QueryClient,
+	workspaceCode: string,
+) {
+	return queryClient.ensureQueryData(teammatesQueryOptions(workspaceCode))
+}
+
+export async function ensureWorkspaceSession(
+	queryClient: QueryClient,
+	workspaceCode: string,
+) {
+	const [, teammate] = await Promise.all([
+		loadWorkspace(queryClient, workspaceCode),
+		loadCurrentTeammate(queryClient, workspaceCode),
+		loadFeatureFlags(queryClient, workspaceCode),
+	])
+
+	await Promise.all([
+		loadConversations(queryClient, workspaceCode, teammate.id),
+		loadActiveTeammates(queryClient, workspaceCode),
 	])
 }
