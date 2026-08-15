@@ -19,7 +19,7 @@ export function WorkspacePending() {
 				<EmptyMedia variant="icon">
 					<Spinner />
 				</EmptyMedia>
-				<EmptyTitle>Loading your workspace</EmptyTitle>
+				<EmptyTitle>Loading your stuff</EmptyTitle>
 				<EmptyDescription>
 					Setting up workspace, profile, and conversations...
 				</EmptyDescription>

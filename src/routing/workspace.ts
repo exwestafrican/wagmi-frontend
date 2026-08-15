@@ -57,7 +57,10 @@ const conversationRoute = createRoute({
 		code: search.code,
 		conversationId: search.conversationId,
 	}),
-	loader: async ({ context: { queryClient }, deps: { code, conversationId } }) => {
+	loader: async ({
+		context: { queryClient },
+		deps: { code, conversationId },
+	}) => {
 		if (conversationId <= 0) return
 		await queryClient.ensureQueryData(
 			chatHistoryQueryOptions(code, conversationId),

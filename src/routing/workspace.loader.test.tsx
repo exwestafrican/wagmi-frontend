@@ -194,9 +194,7 @@ describe("workspaceLayoutRoute loader", () => {
 
 		expect(router.state.location.pathname).toBe("/workspace/conversation")
 		expect(
-			queryClient.getQueryData(
-				chatHistoryQueryKey(envoyeWorkspace.code, 0),
-			),
+			queryClient.getQueryData(chatHistoryQueryKey(envoyeWorkspace.code, 0)),
 		).toBeUndefined()
 	})
 

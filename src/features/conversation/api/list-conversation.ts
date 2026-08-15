@@ -1,8 +1,4 @@
-import {
-	type QueryClient,
-	queryOptions,
-	useQuery,
-} from "@tanstack/react-query"
+import { type QueryClient, queryOptions, useQuery } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 

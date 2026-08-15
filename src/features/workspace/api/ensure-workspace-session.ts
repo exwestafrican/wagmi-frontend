@@ -12,13 +12,8 @@ function loadWorkspace(queryClient: QueryClient, workspaceCode: string) {
 	return queryClient.ensureQueryData(workspaceQueryOptions(workspaceCode))
 }
 
-function loadCurrentTeammate(
-	queryClient: QueryClient,
-	workspaceCode: string,
-) {
-	return queryClient.ensureQueryData(
-		currentTeammateQueryOptions(workspaceCode),
-	)
+function loadCurrentTeammate(queryClient: QueryClient, workspaceCode: string) {
+	return queryClient.ensureQueryData(currentTeammateQueryOptions(workspaceCode))
 }
 
 function loadFeatureFlags(queryClient: QueryClient, workspaceCode: string) {
@@ -48,10 +43,7 @@ function loadConversations(
 	])
 }
 
-function loadActiveTeammates(
-	queryClient: QueryClient,
-	workspaceCode: string,
-) {
+function loadActiveTeammates(queryClient: QueryClient, workspaceCode: string) {
 	return queryClient.ensureQueryData(teammatesQueryOptions(workspaceCode))
 }
 
