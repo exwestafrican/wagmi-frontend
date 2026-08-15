@@ -21,6 +21,10 @@ vi.mock("@/lib/admin-api-client", () => ({
 	},
 }))
 
+vi.mock("@tanstack/react-router-devtools", () => ({
+	TanStackRouterDevtools: () => null,
+}))
+
 beforeEach(() => {
 	localStorage.clear()
 	window.location.hash = ""

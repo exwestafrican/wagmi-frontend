@@ -14,47 +14,50 @@ import { z } from "zod"
 import LoginPage from "@/features/auth/login-page.tsx"
 import SignupPage from "@/features/auth/signup-page.tsx"
 import { CheckEmail } from "@/features/auth/check-email-page.tsx"
-import { ExistingWorkspaceSetup } from "@/features/workspace/existing-workspace-setup.tsx"
-import { AcceptInvite } from "@/features/workspace/accept-invite.tsx"
-import WorkspacePage from "@/features/workspace/workspace.page.tsx"
-import WorkspaceDirectoryPage from "@/features/directory/workspace-directory-page.tsx"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
-import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
+import {
+	acceptInviteRoute,
+	checkEmailRoute,
+	existingWorkspaceSetupRoute,
+	loginRoute,
+	rootRoute,
+} from "@/routing/root.ts"
+import { workspaceRouteTree } from "@/routing/workspace.ts"
 
 function WaitlistPlaceholder() {
 	return <div data-testid="waitlist-route">Waitlist</div>
 }
 
 export function makeAuthTestRouter() {
-	const rootRoute = createRootRoute({
+	const authRootRoute = createRootRoute({
 		component: () => <Outlet />,
 	})
 
 	const indexRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "/",
 		component: WaitlistPlaceholder,
 	})
 
 	const signupRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "signup",
 		component: SignupPage,
 	})
 
-	const loginRoute = createRoute({
-		getParentRoute: () => rootRoute,
+	const authLoginRoute = createRoute({
+		getParentRoute: () => authRootRoute,
 		path: "login",
 		validateSearch: (search) =>
 			z.object({ redirect: z.string().optional() }).parse(search),
 		component: LoginPage,
 	})
 
-	const checkEmailRoute = createRoute({
-		getParentRoute: () => rootRoute,
+	const authCheckEmailRoute = createRoute({
+		getParentRoute: () => authRootRoute,
 		path: "/check-email",
 		validateSearch: z.object({
 			email: z.email(),
@@ -65,14 +68,14 @@ export function makeAuthTestRouter() {
 	})
 
 	const setupWorkspaceRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "/setup/workspace",
 		validateSearch: z.object({ code: z.string() }),
 		component: () => <div data-testid="setup-workspace-route">Setup</div>,
 	})
 
 	const workspaceLayoutRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "workspace",
 		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 		beforeLoad: ({ location }) => {
@@ -91,30 +94,30 @@ export function makeAuthTestRouter() {
 		component: () => <div data-testid="conversation-route">Conversation</div>,
 	})
 
-	const workspaceRouteTree = workspaceLayoutRoute.addChildren([
+	const stubWorkspaceRouteTree = workspaceLayoutRoute.addChildren([
 		conversationRoute,
 	])
 
 	const adminLoginRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "/admin/login",
 		component: AdminLoginPage,
 	})
 
 	const adminHomeRoute = createRoute({
-		getParentRoute: () => rootRoute,
+		getParentRoute: () => authRootRoute,
 		path: "/admin",
 		component: () => <div data-testid="admin-home-route">Admin</div>,
 	})
 
 	return createRouter({
-		routeTree: rootRoute.addChildren([
+		routeTree: authRootRoute.addChildren([
 			indexRoute,
 			signupRoute,
-			loginRoute,
-			checkEmailRoute,
+			authLoginRoute,
+			authCheckEmailRoute,
 			setupWorkspaceRoute,
-			workspaceRouteTree,
+			stubWorkspaceRouteTree,
 			adminLoginRoute,
 			adminHomeRoute,
 		]),
@@ -122,81 +125,16 @@ export function makeAuthTestRouter() {
 	})
 }
 
-export function makeTestRouter() {
-	const rootRoute = createRootRoute({
-		component: () => <Outlet />,
-	})
-	const setupRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/setup/workspace",
-		validateSearch: z.object({ code: z.string() }),
-		beforeLoad: ({ location }) => {
-			handleAuthToken(location, Pages.LOGIN)
-		},
-		component: ExistingWorkspaceSetup,
-	})
-
-	const loginRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/login",
-		validateSearch: (search) =>
-			z.object({ redirect: z.string().optional() }).parse(search),
-		component: () => <div data-testid="login-route">Login</div>,
-	})
-
-	const workspaceRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/workspace",
-		validateSearch: z.object({ code: z.string() }),
-		beforeLoad: ({ location }) => {
-			handleAuthToken(location, Pages.LOGIN)
-		},
-		component: WorkspacePage,
-	})
-
-	const workspaceDirectoryRoute = createRoute({
-		getParentRoute: () => workspaceRoute,
-		path: "directory",
-		validateSearch: z.object({ code: z.string() }),
-		component: WorkspaceDirectoryPage,
-	})
-
-	const conversationRoute = createRoute({
-		getParentRoute: () => workspaceRoute,
-		path: "conversation",
-		validateSearch: z.object({
-			code: z.string(),
-			conversationId: z.number(),
-		}),
-		component: NewConversationPage,
-	})
-
-	const acceptInviteRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/workspace-invite",
-		validateSearch: z.object({ inviteCode: z.string() }),
-		component: AcceptInvite,
-	})
-
-	const checkEmailRoute = createRoute({
-		getParentRoute: () => rootRoute,
-		path: "/check-email",
-		validateSearch: z.object({
-			email: z.email(),
-			type: z.string(),
-		}),
-		component: CheckEmail,
-	})
-
+export function makeTestRouter(queryClient: QueryClient) {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
-			setupRoute,
+			existingWorkspaceSetupRoute,
 			loginRoute,
-			workspaceRoute.addChildren([workspaceDirectoryRoute, conversationRoute]),
+			workspaceRouteTree,
 			acceptInviteRoute,
 			checkEmailRoute,
 		]),
-		context: {},
+		context: { queryClient },
 	})
 }
 
@@ -213,7 +151,7 @@ export async function navigateToTestPage({
 }) {
 	const queryClient = createTestQueryClient()
 	seedQueryCache?.(queryClient)
-	const router = makeTestRouter()
+	const router = makeTestRouter(queryClient)
 	const navigateSpy = vi.spyOn(router, "navigate") // spy BEFORE render
 
 	if (Object.values(search).length > 0) {
@@ -223,9 +161,9 @@ export async function navigateToTestPage({
 	}
 	renderWithQueryClient(
 		<LanguageProvider>
-			<RouterProvider router={router} />
+			<RouterProvider router={router} context={{ queryClient }} />
 		</LanguageProvider>,
 		{ queryClient },
 	)
-	return { router, navigateSpy }
+	return { router, navigateSpy, queryClient }
 }

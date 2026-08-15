@@ -4,6 +4,10 @@ import { waitFor } from "@testing-library/react"
 import { Pages } from "@/utils/pages.ts"
 import { useAuthStore } from "@/stores/auth.store.ts"
 import { navigateToTestPage } from "@/test/helpers/navigate"
+import { mockGetUrls } from "@/test/helpers/mocks.ts"
+import { ApiPaths } from "@/constants.ts"
+import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
+import { teammateFactory } from "@/test/factory/teammate.ts"
 
 describe("Existing workspace setup", () => {
 	describe("Auto redirect works as expected", () => {
@@ -13,6 +17,26 @@ describe("Existing workspace setup", () => {
 
 		test("it redirects valid url to dashboard", async () => {
 			const fakeAccessToken = faker.string.alphanumeric(20)
+			const teammate = teammateFactory.build()
+			mockGetUrls()
+				.url(ApiPaths.WORKSPACE)
+				.respond({
+					code: "e8r4z7",
+					name: "Envoye",
+					status: WorkspaceStatus.ACTIVE,
+				})
+				.url(ApiPaths.CURRENT_TEAMMATE)
+				.respond(teammate)
+				.url(ApiPaths.FEATURE_FLAGS_ENABLED)
+				.respond([])
+				.url(ApiPaths.CONVERSATIONS)
+				.respond([])
+				.url(ApiPaths.ACTIVE_TEAMMATES)
+				.respond([teammate])
+				.url(ApiPaths.CONVERSATION_CHAT_HISTORY)
+				.respond([])
+				.apply()
+
 			const { navigateSpy } = await navigateToTestPage({
 				to: "/setup/workspace",
 				search: { code: "e8r4z7" },

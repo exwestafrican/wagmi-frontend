@@ -1,9 +1,6 @@
 import { describe, expect, test, beforeEach, vi } from "vitest"
-import { createRouter, RouterProvider } from "@tanstack/react-router"
+import { RouterProvider } from "@tanstack/react-router"
 import { screen } from "@testing-library/react"
-import type { QueryClient } from "@tanstack/react-query"
-import { rootRoute, loginRoute } from "@/routing/root.ts"
-import { workspaceRouteTree } from "@/routing/workspace.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
@@ -24,17 +21,7 @@ import { chatHistoryQueryKey } from "@/features/conversation/api/chat-history.ts
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
 import { mockGetUrls } from "@/test/helpers/mocks.ts"
 import { apiClient } from "@/lib/api-client.ts"
-
-vi.mock("@tanstack/react-router-devtools", () => ({
-	TanStackRouterDevtools: () => null,
-}))
-
-function makeWorkspaceLoaderRouter(queryClient: QueryClient) {
-	return createRouter({
-		routeTree: rootRoute.addChildren([loginRoute, workspaceRouteTree]),
-		context: { queryClient },
-	})
-}
+import { makeTestRouter } from "@/test/helpers/navigate.tsx"
 
 describe("workspaceLayoutRoute loader", () => {
 	const envoyeWorkspace = {
@@ -78,7 +65,7 @@ describe("workspaceLayoutRoute loader", () => {
 	test("prefetches workspace session data before rendering workspace UI", async () => {
 		useAuthStore.getState().setAuthToken("fake-token")
 		const queryClient = createTestQueryClient()
-		const router = makeWorkspaceLoaderRouter(queryClient)
+		const router = makeTestRouter(queryClient)
 
 		await router.navigate({
 			to: "/workspace/directory",
@@ -148,7 +135,7 @@ describe("workspaceLayoutRoute loader", () => {
 	test("prefetches chat history when deep-linking to a conversation", async () => {
 		useAuthStore.getState().setAuthToken("fake-token")
 		const queryClient = createTestQueryClient()
-		const router = makeWorkspaceLoaderRouter(queryClient)
+		const router = makeTestRouter(queryClient)
 
 		await router.navigate({
 			to: "/workspace/conversation",
@@ -182,7 +169,7 @@ describe("workspaceLayoutRoute loader", () => {
 	test("does not prefetch chat history when opening a new conversation", async () => {
 		useAuthStore.getState().setAuthToken("fake-token")
 		const queryClient = createTestQueryClient()
-		const router = makeWorkspaceLoaderRouter(queryClient)
+		const router = makeTestRouter(queryClient)
 
 		await router.navigate({
 			to: "/workspace/conversation",
@@ -200,7 +187,7 @@ describe("workspaceLayoutRoute loader", () => {
 
 	test("redirects to login when no auth token is present", async () => {
 		const queryClient = createTestQueryClient()
-		const router = makeWorkspaceLoaderRouter(queryClient)
+		const router = makeTestRouter(queryClient)
 
 		await router.navigate({
 			to: "/workspace/directory",
