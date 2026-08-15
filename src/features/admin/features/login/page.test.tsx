@@ -10,6 +10,7 @@ import { screen, waitFor } from "@testing-library/react"
 import { makeAuthTestRouter } from "@/test/helpers/navigate.tsx"
 import { AdminPages, Pages } from "@/utils/pages.ts"
 import { RouterProvider } from "@tanstack/react-router"
+import { mockGetUrls } from "@/test/helpers/mocks.ts"
 
 describe("Admin login page", () => {
 	let user: UserEvent
@@ -22,9 +23,12 @@ describe("Admin login page", () => {
 
 	async function setupAdminLoginPage() {
 		const queryClient = createTestQueryClient()
-		const router = makeAuthTestRouter()
+		const router = makeAuthTestRouter(queryClient)
 		await router.navigate({ to: AdminPages.LOGIN })
-		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		renderWithQueryClient(
+			<RouterProvider router={router} context={{ queryClient }} />,
+			{ queryClient },
+		)
 		return { router }
 	}
 
@@ -64,6 +68,8 @@ describe("Admin login page", () => {
 		const otp = "847291"
 		const workspaceCode = "e8r4z7"
 		const accessToken = "tok_envoye_sam"
+
+		mockGetUrls().url(ApiPaths.PERMISSIONS).respond([]).apply()
 
 		const { router } = await setupAdminLoginPage()
 		await enterEmail(email)
