@@ -179,6 +179,27 @@ describe("workspaceLayoutRoute loader", () => {
 		expect(chatHistoryCalls).toHaveLength(1)
 	})
 
+	test("does not prefetch chat history when opening a new conversation", async () => {
+		useAuthStore.getState().setAuthToken("fake-token")
+		const queryClient = createTestQueryClient()
+		const router = makeWorkspaceLoaderRouter(queryClient)
+
+		await router.navigate({
+			to: "/workspace/conversation",
+			search: {
+				code: envoyeWorkspace.code,
+				conversationId: 0,
+			},
+		})
+
+		expect(router.state.location.pathname).toBe("/workspace/conversation")
+		expect(
+			queryClient.getQueryData(
+				chatHistoryQueryKey(envoyeWorkspace.code, 0),
+			),
+		).toBeUndefined()
+	})
+
 	test("redirects to login when no auth token is present", async () => {
 		const queryClient = createTestQueryClient()
 		const router = makeWorkspaceLoaderRouter(queryClient)
