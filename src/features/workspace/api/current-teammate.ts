@@ -1,12 +1,12 @@
-import { useQuery } from "@tanstack/react-query"
+import { queryOptions, useQuery } from "@tanstack/react-query"
 import { ApiPaths } from "@/constants.ts"
 import { apiClient } from "@/lib/api-client.ts"
 import type { Teammate } from "@/features/workspace/interface/teammate.interface.ts"
 
 export const CURRENT_TEAMMATE_QUERY_KEY = "current-teammate"
 
-export function useCurrentWorkspaceTeammate(workspaceCode: string) {
-	return useQuery<Teammate>({
+export function currentTeammateQueryOptions(workspaceCode: string) {
+	return queryOptions({
 		queryKey: [CURRENT_TEAMMATE_QUERY_KEY, workspaceCode],
 		queryFn: async () => {
 			const res = await apiClient.get<Teammate>(ApiPaths.CURRENT_TEAMMATE, {
@@ -18,4 +18,8 @@ export function useCurrentWorkspaceTeammate(workspaceCode: string) {
 		staleTime: Number.POSITIVE_INFINITY,
 		refetchOnWindowFocus: false,
 	})
+}
+
+export function useCurrentWorkspaceTeammate(workspaceCode: string) {
+	return useQuery(currentTeammateQueryOptions(workspaceCode))
 }

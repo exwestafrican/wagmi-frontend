@@ -57,7 +57,7 @@ if (rootElement && !rootElement.innerHTML) {
 		<StrictMode>
 			<LanguageProvider>
 				<QueryClientProvider client={queryClient}>
-					<RouterProvider router={router} />
+					<RouterProvider router={router} context={{ queryClient }} />
 				</QueryClientProvider>
 			</LanguageProvider>
 		</StrictMode>,

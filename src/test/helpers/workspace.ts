@@ -116,5 +116,9 @@ export function mockWorkspaceAndCurrentTeammate(
 		.respond(teammate)
 		.url(ApiPaths.ACTIVE_TEAMMATES)
 		.respond(teammates)
+		.url(ApiPaths.FEATURE_FLAGS_ENABLED)
+		.respond([])
+		.url(ApiPaths.CONVERSATIONS)
+		.respond([])
 		.apply()
 }
