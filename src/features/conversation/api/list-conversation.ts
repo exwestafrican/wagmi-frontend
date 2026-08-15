@@ -1,4 +1,4 @@
-import { type QueryClient, useQuery } from "@tanstack/react-query"
+import { type QueryClient, queryOptions, useQuery } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
 
@@ -71,12 +71,12 @@ export function getConversationType(participantCount: number) {
 	return ConversationType.COLLABORATIVE
 }
 
-export default function useTeammateConversations(
+export function teammateConversationsQueryOptions(
 	workspaceCode: string,
 	currentTeammateId: number,
 	conversationType: string,
 ) {
-	return useQuery<ConversationSummary[]>({
+	return queryOptions({
 		queryKey: conversationListQueryKey(
 			workspaceCode,
 			currentTeammateId,
@@ -95,4 +95,18 @@ export default function useTeammateConversations(
 		},
 		enabled: Boolean(workspaceCode) && Boolean(currentTeammateId),
 	})
+}
+
+export default function useTeammateConversations(
+	workspaceCode: string,
+	currentTeammateId: number,
+	conversationType: string,
+) {
+	return useQuery(
+		teammateConversationsQueryOptions(
+			workspaceCode,
+			currentTeammateId,
+			conversationType,
+		),
+	)
 }

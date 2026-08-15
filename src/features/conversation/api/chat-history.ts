@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api-client.ts"
 import { ApiPaths } from "@/constants.ts"
-import { type QueryClient, useQuery } from "@tanstack/react-query"
+import { type QueryClient, queryOptions, useQuery } from "@tanstack/react-query"
 import type {
 	MessageContent,
 	MessageState,
@@ -113,12 +113,12 @@ export async function fetchChatHistory(
 	return res.data.map((raw) => toMessageContent(raw))
 }
 
-export default function useChatHistory(
+export function chatHistoryQueryOptions(
 	workspaceCode: string,
 	conversationId: number,
-	lastMessageSentAt: number | undefined,
+	lastMessageSentAt?: number,
 ) {
-	return useQuery<MessageContent[]>({
+	return queryOptions({
 		queryKey: chatHistoryQueryKey(workspaceCode, conversationId),
 		queryFn: async () =>
 			fetchChatHistory(workspaceCode, conversationId, lastMessageSentAt),
@@ -129,4 +129,14 @@ export default function useChatHistory(
 		// if you change this click around in the ui to be sure things are fine.
 		staleTime: Number.POSITIVE_INFINITY,
 	})
+}
+
+export default function useChatHistory(
+	workspaceCode: string,
+	conversationId: number,
+	lastMessageSentAt: number | undefined,
+) {
+	return useQuery(
+		chatHistoryQueryOptions(workspaceCode, conversationId, lastMessageSentAt),
+	)
 }

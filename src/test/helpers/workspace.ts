@@ -62,7 +62,7 @@ export async function navigateToWorkspacePage(
 		useAuthStore.getState().setAuthToken("fake-token")
 		mockWorkspaceAndCurrentTeammate(workspace, teammate, workspaceTeammates)
 		return await navigateToTestPage({
-			to: "/workspace",
+			to: "/workspace/directory",
 			search: { code: workspace.code },
 			seedQueryCache: (queryClient) =>
 				seedConversationCache(
@@ -116,5 +116,11 @@ export function mockWorkspaceAndCurrentTeammate(
 		.respond(teammate)
 		.url(ApiPaths.ACTIVE_TEAMMATES)
 		.respond(teammates)
+		.url(ApiPaths.FEATURE_FLAGS_ENABLED)
+		.respond([])
+		.url(ApiPaths.CONVERSATIONS)
+		.respond([])
+		.url(ApiPaths.CONVERSATION_CHAT_HISTORY)
+		.respond([])
 		.apply()
 }

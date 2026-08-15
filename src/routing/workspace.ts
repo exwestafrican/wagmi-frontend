@@ -7,6 +7,9 @@ import NotFound from "@/features/not-found.tsx"
 import { NewConversationPage } from "@/features/conversation/new-conversation.page.tsx"
 import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
 import { Pages } from "@/utils/pages"
+import { ensureWorkspaceSession } from "@/features/workspace/api/ensure-workspace-session.ts"
+import { WorkspacePending } from "@/features/workspace/components/workspace-pending.tsx"
+import { chatHistoryQueryOptions } from "@/features/conversation/api/chat-history.ts"
 
 export const workspaceLayoutRoute = createRoute({
 	getParentRoute: () => rootRoute,
@@ -15,8 +18,12 @@ export const workspaceLayoutRoute = createRoute({
 	validateSearch: (search) => z.object({ code: z.string() }).parse(search),
 	beforeLoad: ({ location }) => {
 		handleAuthToken(location, Pages.LOGIN)
-		//TODO: Load a bunch things here, like feature flags, permissions, teammates, conversation summeries, etc. and then navigate to the workspace directory page
 	},
+	loaderDeps: ({ search: { code } }) => ({ code }),
+	loader: async ({ context: { queryClient }, deps: { code } }) => {
+		await ensureWorkspaceSession(queryClient, code)
+	},
+	pendingComponent: WorkspacePending,
 	component: WorkspacePage,
 })
 
@@ -46,6 +53,20 @@ const conversationRoute = createRoute({
 				conversationId: z.number(),
 			})
 			.parse(search),
+	loaderDeps: ({ search }) => ({
+		code: search.code,
+		conversationId: search.conversationId,
+	}),
+	loader: async ({
+		context: { queryClient },
+		deps: { code, conversationId },
+	}) => {
+		if (conversationId <= 0) return
+		await queryClient.ensureQueryData(
+			chatHistoryQueryOptions(code, conversationId),
+		)
+	},
+	pendingComponent: WorkspacePending,
 	component: NewConversationPage,
 })
 

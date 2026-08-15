@@ -70,8 +70,6 @@ describe("Workspace Test", () => {
 			[teammate],
 		)
 
-		await user.click(await screen.findByText(/people/i))
-
 		await waitFor(() => {
 			expect(apiClient.get).toHaveBeenCalledWith(
 				ApiPaths.ACTIVE_TEAMMATES,
