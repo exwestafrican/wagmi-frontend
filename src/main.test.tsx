@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import {
 	RouterProvider,
@@ -7,11 +7,6 @@ import {
 	createRouter,
 } from "@tanstack/react-router"
 import { RootRouteComponent } from "@/routing/root-route-component.tsx"
-
-// Mock components that might cause issues in tests
-vi.mock("@tanstack/react-router-devtools", () => ({
-	TanStackRouterDevtools: () => null,
-}))
 
 function makeTestRoute() {
 	const rootRoute = createRootRoute({

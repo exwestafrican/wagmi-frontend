@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { screen } from "@testing-library/react"
+import { screen, within } from "@testing-library/react"
 import { WorkspaceCode } from "@/test/constants.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { navigateToWorkspacePage } from "@/test/helpers/workspace.ts"
@@ -13,8 +13,10 @@ const envoyeWorkspace = {
 }
 
 async function expectDisplayNameInDirectMessages(name: string) {
-	await screen.findByText(/direct messages/i)
-	expect(await screen.findByText(name)).toBeInTheDocument()
+	const dmLabel = await screen.findByText(/direct messages/i)
+	const dmGroup = dmLabel.closest("[data-sidebar='group']")
+	expect(dmGroup).not.toBeNull()
+	expect(within(dmGroup as HTMLElement).getByText(name)).toBeInTheDocument()
 }
 
 describe("Direct messages sidebar display name", () => {
