@@ -84,17 +84,29 @@ export function makeAuthTestRouter() {
 		component: () => <Outlet />,
 	})
 
+	const workspaceDirectoryRoute = createRoute({
+		getParentRoute: () => workspaceLayoutRoute,
+		path: "directory",
+		component: () => (
+			<div data-testid="workspace-directory-route">Directory</div>
+		),
+	})
+
 	const conversationRoute = createRoute({
 		getParentRoute: () => workspaceLayoutRoute,
 		path: "conversation",
+		// Mirrors the production route (src/routing/workspace.ts): conversationId
+		// must be a real number, so the redirect must parse search params the same
+		// way the router does rather than as raw strings.
 		validateSearch: z.object({
 			code: z.string(),
-			conversationId: z.coerce.number(), // query strings arrive as strings
+			conversationId: z.number(),
 		}),
 		component: () => <div data-testid="conversation-route">Conversation</div>,
 	})
 
 	const stubWorkspaceRouteTree = workspaceLayoutRoute.addChildren([
+		workspaceDirectoryRoute,
 		conversationRoute,
 	])
 

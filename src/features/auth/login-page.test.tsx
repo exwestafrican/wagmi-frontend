@@ -144,6 +144,46 @@ describe("Login page", () => {
 		})
 	})
 
+	test("user is redirected back to their workspace (preserving workspace code and conversation ID) after re-login", async () => {
+		const email = "sam@useenvoye.co"
+		const otp = "847291"
+		const workspaceCode = "e8r4z7"
+		const accessToken = "tok_envoye_sam"
+		// Mirrors what the 401 interceptor stores: the full absolute href.
+		const redirect = `${window.location.origin}/workspace/conversation?code=${workspaceCode}&conversationId=1`
+		const { router } = await setupLoginPage({ redirect })
+
+		await enterEmail(email)
+		await submit()
+
+		await waitFor(() => {
+			expect(router.state.location.pathname).toBe(Pages.CHECK_EMAIL)
+			expect(router.state.location.search).toMatchObject({ redirect })
+		})
+		mockApiClientPost.mockResolvedValueOnce({
+			data: { workspaceCode, accessToken },
+		})
+
+		for (const [index, digit] of [...otp].entries()) {
+			await user.type(screen.getByLabelText(`Digit ${index + 1}`), digit)
+		}
+
+		await user.click(screen.getByRole("button", { name: "Verify" }))
+
+		await waitFor(() => {
+			expect(mockApiClientPost).toHaveBeenCalledWith(ApiPaths.VERIFY_OTP, {
+				otp,
+				email,
+			})
+			expect(router.state.location.pathname).toBe('/workspace/conversation')
+			expect(router.state.location.search).toMatchObject({
+				code: workspaceCode,
+			})
+			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
+			expect(screen.getByTestId("conversation-route")).toBeInTheDocument()
+		})
+	})
+
 	test("unauthorized user cannot login", async () => {
 		mockApiClientPost.mockRejectedValueOnce(
 			mockError(HttpStatusCode.Unauthorized),
