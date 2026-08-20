@@ -1,17 +1,17 @@
-import { beforeEach, describe, expect, vi, test } from "vitest"
-import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { HttpStatusCode } from "axios"
-import { ApiPaths, CHECK_MAIL_REASON } from "@/constants"
-import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
-import { screen, waitFor } from "@testing-library/react"
+import { ApiPaths, CHECK_MAIL_REASON } from "@/constants"
+import { apiClient } from "@/lib/api-client"
+import { useAuthStore } from "@/stores/auth.store.ts"
 import { mockError } from "@/test/helpers/mocks.ts"
 import { makeAuthTestRouter } from "@/test/helpers/navigate.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { RouterProvider } from "@tanstack/react-router"
-import { useAuthStore } from "@/stores/auth.store.ts"
+import { screen, waitFor } from "@testing-library/react"
+import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { HttpStatusCode } from "axios"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 describe("Login page", () => {
 	let user: UserEvent
@@ -175,7 +175,7 @@ describe("Login page", () => {
 				otp,
 				email,
 			})
-			expect(router.state.location.pathname).toBe('/workspace/conversation')
+			expect(router.state.location.pathname).toBe("/workspace/conversation")
 			expect(router.state.location.search).toMatchObject({
 				code: workspaceCode,
 			})
