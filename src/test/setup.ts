@@ -1,42 +1,6 @@
 import { afterEach, beforeEach, vi } from "vitest"
 import "@testing-library/jest-dom/vitest"
 
-// Node >= 25 injects a non-functional global `localStorage`/`sessionStorage`
-// that shadows jsdom's implementation and lacks the Web Storage API (no
-// `.clear`, `.getItem`, etc.). Install a memory-backed shim so the suite runs
-// regardless of Node version.
-class MemoryStorage implements Storage {
-	private store = new Map<string, string>()
-	get length() {
-		return this.store.size
-	}
-	clear() {
-		this.store.clear()
-	}
-	getItem(key: string) {
-		return this.store.has(key) ? (this.store.get(key) as string) : null
-	}
-	key(index: number) {
-		return Array.from(this.store.keys())[index] ?? null
-	}
-	removeItem(key: string) {
-		this.store.delete(key)
-	}
-	setItem(key: string, value: string) {
-		this.store.set(key, String(value))
-	}
-}
-
-for (const name of ["localStorage", "sessionStorage"] as const) {
-	if (typeof globalThis[name]?.clear !== "function") {
-		Object.defineProperty(globalThis, name, {
-			value: new MemoryStorage(),
-			configurable: true,
-			writable: true,
-		})
-	}
-}
-
 vi.mock("@/lib/api-client", () => ({
 	apiClient: {
 		get: vi.fn(),

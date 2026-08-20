@@ -149,7 +149,7 @@ describe("Login page", () => {
 		const otp = "847291"
 		const workspaceCode = "e8r4z7"
 		const accessToken = "tok_envoye_sam"
-		// Mirrors what the 401 interceptor stores: the full absolute href.
+		// Mirrors what the 401 response interceptor stores(see create-api-client.ts): the full absolute href.
 		const redirect = `${window.location.origin}/workspace/conversation?code=${workspaceCode}&conversationId=1`
 		const { router } = await setupLoginPage({ redirect })
 
