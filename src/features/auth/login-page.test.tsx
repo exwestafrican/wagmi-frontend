@@ -197,7 +197,7 @@ describe("Login page", () => {
 				code: workspaceCode,
 			})
 			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
-			expect(screen.getByTestId("conversation-route")).toBeInTheDocument()
+			expect(screen.getByLabelText("message-composer")).toBeInTheDocument()
 		})
 	})
 
