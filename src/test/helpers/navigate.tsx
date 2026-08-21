@@ -84,14 +84,6 @@ export function makeAuthTestRouter() {
 		component: () => <Outlet />,
 	})
 
-	const workspaceDirectoryRoute = createRoute({
-		getParentRoute: () => workspaceLayoutRoute,
-		path: "directory",
-		component: () => (
-			<div data-testid="workspace-directory-route">Directory</div>
-		),
-	})
-
 	const conversationRoute = createRoute({
 		getParentRoute: () => workspaceLayoutRoute,
 		path: "conversation",
@@ -103,7 +95,6 @@ export function makeAuthTestRouter() {
 	})
 
 	const stubWorkspaceRouteTree = workspaceLayoutRoute.addChildren([
-		workspaceDirectoryRoute,
 		conversationRoute,
 	])
 
