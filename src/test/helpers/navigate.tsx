@@ -3,139 +3,44 @@ import renderWithQueryClient, {
 } from "@/common/renderWithQueryClient.tsx"
 import type { QueryClient } from "@tanstack/react-query"
 import { vi } from "vitest"
-import {
-	createRootRoute,
-	createRoute,
-	createRouter,
-	Outlet,
-	RouterProvider,
-} from "@tanstack/react-router"
-import { z } from "zod"
-import LoginPage from "@/features/auth/login-page.tsx"
-import SignupPage from "@/features/auth/signup-page.tsx"
-import { CheckEmail } from "@/features/auth/check-email-page.tsx"
+import { createRouter, RouterProvider } from "@tanstack/react-router"
 import LanguageProvider from "@/i18n/LanguageProvider.tsx"
-import { Pages } from "@/utils/pages.ts"
-import { AdminLoginPage } from "@/features/admin/features/login/page.tsx"
-import { handleAuthToken } from "@/features/auth/hooks/handle-auth-token.ts"
 import {
 	acceptInviteRoute,
 	checkEmailRoute,
 	existingWorkspaceSetupRoute,
+	indexRoute,
 	loginRoute,
 	rootRoute,
+	signupRoute,
+	workspaceSetupRoute,
 } from "@/routing/root.ts"
 import { workspaceRouteTree } from "@/routing/workspace.ts"
+import { adminRouteTree } from "@/routing/admin.ts"
 
-function WaitlistPlaceholder() {
-	return <div data-testid="waitlist-route">Waitlist</div>
-}
-
-export function makeAuthTestRouter() {
-	const authRootRoute = createRootRoute({
-		component: () => <Outlet />,
-	})
-
-	const indexRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "/",
-		component: WaitlistPlaceholder,
-	})
-
-	const signupRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "signup",
-		component: SignupPage,
-	})
-
-	const authLoginRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "login",
-		validateSearch: (search) =>
-			z.object({ redirect: z.string().optional() }).parse(search),
-		component: LoginPage,
-	})
-
-	const authCheckEmailRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "/check-email",
-		validateSearch: z.object({
-			email: z.email(),
-			type: z.string(),
-			redirect: z.string().optional(),
-		}),
-		component: CheckEmail,
-	})
-
-	const setupWorkspaceRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "/setup/workspace",
-		validateSearch: z.object({ code: z.string() }),
-		component: () => <div data-testid="setup-workspace-route">Setup</div>,
-	})
-
-	const workspaceLayoutRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "workspace",
-		validateSearch: (search) => z.object({ code: z.string() }).parse(search),
-		beforeLoad: ({ location }) => {
-			handleAuthToken(location, Pages.LOGIN)
-		},
-		component: () => <Outlet />,
-	})
-
-	const conversationRoute = createRoute({
-		getParentRoute: () => workspaceLayoutRoute,
-		path: "conversation",
-		validateSearch: z.object({
-			code: z.string(),
-			conversationId: z.coerce.number(), // query strings arrive as strings
-		}),
-		component: () => <div data-testid="conversation-route">Conversation</div>,
-	})
-
-	const stubWorkspaceRouteTree = workspaceLayoutRoute.addChildren([
-		conversationRoute,
-	])
-
-	const adminLoginRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "/admin/login",
-		component: AdminLoginPage,
-	})
-
-	const adminHomeRoute = createRoute({
-		getParentRoute: () => authRootRoute,
-		path: "/admin",
-		component: () => <div data-testid="admin-home-route">Admin</div>,
-	})
-
-	return createRouter({
-		routeTree: authRootRoute.addChildren([
-			indexRoute,
-			signupRoute,
-			authLoginRoute,
-			authCheckEmailRoute,
-			setupWorkspaceRoute,
-			stubWorkspaceRouteTree,
-			adminLoginRoute,
-			adminHomeRoute,
-		]),
-		context: {},
-	})
-}
-
-export function makeTestRouter(queryClient: QueryClient) {
+export function makeAppTestRouter(queryClient: QueryClient) {
 	return createRouter({
 		routeTree: rootRoute.addChildren([
+			indexRoute,
+			workspaceSetupRoute,
 			existingWorkspaceSetupRoute,
+			signupRoute,
 			loginRoute,
-			workspaceRouteTree,
 			acceptInviteRoute,
 			checkEmailRoute,
+			workspaceRouteTree,
+			adminRouteTree,
 		]),
 		context: { queryClient },
 	})
+}
+
+export function makeAuthTestRouter(queryClient: QueryClient) {
+	return makeAppTestRouter(queryClient)
+}
+
+export function makeTestRouter(queryClient: QueryClient) {
+	return makeAppTestRouter(queryClient)
 }
 
 export async function navigateToTestPage({
