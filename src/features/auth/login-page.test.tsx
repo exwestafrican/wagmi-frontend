@@ -12,6 +12,10 @@ import { screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { useAuthStore } from "@/stores/auth.store.ts"
+import { mockWorkspaceAndCurrentTeammate } from "@/test/helpers/workspace.ts"
+import { teammateFactory } from "@/test/factory/teammate.ts"
+import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
 
 describe("Login page", () => {
 	let user: UserEvent
@@ -24,9 +28,12 @@ describe("Login page", () => {
 
 	async function setupLoginPage(search?: { redirect: string }) {
 		const queryClient = createTestQueryClient()
-		const router = makeAuthTestRouter()
+		const router = makeAuthTestRouter(queryClient)
 		await router.navigate({ to: Pages.LOGIN, search })
-		renderWithQueryClient(<RouterProvider router={router} />, { queryClient })
+		renderWithQueryClient(
+			<RouterProvider router={router} context={{ queryClient }} />,
+			{ queryClient },
+		)
 		return { router }
 	}
 
@@ -111,6 +118,17 @@ describe("Login page", () => {
 		const accessToken = "tok_envoye_sam"
 		const conversationId = 14
 		const redirect = `/workspace/conversation?code=${workspaceCode}&conversationId=${conversationId}`
+		const teammate = teammateFactory.build()
+
+		mockWorkspaceAndCurrentTeammate(
+			{
+				code: workspaceCode,
+				name: "Envoye",
+				status: WorkspaceStatus.ACTIVE,
+			},
+			teammate,
+		)
+
 		const { router } = await setupLoginPage({ redirect })
 
 		await enterEmail(email)
@@ -140,7 +158,7 @@ describe("Login page", () => {
 				conversationId: conversationId,
 			})
 
-			expect(screen.getByTestId("conversation-route")).toBeInTheDocument()
+			expect(screen.getByLabelText("message-composer")).toBeInTheDocument()
 		})
 	})
 
