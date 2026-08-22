@@ -10,11 +10,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/common/test/setup.ts'],
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      '@common': resolve(__dirname, './src/common'),
+      '@envoye': resolve(__dirname, './src/envoye'),
+      '@fahari': resolve(__dirname, './src/fahari'),
     },
   },
 })

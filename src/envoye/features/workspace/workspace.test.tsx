@@ -1,0 +1,156 @@
+import { describe, expect, test, beforeEach } from "vitest"
+import { WorkspaceCode } from "@envoye/test/constants.ts"
+import { screen, waitFor, within } from "@testing-library/react"
+import { apiClient } from "@common/lib/api-client.ts"
+import type { UserEvent } from "@testing-library/user-event"
+import userEvent from "@testing-library/user-event"
+import { enterEmailToInvite } from "@envoye/test/helpers/invite-teammates.tsx"
+import { WorkspaceStatus } from "@envoye/features/workspace/interface/workspace.interface.ts"
+import { ApiPaths } from "@envoye/constants.ts"
+import { teammateFactory } from "@envoye/test/factory/teammate.ts"
+import { navigateToWorkspacePage } from "@envoye/test/helpers/workspace.ts"
+
+const envoyeWorkspace = {
+	code: WorkspaceCode.ENVOYE,
+	name: "Envoye",
+	status: WorkspaceStatus.ACTIVE,
+}
+
+describe("Workspace Test", () => {
+	let user: UserEvent
+
+	beforeEach(async () => {
+		user = userEvent.setup()
+	})
+
+	async function openInviteTeammateModal() {
+		const menuTrigger = screen.getByRole("button", { name: /workspace menu/i }) // MoreVertical trigger
+		await user.click(menuTrigger)
+		await user.click(screen.getByRole("menuitem", { name: /add teammate/i }))
+	}
+
+	test("renders current teammate email in sidebar", async () => {
+		const sidebarUsername = "tboy"
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			teammateFactory.build({ username: sidebarUsername }),
+		)
+		expect(await screen.findByText(sidebarUsername)).toBeInTheDocument()
+		expect(apiClient.get).toHaveBeenCalledWith(
+			ApiPaths.CURRENT_TEAMMATE,
+			expect.objectContaining({
+				params: { workspaceCode: envoyeWorkspace.code },
+			}),
+		)
+	})
+
+	test.each([
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+			}),
+			expectedRole: "Workspace Owner",
+		},
+		{
+			teammate: teammateFactory.build({
+				firstName: "derick",
+				lastName: "omari",
+				username: "derick.omari",
+				role: "SomeNewRoleFromBackend",
+			}),
+
+			expectedRole: "Unknown Role",
+		},
+	])("we set correct teammate details", async ({ teammate, expectedRole }) => {
+		await navigateToWorkspacePage(
+			envoyeWorkspace,
+			teammateFactory.build({ username: "sidebar-user" }),
+			[teammate],
+		)
+
+		await waitFor(() => {
+			expect(apiClient.get).toHaveBeenCalledWith(
+				ApiPaths.ACTIVE_TEAMMATES,
+				expect.objectContaining({
+					params: { workspaceCode: envoyeWorkspace.code },
+				}),
+			)
+		})
+
+		const derickUsername = await screen.findByText("@derick.omari")
+		const derickCard = derickUsername.closest(
+			"[data-slot='card']",
+		) as HTMLElement
+		expect(within(derickCard).getByText("Derick Omari")).toBeInTheDocument()
+		expect(within(derickCard).getByText("@derick.omari")).toBeInTheDocument()
+		expect(
+			within(derickCard).getByText(new RegExp(expectedRole, "i")),
+		).toBeInTheDocument()
+	})
+
+	describe("workspace invite", () => {
+		test("on click cancel we close modal and clear all emails typed in by user", async () => {
+			await navigateToWorkspacePage(envoyeWorkspace)
+			await openInviteTeammateModal()
+			expect(screen.getByRole("dialog")).toBeInTheDocument()
+			await enterEmailToInvite(user, "tumise@useenvoye.io")
+			expect(screen.getByText("tumise@useenvoye.io")).toBeInTheDocument()
+
+			await user.click(screen.getByRole("button", { name: /cancel/i }))
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+
+			await openInviteTeammateModal()
+			await waitFor(() => {
+				expect(
+					screen.queryByText("tumise@useenvoye.io"),
+				).not.toBeInTheDocument()
+			})
+		})
+
+		test("on click X button we clear all emails and close modal", async () => {
+			await navigateToWorkspacePage(envoyeWorkspace)
+			await openInviteTeammateModal()
+
+			expect(screen.getByRole("dialog")).toBeInTheDocument()
+
+			await enterEmailToInvite(user, "tumise@useenvoye.io")
+			expect(screen.getByText("tumise@useenvoye.io")).toBeInTheDocument()
+
+			const closeButton = screen.getByRole("button", { name: /close/i })
+			await user.click(closeButton)
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+
+			await openInviteTeammateModal()
+
+			await waitFor(() => {
+				expect(
+					screen.queryByText("tumise@useenvoye.io"),
+				).not.toBeInTheDocument()
+			})
+		})
+	})
+
+	test("on Escape key we close modal and clear emails", async () => {
+		await navigateToWorkspacePage(envoyeWorkspace)
+		await openInviteTeammateModal()
+
+		expect(screen.getByRole("dialog")).toBeInTheDocument()
+
+		await enterEmailToInvite(user, "tumise@useenvoye.io")
+		expect(screen.getByText("tumise@useenvoye.io")).toBeInTheDocument()
+
+		await user.keyboard("{Escape}")
+
+		await waitFor(() => {
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+		})
+
+		await openInviteTeammateModal()
+
+		await waitFor(() => {
+			expect(screen.queryByText("tumise@useenvoye.io")).not.toBeInTheDocument()
+		})
+	})
+})

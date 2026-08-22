@@ -1,4 +1,4 @@
-import { Empty, EmptyContent } from "@/components/ui/empty.tsx"
+import { Empty, EmptyContent } from "@common/components/ui/empty.tsx"
 
 export default function NoContent({ text }: { text: string }) {
 	return (
