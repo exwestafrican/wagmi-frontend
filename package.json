@@ -10,7 +10,7 @@
     "test": "vitest run",
     "format": "biome format",
     "check:types": "tsc --noEmit",
-    "lint": "biome lint",
+    "lint": "biome lint && pnpm run lint:boundaries",
     "lint:boundaries": "eslint src",
     "check": "biome check",
     "clean": "rm -rf node_modules pnpm-lock.yaml"

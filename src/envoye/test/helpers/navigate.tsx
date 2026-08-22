@@ -3,36 +3,12 @@ import renderWithQueryClient, {
 } from "@common/renderWithQueryClient.tsx"
 import type { QueryClient } from "@tanstack/react-query"
 import { vi } from "vitest"
-import { createRouter, RouterProvider } from "@tanstack/react-router"
+import { RouterProvider } from "@tanstack/react-router"
 import LanguageProvider from "@common/i18n/LanguageProvider.tsx"
-import {
-	acceptInviteRoute,
-	checkEmailRoute,
-	existingWorkspaceSetupRoute,
-	indexRoute,
-	loginRoute,
-	rootRoute,
-	signupRoute,
-	workspaceSetupRoute,
-} from "@envoye/routing/root.ts"
-import { workspaceRouteTree } from "@envoye/routing/workspace.ts"
-import { adminRouteTree } from "@envoye/routing/admin.ts"
+import { createAppRouter } from "@/app-router.tsx"
 
 export function makeAppTestRouter(queryClient: QueryClient) {
-	return createRouter({
-		routeTree: rootRoute.addChildren([
-			indexRoute,
-			workspaceSetupRoute,
-			existingWorkspaceSetupRoute,
-			signupRoute,
-			loginRoute,
-			acceptInviteRoute,
-			checkEmailRoute,
-			workspaceRouteTree,
-			adminRouteTree,
-		]),
-		context: { queryClient },
-	})
+	return createAppRouter(queryClient)
 }
 
 export function makeAuthTestRouter(queryClient: QueryClient) {
