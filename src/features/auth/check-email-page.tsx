@@ -1,7 +1,11 @@
 import { AdminPages, Pages } from "@/utils/pages.ts"
 import { ChevronLeft } from "lucide-react"
 import { useRef } from "react"
-import { useNavigate, useSearch } from "@tanstack/react-router"
+import {
+	defaultParseSearch,
+	useNavigate,
+	useSearch,
+} from "@tanstack/react-router"
 import { CHECK_MAIL_REASON } from "@/constants.ts"
 import { Button } from "@/components/ui/button.tsx"
 import { OtpInput, type OtpInputHandle } from "@/components/ui/otp-input.tsx"
@@ -75,8 +79,10 @@ export function CheckEmail() {
 			{
 				onSuccess: (response) => {
 					if (search.redirect) {
+						const url = new URL(search.redirect, window.location.origin)
 						navigate({
-							to: search.redirect,
+							to: url.pathname,
+							search: defaultParseSearch(url.search),
 							hash: new URLSearchParams({
 								access_token: response.data.accessToken,
 							}).toString(),

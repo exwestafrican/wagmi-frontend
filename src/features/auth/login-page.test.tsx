@@ -1,17 +1,17 @@
-import { beforeEach, describe, expect, vi, test } from "vitest"
-import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { HttpStatusCode } from "axios"
-import { ApiPaths, CHECK_MAIL_REASON } from "@/constants"
-import { apiClient } from "@/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@/common/renderWithQueryClient.tsx"
-import { screen, waitFor } from "@testing-library/react"
+import { ApiPaths, CHECK_MAIL_REASON } from "@/constants"
+import { apiClient } from "@/lib/api-client"
+import { useAuthStore } from "@/stores/auth.store.ts"
 import { mockError } from "@/test/helpers/mocks.ts"
 import { makeAuthTestRouter } from "@/test/helpers/navigate.tsx"
 import { Pages } from "@/utils/pages.ts"
 import { RouterProvider } from "@tanstack/react-router"
-import { useAuthStore } from "@/stores/auth.store.ts"
+import { screen, waitFor } from "@testing-library/react"
+import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { HttpStatusCode } from "axios"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { mockWorkspaceAndCurrentTeammate } from "@/test/helpers/workspace.ts"
 import { teammateFactory } from "@/test/factory/teammate.ts"
 import { WorkspaceStatus } from "@/features/workspace/interface/workspace.interface.ts"
@@ -157,6 +157,46 @@ describe("Login page", () => {
 				conversationId: conversationId,
 			})
 
+			expect(screen.getByLabelText("message-composer")).toBeInTheDocument()
+		})
+	})
+
+	test("user is redirected back to their workspace (preserving workspace code and conversation ID) after re-login", async () => {
+		const email = "sam@useenvoye.co"
+		const otp = "847291"
+		const workspaceCode = "e8r4z7"
+		const accessToken = "tok_envoye_sam"
+		// Mirrors what the 401 response interceptor stores(see create-api-client.ts): the full absolute href.
+		const redirect = `${window.location.origin}/workspace/conversation?code=${workspaceCode}&conversationId=1`
+		const { router } = await setupLoginPage({ redirect })
+
+		await enterEmail(email)
+		await submit()
+
+		await waitFor(() => {
+			expect(router.state.location.pathname).toBe(Pages.CHECK_EMAIL)
+			expect(router.state.location.search).toMatchObject({ redirect })
+		})
+		mockApiClientPost.mockResolvedValueOnce({
+			data: { workspaceCode, accessToken },
+		})
+
+		for (const [index, digit] of [...otp].entries()) {
+			await user.type(screen.getByLabelText(`Digit ${index + 1}`), digit)
+		}
+
+		await user.click(screen.getByRole("button", { name: "Verify" }))
+
+		await waitFor(() => {
+			expect(mockApiClientPost).toHaveBeenCalledWith(ApiPaths.VERIFY_OTP, {
+				otp,
+				email,
+			})
+			expect(router.state.location.pathname).toBe("/workspace/conversation")
+			expect(router.state.location.search).toMatchObject({
+				code: workspaceCode,
+			})
+			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
 			expect(screen.getByLabelText("message-composer")).toBeInTheDocument()
 		})
 	})
