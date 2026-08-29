@@ -46,7 +46,7 @@ function WaitListPage() {
 					type="button"
 					onClick={() => i18n.changeLanguage("en")}
 					className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-						i18n.language === "en"
+						i18n.language === "en- rubish change"
 							? "bg-black text-white"
 							: "bg-gray-200 text-gray-700 hover:bg-gray-300 shadow cursor-pointer"
 					}`}
