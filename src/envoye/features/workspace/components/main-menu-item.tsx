@@ -1,6 +1,9 @@
 import type { MenuItem } from "@envoye/features/workspace/interface/menu.ts"
 import useActivePath from "@common/hooks/use-active-path.ts"
-import { SidebarMenuButton, SidebarMenuItem } from "@common/components/ui/sidebar.tsx"
+import {
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from "@common/components/ui/sidebar.tsx"
 
 export default function MainMenuItem({
 	item,

@@ -8,7 +8,10 @@ import {
 } from "@tanstack/react-router"
 import { CHECK_MAIL_REASON } from "@common/constants.ts"
 import { Button } from "@common/components/ui/button.tsx"
-import { OtpInput, type OtpInputHandle } from "@common/components/ui/otp-input.tsx"
+import {
+	OtpInput,
+	type OtpInputHandle,
+} from "@common/components/ui/otp-input.tsx"
 import useVerifyOtp from "./api/otp"
 import { toast } from "sonner"
 
