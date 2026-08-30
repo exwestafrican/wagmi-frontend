@@ -2,8 +2,8 @@ import {
 	Empty,
 	EmptyContent,
 	EmptyDescription,
-} from "@/components/ui/empty.tsx"
-import { Progress } from "@/components/ui/progress.tsx"
+} from "@common/components/ui/empty.tsx"
+import { Progress } from "@common/components/ui/progress.tsx"
 
 export function Loading({
 	text,

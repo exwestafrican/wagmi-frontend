@@ -6,7 +6,7 @@ import {
 	createRoute,
 	createRouter,
 } from "@tanstack/react-router"
-import { RootRouteComponent } from "@/routing/root-route-component.tsx"
+import { RootRouteComponent } from "@envoye/routing/root-route-component.tsx"
 
 function makeTestRoute() {
 	const rootRoute = createRootRoute({

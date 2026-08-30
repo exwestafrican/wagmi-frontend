@@ -11,6 +11,7 @@
     "format": "biome format",
     "check:types": "tsc --noEmit",
     "lint": "biome lint",
+    "lint:boundaries": "eslint src",
     "check": "biome check",
     "clean": "rm -rf node_modules pnpm-lock.yaml"
   },
@@ -62,10 +63,13 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "3.2.4",
+    "eslint": "^10.9.0",
+    "eslint-plugin-import": "^2.32.0",
     "fishery": "^2.4.0",
     "jsdom": "^26.0.0",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.67.0",
     "vite": "^6.3.5",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4"

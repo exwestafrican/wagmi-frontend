@@ -1,4 +1,4 @@
-import UploadPage from "@/features/file-upload/upload-page"
+import UploadPage from "@envoye/features/file-upload/upload-page"
 
 function App() {
 	return <UploadPage />

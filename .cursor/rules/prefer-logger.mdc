@@ -6,10 +6,10 @@ alwaysApply: false
 
 # Prefer logger over console
 
-Use [`src/lib/logger.ts`](src/lib/logger.ts) instead of calling `console.log` or `console.error` directly in application code.
+Use [`src/common/lib/logger.ts`](src/common/lib/logger.ts) instead of calling `console.log` or `console.error` directly in application code.
 
 ```ts
-import { logger } from "@/lib/logger.ts"
+import { logger } from "@common/lib/logger.ts"
 
 // ❌ BAD
 console.error(error)

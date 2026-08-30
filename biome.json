@@ -9,9 +9,9 @@
 		"ignoreUnknown": false,
 		"ignore": [
 			"src/routeTree.gen.ts",
-			"src/components/ui/*",
+			"src/common/components/ui/*",
 			"reportWebVitals.ts",
-			"src/lib/utils.ts"
+			"src/common/lib/utils.ts"
 		],
 		"include": ["src/*", ".vscode/*", "index.html", "vite.config.js"]
 	},

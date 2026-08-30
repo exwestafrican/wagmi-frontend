@@ -1,5 +1,5 @@
 import { useState } from "react"
-import pickRandomName from "@/common/pick-random-number.ts"
+import pickRandomName from "@common/pick-random-number.ts"
 
 const SPINNER_VERBS = [
 	"Accomplishing",
