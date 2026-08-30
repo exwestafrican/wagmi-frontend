@@ -37,8 +37,8 @@ const LoginPage = () => {
 				form.reset()
 				navigate({
 					to: Pages.CHECK_EMAIL,
-					search: (previous) => ({
-						...previous,
+					search: (previous: { redirect?: string }) => ({
+						redirect: previous.redirect,
 						email: data.email,
 						type: CHECK_MAIL_REASON.LOGIN_SUCCESS,
 					}),
