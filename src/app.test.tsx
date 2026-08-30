@@ -21,7 +21,9 @@ describe("createAppRouter", () => {
 		)
 
 		await waitFor(() => {
-			expect(screen.getByRole("heading", { name: "Fahari" })).toBeInTheDocument()
+			expect(
+				screen.getByRole("heading", { name: "Fahari" }),
+			).toBeInTheDocument()
 		})
 	})
 })
