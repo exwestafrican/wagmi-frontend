@@ -1,4 +1,4 @@
-import { FahariAdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
+import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
 import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
 import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
@@ -29,7 +29,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		validateSearch: z.object({
 			email: z.email(),
 		}),
-		component: FahariAdminCheckEmailPage,
+		component: AdminCheckEmailPage,
 	})
 
 	return fahariLayoutRoute.addChildren([

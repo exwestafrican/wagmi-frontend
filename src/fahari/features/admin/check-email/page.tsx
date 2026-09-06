@@ -12,7 +12,7 @@ import { toast } from "sonner"
 
 const OTP_LENGTH = 6
 
-export function FahariAdminCheckEmailPage() {
+export function AdminCheckEmailPage() {
 	const navigate = useNavigate()
 	const { email } = useSearch({ from: "/fahari/admin/check-email" })
 	const otpRef = useRef<OtpInputHandle>(null)
