@@ -1,19 +1,19 @@
+import { Button } from "@common/components/ui/button.tsx"
+import { CHECK_MAIL_REASON } from "@common/constants.ts"
 import { AdminPages, Pages } from "@common/utils/pages.ts"
-import { ChevronLeft } from "lucide-react"
-import { useRef } from "react"
+import {
+	EnvoyeOtpInput,
+	type OtpInputHandle,
+} from "@envoye/features/auth/component/otp-input.tsx"
 import {
 	defaultParseSearch,
 	useNavigate,
 	useSearch,
 } from "@tanstack/react-router"
-import { CHECK_MAIL_REASON } from "@common/constants.ts"
-import { Button } from "@common/components/ui/button.tsx"
-import {
-	OtpInput,
-	type OtpInputHandle,
-} from "@common/components/ui/otp-input.tsx"
-import useVerifyOtp from "./api/otp"
+import { ChevronLeft } from "lucide-react"
+import { useRef } from "react"
 import { toast } from "sonner"
+import useVerifyOtp from "./api/otp"
 
 const OTP_LENGTH = 6
 
@@ -125,9 +125,8 @@ export function CheckEmail() {
 				</h1>
 				{renderMessage()}
 
-				<OtpInput
+				<EnvoyeOtpInput
 					ref={otpRef}
-					className="mt-8"
 					length={OTP_LENGTH}
 					onSubmit={onSubmit}
 					isPending={isPending}
