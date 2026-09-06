@@ -21,6 +21,16 @@ vi.mock("@common/lib/admin-api-client", () => ({
 	},
 }))
 
+vi.mock("@fahari/lib/fahari-admin-api-client", () => ({
+	fahariAdminApiClient: {
+		get: vi.fn(),
+		post: vi.fn(),
+		put: vi.fn(),
+		patch: vi.fn(),
+		delete: vi.fn(),
+	},
+}))
+
 vi.mock("@tanstack/react-router-devtools", () => ({
 	TanStackRouterDevtools: () => null,
 }))
