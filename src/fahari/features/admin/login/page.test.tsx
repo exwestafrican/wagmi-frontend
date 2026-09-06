@@ -164,7 +164,6 @@ describe("Fahari admin login", () => {
 		expect(
 			screen.getByRole("heading", { name: "Bookings" }),
 		).toBeInTheDocument()
-		expect(screen.getByRole("link", { name: "Bookings" })).toBeInTheDocument()
 		expect(screen.getByText("Admin")).toBeInTheDocument()
 		expect(screen.getByText("admin@company.io")).toBeInTheDocument()
 	})

@@ -1,4 +1,5 @@
 import { FahariAdminPages } from "@fahari/constants.ts"
+import AdminDashboardPage from "@fahari/features/admin/admin-dashboard.page.tsx"
 import { AdminBookingsPage } from "@fahari/features/admin/bookings/page.tsx"
 import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
 import { handleAuthToken } from "@fahari/features/admin/hooks/handle-auth-token.ts"
@@ -38,12 +39,18 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		component: AdminCheckEmailPage,
 	})
 
-	const fahariAdminBookingsRoute = createRoute({
+	const fahariAdminDashboardLayoutRoute = createRoute({
 		getParentRoute: () => fahariLayoutRoute,
-		path: "admin/bookings",
+		id: "fahari-admin-dashboard",
 		beforeLoad: ({ location }) => {
 			handleAuthToken(location, FahariAdminPages.LOGIN)
 		},
+		component: AdminDashboardPage,
+	})
+
+	const fahariAdminBookingsRoute = createRoute({
+		getParentRoute: () => fahariAdminDashboardLayoutRoute,
+		path: "admin/bookings",
 		component: AdminBookingsPage,
 	})
 
@@ -51,6 +58,6 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		fahariIndexRoute,
 		fahariAdminLoginRoute,
 		fahariAdminCheckEmailRoute,
-		fahariAdminBookingsRoute,
+		fahariAdminDashboardLayoutRoute.addChildren([fahariAdminBookingsRoute]),
 	])
 }
