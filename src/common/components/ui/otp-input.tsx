@@ -2,8 +2,6 @@ import * as React from "react"
 import { useState } from "react"
 
 import { cn } from "@common/lib/utils"
-import { Button } from "@common/components/ui/button.tsx"
-import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
 
 export interface OtpInputHandle {
 	clear: () => void
@@ -24,7 +22,7 @@ interface OtpInputProps {
 	isPending: boolean
 	className?: string
 	inputClassName?: string
-	renderSubmit?: (ctx: OtpSubmitContext) => React.ReactNode
+	children: (ctx: OtpSubmitContext) => React.ReactNode
 }
 
 function OtpInput({
@@ -34,11 +32,10 @@ function OtpInput({
 	isPending,
 	className,
 	inputClassName,
-	renderSubmit,
+	children,
 }: OtpInputProps) {
 	const [digits, setDigits] = useState(() => Array(length).fill(""))
 	const inputsRef = React.useRef<Array<HTMLInputElement | null>>([])
-	const spinnerVerb = useSpinnerVerbs()
 
 	const value = digits.join("")
 	const isComplete = value.length === length
@@ -154,26 +151,14 @@ function OtpInput({
 						onPaste={(event) => handlePaste(index, event)}
 						onFocus={(event) => event.target.select()}
 						className={cn(
-							"h-12 w-11 rounded-lg border border-input bg-transparent text-center text-lg font-semibold text-neutral-900 shadow-xs transition-[color,box-shadow] outline-none sm:h-14 sm:w-12 sm:text-xl",
-							"focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+							"text-center outline-none",
 							"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
 							inputClassName,
 						)}
 					/>
 				))}
 			</div>
-			{renderSubmit ? (
-				renderSubmit(submitContext)
-			) : (
-				<Button
-					size="lg"
-					disabled={disabled}
-					className="w-full cursor-pointer"
-					onClick={submit}
-				>
-					{isPending ? `${spinnerVerb}...` : "Verify"}
-				</Button>
-			)}
+			{children(submitContext)}
 		</div>
 	)
 }
