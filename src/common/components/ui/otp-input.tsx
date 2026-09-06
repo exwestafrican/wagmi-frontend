@@ -15,9 +15,12 @@ interface OtpInputProps {
 	onSubmit: (value: string) => void
 	isPending: boolean
 	className?: string
+	submitLabel?: string
+	buttonClassName?: string
+	inputClassName?: string
 }
 
-function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputProps) {
+function OtpInput({ ref, length = 6, onSubmit, isPending, className, submitLabel = "Verify", buttonClassName, inputClassName}: OtpInputProps) {
 	const [digits, setDigits] = useState(() => Array(length).fill(""))
 	const inputsRef = React.useRef<Array<HTMLInputElement | null>>([])
     const spinnerVerb = useSpinnerVerbs()
@@ -108,7 +111,7 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 
 	return (
 		<div className={cn("flex flex-col items-center gap-6", className)}>
-			<div className="flex items-center justify-center gap-2 sm:gap-3">
+			<div className="flex w-full items-center justify-center gap-2 sm:gap-3">
 				{digits.map((digit, index) => (
 					<input
 						key={index}
@@ -130,6 +133,7 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 							"h-12 w-11 rounded-lg border border-input bg-transparent text-center text-lg font-semibold text-neutral-900 shadow-xs transition-[color,box-shadow] outline-none sm:h-14 sm:w-12 sm:text-xl",
 							"focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
 							"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+							inputClassName,
 						)}
 					/>
 				))}
@@ -137,11 +141,10 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className}: OtpInputPr
 			<Button
 				size="lg"
 				disabled={isPending || !isComplete}
-				className="w-full cursor-pointer"
+				className={cn("w-full cursor-pointer", buttonClassName)}
 				onClick={() => submit(value)}
 			>
-
-                {isPending ? `${spinnerVerb}...` : "Verify" }
+				{isPending ? `${spinnerVerb}...` : submitLabel}
 			</Button>
 		</div>
 	)

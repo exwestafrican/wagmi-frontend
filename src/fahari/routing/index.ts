@@ -1,5 +1,8 @@
-import { createRoute, Outlet, type AnyRoute } from "@tanstack/react-router"
+import { FahariAdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
+import { FahariAdminLoginPage } from "@fahari/features/admin/login/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
+import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
+import { z } from "zod"
 
 export function createFahariRouteTree(parentRoute: AnyRoute) {
 	const fahariLayoutRoute = createRoute({
@@ -14,5 +17,24 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		component: FahariHomePage,
 	})
 
-	return fahariLayoutRoute.addChildren([fahariIndexRoute])
+	const fahariAdminLoginRoute = createRoute({
+		getParentRoute: () => fahariLayoutRoute,
+		path: "admin",
+		component: FahariAdminLoginPage,
+	})
+
+	const fahariAdminCheckEmailRoute = createRoute({
+		getParentRoute: () => fahariLayoutRoute,
+		path: "admin/check-email",
+		validateSearch: z.object({
+			email: z.email(),
+		}),
+		component: FahariAdminCheckEmailPage,
+	})
+
+	return fahariLayoutRoute.addChildren([
+		fahariIndexRoute,
+		fahariAdminLoginRoute,
+		fahariAdminCheckEmailRoute,
+	])
 }
