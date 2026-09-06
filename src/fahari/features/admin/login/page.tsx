@@ -10,7 +10,7 @@ import {
 import { Input } from "@common/components/ui/input.tsx"
 import { FahariAdminPages } from "@fahari/constants.ts"
 import { AdminAuthLayout } from "@fahari/features/admin/components/admin-auth-layout.tsx"
-import { useFahariAdminLogin } from "@fahari/features/admin/login/api/login.ts"
+import { useAdminLogin } from "@fahari/features/admin/login/api/login.ts"
 import {
 	type LoginData,
 	loginSchema,
@@ -20,9 +20,9 @@ import { useNavigate } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-export function FahariAdminLoginPage() {
+export function AdminLoginPage() {
 	const navigate = useNavigate()
-	const { mutate: adminLogin, isPending } = useFahariAdminLogin()
+	const { mutate: adminLogin, isPending } = useAdminLogin()
 	const form = useForm<LoginData>({
 		resolver: zodResolver(loginSchema),
 		mode: "onChange",

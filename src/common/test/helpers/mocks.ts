@@ -1,8 +1,8 @@
-import { AxiosError, type HttpStatusCode } from "axios"
-import { faker } from "@faker-js/faker"
-import { vi } from "vitest"
 import { apiClient } from "@common/lib/api-client"
 import { useAuthStore } from "@common/stores/auth.store"
+import { faker } from "@faker-js/faker"
+import { AxiosError, type HttpStatusCode } from "axios"
+import { vi } from "vitest"
 
 export function mockError(statusCode: HttpStatusCode) {
 	const code = "ERR_BAD_REQUEST"
@@ -58,6 +58,43 @@ export function mockGetUrls({ isAuthenticated = false } = {}) {
 			vi.mocked(apiClient.get).mockImplementation((url: string) => {
 				const route = routes.get(url)
 				if (!route) return Promise.reject(new Error(`Unexpected GET ${url}`))
+				if (!route.ok) return Promise.reject(mockError(route.status))
+				return Promise.resolve({ data: route.data })
+			})
+		},
+	}
+
+	return builder
+}
+
+type PostClient = {
+	post: (...args: never[]) => unknown
+}
+
+export function mockPostUrls(client: PostClient) {
+	type RouteResult =
+		| { ok: true; data: unknown }
+		| { ok: false; status: HttpStatusCode }
+
+	const routes = new Map<string, RouteResult>()
+
+	const builder = {
+		url(url: string) {
+			return {
+				respond(data: unknown) {
+					routes.set(url, { ok: true, data })
+					return builder
+				},
+				fail(status: HttpStatusCode) {
+					routes.set(url, { ok: false, status })
+					return builder
+				},
+			}
+		},
+		apply() {
+			vi.mocked(client.post).mockImplementation((url: string) => {
+				const route = routes.get(url)
+				if (!route) return Promise.reject(new Error(`Unexpected POST ${url}`))
 				if (!route.ok) return Promise.reject(mockError(route.status))
 				return Promise.resolve({ data: route.data })
 			})

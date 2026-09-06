@@ -1,5 +1,5 @@
 import { FahariAdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
-import { FahariAdminLoginPage } from "@fahari/features/admin/login/page.tsx"
+import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
 import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
 import { z } from "zod"
@@ -20,7 +20,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 	const fahariAdminLoginRoute = createRoute({
 		getParentRoute: () => fahariLayoutRoute,
 		path: "admin",
-		component: FahariAdminLoginPage,
+		component: AdminLoginPage,
 	})
 
 	const fahariAdminCheckEmailRoute = createRoute({

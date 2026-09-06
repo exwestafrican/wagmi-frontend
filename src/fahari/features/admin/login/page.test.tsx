@@ -1,10 +1,9 @@
 import { createAppRouter } from "@/app-router.tsx"
 import LanguageProvider from "@common/i18n/LanguageProvider.tsx"
-import { apiClient } from "@common/lib/api-client"
-import { mockError } from "@common/test/helpers/mocks.ts"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@common/renderWithQueryClient.tsx"
+import { mockPostUrls } from "@common/test/helpers/mocks.ts"
 import { FahariAdminApiPaths, FahariAdminPages } from "@fahari/constants.ts"
 import { fahariAdminApiClient } from "@fahari/lib/fahari-admin-api-client.ts"
 import { RouterProvider } from "@tanstack/react-router"
@@ -15,7 +14,6 @@ import { describe, expect, test, vi } from "vitest"
 
 describe("Fahari admin login", () => {
 	let user: UserEvent
-	const mockApiClientPost = vi.mocked(apiClient.post)
 	const mockFahariAdminApiClientPost = vi.mocked(fahariAdminApiClient.post)
 
 	async function setupLoginPage() {
@@ -48,6 +46,11 @@ describe("Fahari admin login", () => {
 
 	test("valid email calls login endpoint then goes to check-email", async () => {
 		const email = "adaeze.okonkwo@fahari.io"
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.LOGIN)
+			.respond({})
+			.apply()
+
 		const { router } = await setupLoginPage()
 
 		await user.type(screen.getByRole("textbox"), email)
@@ -62,7 +65,6 @@ describe("Fahari admin login", () => {
 			expect(router.state.location.search).toMatchObject({ email })
 		})
 
-		expect(mockApiClientPost).not.toHaveBeenCalled()
 		expect(
 			screen.getByRole("heading", { name: "Check your email" }),
 		).toBeInTheDocument()
@@ -75,9 +77,10 @@ describe("Fahari admin login", () => {
 
 	test("failed login shows an error and stays on login", async () => {
 		const email = "adaeze.okonkwo@fahari.io"
-		mockFahariAdminApiClientPost.mockRejectedValueOnce(
-			mockError(HttpStatusCode.Unauthorized),
-		)
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.LOGIN)
+			.fail(HttpStatusCode.Unauthorized)
+			.apply()
 
 		const { router } = await setupLoginPage()
 
@@ -97,6 +100,11 @@ describe("Fahari admin login", () => {
 
 	test("back returns to login", async () => {
 		const email = "adaeze.okonkwo@fahari.io"
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.LOGIN)
+			.respond({})
+			.apply()
+
 		const { router } = await setupLoginPage()
 
 		await user.type(screen.getByRole("textbox"), email)
