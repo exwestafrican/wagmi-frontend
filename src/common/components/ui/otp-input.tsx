@@ -3,10 +3,18 @@ import { useState } from "react"
 
 import { cn } from "@common/lib/utils"
 import { Button } from "@common/components/ui/button.tsx"
-import useSpinnerVerbs from "@common/hooks/spinner-verb.ts";
+import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
 
 export interface OtpInputHandle {
 	clear: () => void
+}
+
+export interface OtpSubmitContext {
+	disabled: boolean
+	isPending: boolean
+	isComplete: boolean
+	value: string
+	onClick: () => void
 }
 
 interface OtpInputProps {
@@ -15,18 +23,26 @@ interface OtpInputProps {
 	onSubmit: (value: string) => void
 	isPending: boolean
 	className?: string
-	submitLabel?: string
-	buttonClassName?: string
 	inputClassName?: string
+	renderSubmit?: (ctx: OtpSubmitContext) => React.ReactNode
 }
 
-function OtpInput({ ref, length = 6, onSubmit, isPending, className, submitLabel = "Verify", buttonClassName, inputClassName}: OtpInputProps) {
+function OtpInput({
+	ref,
+	length = 6,
+	onSubmit,
+	isPending,
+	className,
+	inputClassName,
+	renderSubmit,
+}: OtpInputProps) {
 	const [digits, setDigits] = useState(() => Array(length).fill(""))
 	const inputsRef = React.useRef<Array<HTMLInputElement | null>>([])
-    const spinnerVerb = useSpinnerVerbs()
+	const spinnerVerb = useSpinnerVerbs()
 
 	const value = digits.join("")
 	const isComplete = value.length === length
+	const disabled = isPending || !isComplete
 
 	const focusInput = (index: number) => {
 		const inputRef = inputsRef.current[index]
@@ -105,9 +121,17 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className, submitLabel
 		focusInput(Math.min(cursor, length - 1))
 	}
 
-    function submit(value: string) {
-        onSubmit(value)
-    }
+	function submit() {
+		onSubmit(value)
+	}
+
+	const submitContext: OtpSubmitContext = {
+		disabled,
+		isPending,
+		isComplete,
+		value,
+		onClick: submit,
+	}
 
 	return (
 		<div className={cn("flex flex-col items-center gap-6", className)}>
@@ -138,14 +162,18 @@ function OtpInput({ ref, length = 6, onSubmit, isPending, className, submitLabel
 					/>
 				))}
 			</div>
-			<Button
-				size="lg"
-				disabled={isPending || !isComplete}
-				className={cn("w-full cursor-pointer", buttonClassName)}
-				onClick={() => submit(value)}
-			>
-				{isPending ? `${spinnerVerb}...` : submitLabel}
-			</Button>
+			{renderSubmit ? (
+				renderSubmit(submitContext)
+			) : (
+				<Button
+					size="lg"
+					disabled={disabled}
+					className="w-full cursor-pointer"
+					onClick={submit}
+				>
+					{isPending ? `${spinnerVerb}...` : "Verify"}
+				</Button>
+			)}
 		</div>
 	)
 }
