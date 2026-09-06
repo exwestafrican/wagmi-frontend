@@ -1,5 +1,4 @@
-import { Button } from "@common/components/ui/button.tsx"
-import { Plus } from "lucide-react"
+import { NewBookingSheet } from "@fahari/features/admin/bookings/components/new-booking-sheet.tsx"
 
 export function AdminBookingsPage() {
 	return (
@@ -8,14 +7,7 @@ export function AdminBookingsPage() {
 				<h1 className="text-sm font-semibold tracking-tight text-slate-900">
 					Bookings
 				</h1>
-				<Button
-					type="button"
-					disabled
-					className="h-auto gap-1.5 rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white shadow-none hover:bg-black disabled:opacity-50"
-				>
-					<Plus className="size-3" strokeWidth={2.5} />
-					New booking
-				</Button>
+				<NewBookingSheet />
 			</header>
 			<div className="min-h-0 flex-1" />
 		</div>
