@@ -17,7 +17,7 @@ import useActivePath from "@common/hooks/use-active-path.ts"
 import { useIsMobile } from "@common/hooks/use-mobile.ts"
 import { FahariAdminPages } from "@fahari/constants.ts"
 import { Outlet, useNavigate } from "@tanstack/react-router"
-import { CalendarDays } from "lucide-react"
+import { BookUser, CalendarDays } from "lucide-react"
 import type { CSSProperties } from "react"
 
 const HARDCODED_ADMIN = {
@@ -35,6 +35,12 @@ const fahariSidebarStyle = {
 } as CSSProperties
 
 const mainMenuItems = [
+	{
+		id: "accounts",
+		path: FahariAdminPages.ACCOUNTS,
+		icon: BookUser,
+		label: "Accounts",
+	},
 	{
 		id: "bookings",
 		path: FahariAdminPages.BOOKINGS,

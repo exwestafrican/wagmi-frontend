@@ -3,6 +3,7 @@ export const FAHARI_WORKSPACE_CODE = ""
 export const FahariAdminPages = {
 	LOGIN: "/fahari/admin",
 	CHECK_EMAIL: "/fahari/admin/check-email",
+	ACCOUNTS: "/fahari/admin/accounts",
 	BOOKINGS: "/fahari/admin/bookings",
 } as const
 
