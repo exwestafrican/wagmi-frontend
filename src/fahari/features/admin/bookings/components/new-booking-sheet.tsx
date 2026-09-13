@@ -44,29 +44,6 @@ function Field({
 	)
 }
 
-function fieldControlClassName(className?: string) {
-	return cn(
-		"h-auto rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-none placeholder:text-slate-300 hover:border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0",
-		className,
-	)
-}
-
-function BookingInput({ className, ...props }: ComponentProps<typeof Input>) {
-	return <Input className={fieldControlClassName(className)} {...props} />
-}
-
-function BookingTextarea({
-	className,
-	...props
-}: ComponentProps<typeof Textarea>) {
-	return (
-		<Textarea
-			className={fieldControlClassName(cn("min-h-24 resize-none", className))}
-			{...props}
-		/>
-	)
-}
-
 function BookingTabsTrigger({
 	className,
 	...props
@@ -122,26 +99,40 @@ export function NewBookingSheet() {
 
 					<TabsContent value="use-the-fleet" className="mt-5 space-y-4">
 						<Field id="new-booking-teammate" label="Teammate">
-							<BookingInput
+							<Input
 								id="new-booking-teammate"
 								placeholder="Search teammate..."
+								className="fahari-field-input"
 							/>
 						</Field>
 						<Field id="new-booking-date" label="Date">
-							<BookingInput id="new-booking-date" type="date" />
+							<Input
+								id="new-booking-date"
+								type="date"
+								className="fahari-field-input"
+							/>
 						</Field>
 						<div className="grid grid-cols-2 gap-3">
 							<Field id="new-booking-start-time" label="Start time">
-								<BookingInput id="new-booking-start-time" type="time" />
+								<Input
+									id="new-booking-start-time"
+									type="time"
+									className="fahari-field-input"
+								/>
 							</Field>
 							<Field id="new-booking-end-time" label="End time">
-								<BookingInput id="new-booking-end-time" type="time" />
+								<Input
+									id="new-booking-end-time"
+									type="time"
+									className="fahari-field-input"
+								/>
 							</Field>
 						</div>
 						<Field id="new-booking-note" label="Note (optional)">
-							<BookingTextarea
+							<Textarea
 								id="new-booking-note"
 								placeholder="Any details about this booking..."
+								className="fahari-field-input min-h-24 resize-none"
 							/>
 						</Field>
 					</TabsContent>
