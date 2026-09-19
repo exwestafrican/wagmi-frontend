@@ -25,7 +25,7 @@ export function AdminCheckEmailPage() {
 			{
 				onSuccess: (response) => {
 					navigate({
-						to: FahariAdminPages.BOOKINGS,
+						to: FahariAdminPages.ACCOUNTS,
 						hash: new URLSearchParams({
 							access_token: response.data.accessToken,
 						}).toString(),

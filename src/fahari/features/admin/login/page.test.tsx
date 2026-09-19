@@ -134,7 +134,7 @@ describe("Fahari admin login", () => {
 		expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument()
 	})
 
-	test("valid OTP verifies then goes to bookings", async () => {
+	test("valid OTP verifies then goes to accounts", async () => {
 		const email = "adaeze.okonkwo@fahari.io"
 		const otp = "123456"
 		const accessToken = "tok_fahari_admin"
@@ -157,12 +157,12 @@ describe("Fahari admin login", () => {
 				FahariAdminApiPaths.VERIFY_OTP,
 				{ otp, email },
 			)
-			expect(router.state.location.pathname).toBe(FahariAdminPages.BOOKINGS)
+			expect(router.state.location.pathname).toBe(FahariAdminPages.ACCOUNTS)
 			expect(router.state.location.hash).toBe(`access_token=${accessToken}`)
 		})
 
 		expect(
-			screen.getByRole("heading", { name: "Bookings" }),
+			screen.getByRole("heading", { name: "Accounts" }),
 		).toBeInTheDocument()
 		expect(screen.getByText("Admin")).toBeInTheDocument()
 		expect(screen.getByText("admin@company.io")).toBeInTheDocument()
