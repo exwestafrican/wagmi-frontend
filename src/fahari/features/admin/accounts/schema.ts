@@ -19,3 +19,10 @@ export const openAccountSchema = z.object({
 })
 
 export type OpenAccountData = z.infer<typeof openAccountSchema>
+
+export const provisionAccountSchema = z.object({
+	bvn: elevenDigits("BVN"),
+	nin: elevenDigits("NIN"),
+})
+
+export type ProvisionAccountData = z.infer<typeof provisionAccountSchema>

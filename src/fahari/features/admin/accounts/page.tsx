@@ -1,8 +1,10 @@
 import { Button } from "@common/components/ui/button.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import { useAccounts } from "@fahari/features/admin/accounts/api/list-accounts.ts"
+import type { DriverAccount } from "@fahari/features/admin/accounts/api/list-accounts.ts"
 import { AccountsTable } from "@fahari/features/admin/accounts/components/accounts-table.tsx"
 import { OpenAccountSheet } from "@fahari/features/admin/accounts/components/open-account-sheet.tsx"
+import { ProvisionAccountSheet } from "@fahari/features/admin/accounts/components/provision-account-sheet.tsx"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 
@@ -23,6 +25,8 @@ function EmptyOpenAccount({ onOpen }: { onOpen: () => void }) {
 
 export function AdminAccountsPage() {
 	const [open, setOpen] = useState(false)
+	const [accountToProvision, setAccountToProvision] =
+		useState<DriverAccount | null>(null)
 	const { data: accounts = [], isPending, isError } = useAccounts()
 
 	return (
@@ -55,11 +59,20 @@ export function AdminAccountsPage() {
 						</div>
 					)}
 					{!isError && accounts.length > 0 && (
-						<AccountsTable accounts={accounts} />
+						<AccountsTable
+							accounts={accounts}
+							onProvision={setAccountToProvision}
+						/>
 					)}
 				</div>
 			)}
 			<OpenAccountSheet open={open} onOpenChange={setOpen} />
+			<ProvisionAccountSheet
+				account={accountToProvision}
+				onOpenChange={(nextOpen) => {
+					if (!nextOpen) setAccountToProvision(null)
+				}}
+			/>
 		</div>
 	)
 }

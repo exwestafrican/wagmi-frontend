@@ -200,8 +200,8 @@ describe("Fahari admin accounts", () => {
 		expect(screen.getByText("brian@company.io")).toBeInTheDocument()
 		expect(screen.getByText("Provision account")).toBeInTheDocument()
 		expect(
-			screen.queryByRole("button", { name: "Provision account" }),
-		).not.toBeInTheDocument()
+			screen.getByRole("button", { name: "Provision account" }),
+		).toBeInTheDocument()
 	})
 
 	test("shows a spinner while the accounts list is loading", () => {
@@ -255,5 +255,133 @@ describe("Fahari admin accounts", () => {
 			)
 			expect(listFetches.length).toBeGreaterThanOrEqual(2)
 		})
+	})
+
+	test("opens the provision sheet from the list", async () => {
+		const user = userEvent.setup()
+		const brianKamau = driverAccountFactory.build({
+			userId: 12,
+			firstName: "Brian",
+			lastName: "Kamau",
+			email: "brian@company.io",
+			reservedAccountId: null,
+			accountNumber: null,
+		})
+		stubAccounts([brianKamau])
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await user.click(
+			await screen.findByRole("button", { name: "Provision account" }),
+		)
+
+		const dialog = await screen.findByRole("dialog", { name: "Brian Kamau" })
+		expect(dialog).toBeVisible()
+		expect(
+			screen.getByText("Enter verification details to provision."),
+		).toBeVisible()
+		expect(screen.getByLabelText(/BVN/)).toBeInTheDocument()
+		expect(screen.getByLabelText(/NIN/)).toBeInTheDocument()
+		expect(
+			within(dialog).getByRole("button", { name: "Provision account" }),
+		).toBeDisabled()
+	})
+
+	test("valid provision submit posts userId, bvn, and nin then reloads the list", async () => {
+		const user = userEvent.setup()
+		const brianKamau = driverAccountFactory.build({
+			userId: 12,
+			firstName: "Brian",
+			lastName: "Kamau",
+			email: "brian@company.io",
+			reservedAccountId: null,
+			accountNumber: null,
+		})
+		stubAccounts([brianKamau])
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.PROVISION_RESERVED_ACCOUNT)
+			.respond({})
+			.apply()
+
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await waitFor(() => {
+			expect(mockFahariAdminApiClientGet).toHaveBeenCalledWith(
+				FahariAdminApiPaths.USERS,
+			)
+		})
+
+		await user.click(
+			await screen.findByRole("button", { name: "Provision account" }),
+		)
+		const dialog = await screen.findByRole("dialog", { name: "Brian Kamau" })
+		await user.type(screen.getByLabelText(/BVN/), "21212121212")
+		await user.type(screen.getByLabelText(/NIN/), "12034875601")
+		await user.click(
+			within(dialog).getByRole("button", { name: "Provision account" }),
+		)
+
+		await waitFor(() => {
+			expect(mockFahariAdminApiClientPost).toHaveBeenCalledWith(
+				FahariAdminApiPaths.PROVISION_RESERVED_ACCOUNT,
+				{
+					userId: 12,
+					bvn: "21212121212",
+					nin: "12034875601",
+				},
+			)
+			expect(dialog).not.toBeInTheDocument()
+		})
+
+		await waitFor(() => {
+			const listFetches = mockFahariAdminApiClientGet.mock.calls.filter(
+				([url]) => url === FahariAdminApiPaths.USERS,
+			)
+			expect(listFetches.length).toBeGreaterThanOrEqual(2)
+		})
+	})
+
+	test("failed provision submit shows an error and keeps the sheet open", async () => {
+		const user = userEvent.setup()
+		const brianKamau = driverAccountFactory.build({
+			userId: 12,
+			firstName: "Brian",
+			lastName: "Kamau",
+			email: "brian@company.io",
+			reservedAccountId: null,
+			accountNumber: null,
+		})
+		stubAccounts([brianKamau])
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.PROVISION_RESERVED_ACCOUNT)
+			.fail(HttpStatusCode.BadRequest)
+			.apply()
+
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await user.click(
+			await screen.findByRole("button", { name: "Provision account" }),
+		)
+		const dialog = await screen.findByRole("dialog", { name: "Brian Kamau" })
+		await user.type(screen.getByLabelText(/BVN/), "21212121212")
+		await user.type(screen.getByLabelText(/NIN/), "12034875601")
+		await user.click(
+			within(dialog).getByRole("button", { name: "Provision account" }),
+		)
+
+		await waitFor(() => {
+			expect(mockFahariAdminApiClientPost).toHaveBeenCalledWith(
+				FahariAdminApiPaths.PROVISION_RESERVED_ACCOUNT,
+				{
+					userId: 12,
+					bvn: "21212121212",
+					nin: "12034875601",
+				},
+			)
+			expect(
+				screen.getAllByText("Could not provision account").length,
+			).toBeGreaterThan(0)
+		})
+
+		expect(dialog).toBeVisible()
 	})
 })

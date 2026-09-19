@@ -12,4 +12,5 @@ export const FahariAdminApiPaths = {
 	VERIFY_OTP: "fahari/auth/verify-otp",
 	USERS: "fahari/admin/users",
 	RESERVED_ACCOUNT: "fahari/admin/users/reserved-account",
+	PROVISION_RESERVED_ACCOUNT: "fahari/admin/users/provision-reserved-account",
 } as const
