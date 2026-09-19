@@ -4,7 +4,7 @@ import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@common/renderWithQueryClient.tsx"
 import { useAuthStore } from "@common/stores/auth.store.ts"
-import { mockPostUrls } from "@common/test/helpers/mocks.ts"
+import { mockGetUrls, mockPostUrls } from "@common/test/helpers/mocks.ts"
 import { FahariAdminApiPaths, FahariAdminPages } from "@fahari/constants.ts"
 import { fahariAdminApiClient } from "@fahari/lib/fahari-admin-api-client.ts"
 import { RouterProvider } from "@tanstack/react-router"
@@ -144,6 +144,10 @@ describe("Fahari admin login", () => {
 		mockPostUrls(fahariAdminApiClient)
 			.url(FahariAdminApiPaths.VERIFY_OTP)
 			.respond({ accessToken })
+			.apply()
+		mockGetUrls({ client: fahariAdminApiClient })
+			.url(FahariAdminApiPaths.USERS)
+			.respond([])
 			.apply()
 
 		for (const [index, digit] of [...otp].entries()) {
