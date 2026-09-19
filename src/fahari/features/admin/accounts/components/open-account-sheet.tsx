@@ -34,10 +34,7 @@ function Field({
 }) {
 	return (
 		<div className="flex flex-col gap-1.5">
-			<Label
-				htmlFor={id}
-				className="text-[11px] font-medium text-slate-500"
-			>
+			<Label htmlFor={id} className="text-[11px] font-medium text-slate-500">
 				{label}{" "}
 				<span className="text-red-500" aria-hidden="true">
 					*
