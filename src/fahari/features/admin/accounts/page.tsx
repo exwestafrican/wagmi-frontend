@@ -1,10 +1,29 @@
 import { Button } from "@common/components/ui/button.tsx"
+import { Spinner } from "@common/components/ui/spinner.tsx"
+import { useAccounts } from "@fahari/features/admin/accounts/api/list-accounts.ts"
+import { AccountsTable } from "@fahari/features/admin/accounts/components/accounts-table.tsx"
 import { OpenAccountSheet } from "@fahari/features/admin/accounts/components/open-account-sheet.tsx"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 
+function EmptyOpenAccount({ onOpen }: { onOpen: () => void }) {
+	return (
+		<button
+			type="button"
+			onClick={onOpen}
+			className="group flex cursor-pointer flex-col items-center gap-3"
+		>
+			<div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-dashed border-slate-900">
+				<Plus className="h-5 w-5 text-slate-900" strokeWidth={2} />
+			</div>
+			<p className="text-xs text-slate-900">Open account</p>
+		</button>
+	)
+}
+
 export function AdminAccountsPage() {
 	const [open, setOpen] = useState(false)
+	const { data: accounts = [], isPending, isError } = useAccounts()
 
 	return (
 		<div className="flex min-h-dvh flex-col bg-[#fafaf8]">
@@ -21,20 +40,25 @@ export function AdminAccountsPage() {
 					Open account
 				</Button>
 			</header>
-			<div className="flex min-h-0 flex-1 items-center justify-center">
-				<button
-					type="button"
-					onClick={() => setOpen(true)}
-					className="group flex cursor-pointer flex-col items-center gap-2 text-slate-900"
-				>
-					<span className="flex size-12 items-center justify-center rounded-full border border-dashed border-slate-400">
-						<Plus className="size-4" strokeWidth={2} />
-					</span>
-					<span className="text-sm group-hover:font-semibold">
-						Open account
-					</span>
-				</button>
-			</div>
+			{isPending ? (
+				<div className="flex flex-1 items-center justify-center">
+					<Spinner className="size-8" />
+				</div>
+			) : (
+				<div className="flex flex-1 flex-col overflow-auto px-8 pt-8 pb-8">
+					{isError && (
+						<p className="text-sm text-slate-400">Could not load accounts</p>
+					)}
+					{!isError && accounts.length === 0 && (
+						<div className="flex flex-1 flex-col items-center justify-center">
+							<EmptyOpenAccount onOpen={() => setOpen(true)} />
+						</div>
+					)}
+					{!isError && accounts.length > 0 && (
+						<AccountsTable accounts={accounts} />
+					)}
+				</div>
+			)}
 			<OpenAccountSheet open={open} onOpenChange={setOpen} />
 		</div>
 	)

@@ -32,7 +32,17 @@ export function mockAuthedUser(token = "fake-token") {
 	useAuthStore.getState().setAuthToken(token)
 }
 
-export function mockGetUrls({ isAuthenticated = false } = {}) {
+type GetClient = {
+	get: (...args: never[]) => unknown
+}
+
+export function mockGetUrls({
+	isAuthenticated = false,
+	client = apiClient,
+}: {
+	isAuthenticated?: boolean
+	client?: GetClient
+} = {}) {
 	if (isAuthenticated) mockAuthedUser()
 
 	type RouteResult =
@@ -55,7 +65,7 @@ export function mockGetUrls({ isAuthenticated = false } = {}) {
 			}
 		},
 		apply() {
-			vi.mocked(apiClient.get).mockImplementation((url: string) => {
+			vi.mocked(client.get).mockImplementation((url: string) => {
 				const route = routes.get(url)
 				if (!route) return Promise.reject(new Error(`Unexpected GET ${url}`))
 				if (!route.ok) return Promise.reject(mockError(route.status))

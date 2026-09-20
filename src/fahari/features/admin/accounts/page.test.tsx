@@ -1,14 +1,24 @@
 import renderWithQueryClient from "@common/renderWithQueryClient.tsx"
-import { mockPostUrls } from "@common/test/helpers/mocks.ts"
+import { mockGetUrls, mockPostUrls } from "@common/test/helpers/mocks.ts"
 import { FahariAdminApiPaths } from "@fahari/constants.ts"
+import type { DriverAccount } from "@fahari/features/admin/accounts/api/list-accounts.ts"
 import { AdminAccountsPage } from "@fahari/features/admin/accounts/page.tsx"
 import { fahariAdminApiClient } from "@fahari/lib/fahari-admin-api-client.ts"
+import { driverAccountFactory } from "@fahari/test/factory/driver-account.ts"
 import { screen, waitFor, within } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
 import { describe, expect, test, vi } from "vitest"
 
 const mockFahariAdminApiClientPost = vi.mocked(fahariAdminApiClient.post)
+const mockFahariAdminApiClientGet = vi.mocked(fahariAdminApiClient.get)
+
+function stubAccounts(accounts: DriverAccount[] = []) {
+	mockGetUrls({ client: fahariAdminApiClient })
+		.url(FahariAdminApiPaths.USERS)
+		.respond(accounts)
+		.apply()
+}
 
 function getHeaderOpenAccountButton() {
 	return within(screen.getByRole("banner")).getByRole("button", {
@@ -50,6 +60,7 @@ async function fillOpenAccountForm(user: UserEvent) {
 describe("Fahari admin accounts", () => {
 	test("opens the open account sheet from the header button", async () => {
 		const user = userEvent.setup()
+		stubAccounts()
 		renderWithQueryClient(<AdminAccountsPage />)
 
 		await user.click(getHeaderOpenAccountButton())
@@ -65,7 +76,12 @@ describe("Fahari admin accounts", () => {
 
 	test("opens the open account sheet from the empty state", async () => {
 		const user = userEvent.setup()
+		stubAccounts()
 		renderWithQueryClient(<AdminAccountsPage />)
+
+		await waitFor(() => {
+			expect(getEmptyStateOpenAccountButton()).toBeInTheDocument()
+		})
 
 		await user.click(getEmptyStateOpenAccountButton())
 
@@ -74,6 +90,7 @@ describe("Fahari admin accounts", () => {
 
 	test("keeps submit disabled until the form is valid", async () => {
 		const user = userEvent.setup()
+		stubAccounts()
 		renderWithQueryClient(<AdminAccountsPage />)
 
 		await user.click(getHeaderOpenAccountButton())
@@ -93,6 +110,7 @@ describe("Fahari admin accounts", () => {
 
 	test("valid submit opens the reserved account then closes the sheet", async () => {
 		const user = userEvent.setup()
+		stubAccounts()
 		mockPostUrls(fahariAdminApiClient)
 			.url(FahariAdminApiPaths.RESERVED_ACCOUNT)
 			.respond({})
@@ -123,6 +141,7 @@ describe("Fahari admin accounts", () => {
 
 	test("failed submit shows an error and keeps the sheet open", async () => {
 		const user = userEvent.setup()
+		stubAccounts()
 		mockPostUrls(fahariAdminApiClient)
 			.url(FahariAdminApiPaths.RESERVED_ACCOUNT)
 			.fail(HttpStatusCode.BadRequest)
@@ -153,5 +172,88 @@ describe("Fahari admin accounts", () => {
 		})
 
 		expect(dialog).toBeVisible()
+	})
+
+	test("renders provisioned and unprovisioned accounts from the list", async () => {
+		const amaraOsei = driverAccountFactory.build({
+			firstName: "Amara",
+			lastName: "Osei",
+			email: "amara@company.io",
+			accountNumber: "FAH1029384",
+		})
+		const brianKamau = driverAccountFactory.build({
+			firstName: "Brian",
+			lastName: "Kamau",
+			email: "brian@company.io",
+			reservedAccountId: null,
+			accountNumber: null,
+		})
+		stubAccounts([amaraOsei, brianKamau])
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await screen.findByText("Amara Osei")
+		expect(screen.getByText("Driver")).toBeInTheDocument()
+		expect(screen.getByText("Account no.")).toBeInTheDocument()
+		expect(screen.getByText("amara@company.io")).toBeInTheDocument()
+		expect(screen.getByText("FAH1029384")).toBeInTheDocument()
+		expect(screen.getByText("Brian Kamau")).toBeInTheDocument()
+		expect(screen.getByText("brian@company.io")).toBeInTheDocument()
+		expect(screen.getByText("Provision account")).toBeInTheDocument()
+		expect(
+			screen.queryByRole("button", { name: "Provision account" }),
+		).not.toBeInTheDocument()
+	})
+
+	test("shows a spinner while the accounts list is loading", () => {
+		mockFahariAdminApiClientGet.mockImplementation(() => new Promise(() => {}))
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument()
+		expect(screen.queryByRole("table")).not.toBeInTheDocument()
+	})
+
+	test("empty list still shows the centered Open account CTA", async () => {
+		stubAccounts([])
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await waitFor(() => {
+			expect(getEmptyStateOpenAccountButton()).toBeInTheDocument()
+		})
+
+		expect(screen.queryByRole("table")).not.toBeInTheDocument()
+	})
+
+	test("successful submit reloads the accounts list", async () => {
+		const user = userEvent.setup()
+		stubAccounts()
+		mockPostUrls(fahariAdminApiClient)
+			.url(FahariAdminApiPaths.RESERVED_ACCOUNT)
+			.respond({})
+			.apply()
+
+		renderWithQueryClient(<AdminAccountsPage />)
+
+		await waitFor(() => {
+			expect(mockFahariAdminApiClientGet).toHaveBeenCalledWith(
+				FahariAdminApiPaths.USERS,
+			)
+		})
+
+		await user.click(getHeaderOpenAccountButton())
+		const dialog = await expectSheetOpen()
+		await fillOpenAccountForm(user)
+		await user.click(getSheetSubmitButton(dialog))
+
+		await waitFor(() => {
+			expect(mockFahariAdminApiClientPost).toHaveBeenCalled()
+			expect(dialog).not.toBeInTheDocument()
+		})
+
+		await waitFor(() => {
+			const listFetches = mockFahariAdminApiClientGet.mock.calls.filter(
+				([url]) => url === FahariAdminApiPaths.USERS,
+			)
+			expect(listFetches.length).toBeGreaterThanOrEqual(2)
+		})
 	})
 })
