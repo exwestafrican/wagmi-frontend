@@ -7,6 +7,7 @@ import { useAuthStore } from "@common/stores/auth.store.ts"
 import { mockGetUrls, mockPostUrls } from "@common/test/helpers/mocks.ts"
 import { FahariAdminApiPaths, FahariAdminPages } from "@fahari/constants.ts"
 import { fahariAdminApiClient } from "@fahari/lib/fahari-admin-api-client.ts"
+import { adminProfileFactory } from "@fahari/test/factory/admin-profile.ts"
 import { RouterProvider } from "@tanstack/react-router"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
@@ -138,6 +139,11 @@ describe("Fahari admin login", () => {
 		const email = "adaeze.okonkwo@fahari.io"
 		const otp = "123456"
 		const accessToken = "tok_fahari_admin"
+		const kemiAdeyemi = adminProfileFactory.build({
+			firstName: "Kemi",
+			lastName: "Adeyemi",
+			email: "kemi.adeyemi@fahari.io",
+		})
 
 		const { router } = await goToCheckEmail(email)
 
@@ -146,6 +152,8 @@ describe("Fahari admin login", () => {
 			.respond({ accessToken })
 			.apply()
 		mockGetUrls({ client: fahariAdminApiClient })
+			.url(FahariAdminApiPaths.ME)
+			.respond(kemiAdeyemi)
 			.url(FahariAdminApiPaths.USERS)
 			.respond([])
 			.apply()
@@ -168,8 +176,8 @@ describe("Fahari admin login", () => {
 		expect(
 			screen.getByRole("heading", { name: "Accounts" }),
 		).toBeInTheDocument()
-		expect(screen.getByText("Admin")).toBeInTheDocument()
-		expect(screen.getByText("admin@company.io")).toBeInTheDocument()
+		expect(screen.getByText("Kemi Adeyemi")).toBeInTheDocument()
+		expect(screen.getByText("kemi.adeyemi@fahari.io")).toBeInTheDocument()
 	})
 
 	test("invalid OTP shows an error and stays on check-email", async () => {

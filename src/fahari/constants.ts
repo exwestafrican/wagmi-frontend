@@ -10,6 +10,7 @@ export const FahariAdminPages = {
 export const FahariAdminApiPaths = {
 	LOGIN: "fahari/auth/admin/login",
 	VERIFY_OTP: "fahari/auth/verify-otp",
+	ME: "fahari/auth/me",
 	USERS: "fahari/admin/users",
 	RESERVED_ACCOUNT: "fahari/admin/users/reserved-account",
 	PROVISION_RESERVED_ACCOUNT: "fahari/admin/users/provision-reserved-account",

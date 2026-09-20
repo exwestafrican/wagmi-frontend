@@ -16,15 +16,10 @@ import {
 import useActivePath from "@common/hooks/use-active-path.ts"
 import { useIsMobile } from "@common/hooks/use-mobile.ts"
 import { FahariAdminPages } from "@fahari/constants.ts"
+import { useCurrentAdmin } from "@fahari/features/admin/api/current-admin.ts"
 import { Outlet, useNavigate } from "@tanstack/react-router"
 import { BookUser, CalendarDays } from "lucide-react"
 import type { CSSProperties } from "react"
-
-const HARDCODED_ADMIN = {
-	name: "Admin",
-	email: "admin@company.io",
-	initial: "A",
-} as const
 
 const fahariSidebarStyle = {
 	"--sidebar-width": "14rem",
@@ -53,6 +48,9 @@ export default function AdminDashboardPage() {
 	const isMobile = useIsMobile()
 	const navigate = useNavigate()
 	const isActivePath = useActivePath()
+	const { data: admin } = useCurrentAdmin()
+	const adminName = admin ? `${admin.firstName} ${admin.lastName}` : ""
+	const adminInitial = admin?.firstName.charAt(0).toUpperCase() ?? ""
 
 	return (
 		<div>
@@ -120,15 +118,13 @@ export default function AdminDashboardPage() {
 						<div className="flex items-center gap-2.5 px-1 py-1">
 							<div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-amber-300">
 								<span className="text-[10px] font-bold text-amber-900">
-									{HARDCODED_ADMIN.initial}
+									{adminInitial}
 								</span>
 							</div>
 							<div className="min-w-0">
-								<p className="truncate text-[11px] font-medium">
-									{HARDCODED_ADMIN.name}
-								</p>
+								<p className="truncate text-[11px] font-medium">{adminName}</p>
 								<p className="truncate text-[10px] text-muted-foreground">
-									{HARDCODED_ADMIN.email}
+									{admin?.email}
 								</p>
 							</div>
 						</div>
