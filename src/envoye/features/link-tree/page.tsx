@@ -26,6 +26,8 @@ export default function LinkTree() {
 			<div className="w-full max-w-sm space-y-3">
 				<Link
 					to={Pages.LOGIN}
+					target="_blank"
+					rel="noopener noreferrer"
 					className="block w-full cursor-pointer rounded-xl bg-black px-4 py-3 text-left text-white shadow-sm transition-colors hover:bg-gray-900"
 				>
 					<p className="text-sm font-medium">Sign in to Envoye</p>
@@ -54,6 +56,8 @@ export default function LinkTree() {
 
 				<a
 					href={`mailto:${CONTACT_EMAIL}`}
+					target="_blank"
+					rel="noopener noreferrer"
 					className="block w-full rounded-xl border border-border bg-white px-4 py-3 transition-colors hover:border-gray-300 hover:text-foreground"
 				>
 					<p className="text-sm font-medium text-foreground">Contact Us</p>

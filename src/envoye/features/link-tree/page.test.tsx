@@ -30,14 +30,16 @@ describe("LinkTree", () => {
 				screen.getByRole("link", { name: /Sign in to Envoye/ }),
 			).toHaveAttribute("href", Pages.LOGIN)
 		})
+		expect(
+			screen.getByRole("link", { name: /Sign in to Envoye/ }),
+		).toHaveAttribute("target", "_blank")
 
 		expect(
 			screen.getByRole("button", { name: /Fahari Bookings/ }),
 		).toBeDisabled()
 		expect(screen.getByText("Book a ride from our fleets")).toBeInTheDocument()
-		expect(screen.getByRole("link", { name: /Contact Us/ })).toHaveAttribute(
-			"href",
-			"mailto:hellofahari@gmail.com",
-		)
+		const contactUs = screen.getByRole("link", { name: /Contact Us/ })
+		expect(contactUs).toHaveAttribute("href", "mailto:hellofahari@gmail.com")
+		expect(contactUs).toHaveAttribute("target", "_blank")
 	})
 })
