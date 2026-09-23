@@ -1,3 +1,4 @@
+import { SplitLayout } from "@common/components/split-layout.tsx"
 import { Button } from "@common/components/ui/button"
 import {
 	Form,
@@ -10,27 +11,26 @@ import {
 } from "@common/components/ui/form"
 import { Input } from "@common/components/ui/input"
 import {
-	type SignupData,
-	signupSchema,
-} from "@envoye/features/auth/schema/signupSchema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { useSignup } from "@envoye/features/auth/api/signup.ts"
-import { type AxiosError, HttpStatusCode } from "axios"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { Pages } from "@common/utils/pages.ts"
-import { toast } from "sonner"
-import { SplitLayout } from "@common/components/split-layout.tsx"
-import { CHECK_MAIL_REASON } from "@common/constants.ts"
-import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 } from "@common/components/ui/input-group.tsx"
+import { CHECK_MAIL_REASON } from "@common/constants.ts"
+import { useDebounce } from "@common/hooks/use-debounce.ts"
+import { Pages } from "@common/utils/pages.ts"
+import { useSignup } from "@envoye/features/auth/api/signup.ts"
+import {
+	type SignupData,
+	signupSchema,
+} from "@envoye/features/auth/schema/signupSchema"
+import { useCheckUsername } from "@envoye/features/workspace/api/check-username.ts"
 import UsernameStateIcon from "@envoye/features/workspace/components/username-state-icon.tsx"
 import usernameCheckMessage from "@envoye/features/workspace/utils/username-check-message.ts"
-import { useDebounce } from "@common/hooks/use-debounce.ts"
-import { useCheckUsername } from "@envoye/features/workspace/api/check-username.ts"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Link, useNavigate } from "@tanstack/react-router"
+import { type AxiosError, HttpStatusCode } from "axios"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 
 const SignupPage = () => {
 	const { mutate: signupUser, isPending } = useSignup()
@@ -78,7 +78,7 @@ const SignupPage = () => {
 							description:
 								"Please join the waitlist to get notified when accounts are available.",
 						})
-						await navigate({ to: Pages.WAITLIST })
+						await navigate({ to: Pages.LINK_TREE })
 						break
 					case HttpStatusCode.Conflict:
 						toast.error("Unable to create account", {

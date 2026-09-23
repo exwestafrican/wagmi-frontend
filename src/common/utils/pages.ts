@@ -1,6 +1,6 @@
 export const Pages = {
 	HOME: "/",
-	WAITLIST: "/",
+	LINK_TREE: "/",
 	WORKSPACE: "/workspace",
 	LOGIN: "/login",
 	SIGNUP: "/signup",
