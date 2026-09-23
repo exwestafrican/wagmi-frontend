@@ -1,17 +1,17 @@
-import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
-import type { QueryClient } from "@tanstack/react-query"
-import WaitListPage from "@envoye/features/waitlist/waitlist-page.tsx"
-import SignupPage from "@envoye/features/auth/signup-page.tsx"
-import { z } from "zod"
-import LoginPage from "@envoye/features/auth/login-page.tsx"
-import SetupWorkspacePage from "@envoye/features/workspace/new-workspace-setup.tsx"
-import { ExistingWorkspaceSetup } from "@envoye/features/workspace/existing-workspace-setup.tsx"
-import { AcceptInvite } from "@envoye/features/workspace/accept-invite.tsx"
-import { CheckEmail } from "@envoye/features/auth/check-email-page.tsx"
-import NotFound from "@envoye/features/not-found.tsx"
-import { RootRouteComponent } from "@envoye/routing/root-route-component.tsx"
-import { handleAuthToken } from "@envoye/features/auth/hooks/handle-auth-token.ts"
 import { Pages } from "@common/utils/pages"
+import { CheckEmail } from "@envoye/features/auth/check-email-page.tsx"
+import { handleAuthToken } from "@envoye/features/auth/hooks/handle-auth-token.ts"
+import LoginPage from "@envoye/features/auth/login-page.tsx"
+import SignupPage from "@envoye/features/auth/signup-page.tsx"
+import LinkTree from "@envoye/features/link-tree/page.tsx"
+import NotFound from "@envoye/features/not-found.tsx"
+import { AcceptInvite } from "@envoye/features/workspace/accept-invite.tsx"
+import { ExistingWorkspaceSetup } from "@envoye/features/workspace/existing-workspace-setup.tsx"
+import SetupWorkspacePage from "@envoye/features/workspace/new-workspace-setup.tsx"
+import { RootRouteComponent } from "@envoye/routing/root-route-component.tsx"
+import type { QueryClient } from "@tanstack/react-query"
+import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
+import { z } from "zod"
 
 export type RouterContext = {
 	queryClient: QueryClient
@@ -25,7 +25,7 @@ export const rootRoute = createRootRouteWithContext<RouterContext>()({
 export const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: WaitListPage,
+	component: LinkTree,
 })
 
 export const signupRoute = createRoute({

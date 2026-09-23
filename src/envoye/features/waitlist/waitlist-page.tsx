@@ -1,20 +1,20 @@
-import JoinWaitListForm from "@envoye/features/waitlist/components/join-form"
-import CountdownClock from "@envoye/features/waitlist/components/countdown-clock.tsx"
-import { useWaitlistStore } from "@envoye/features/waitlist/store/useWaitlistStatus"
 import { useGetRoadmapFeatures } from "@envoye/features/waitlist/api/roadmap-features"
-import {
-	UpcomingFeature,
-	UpcomingFeatureSkeleton,
-} from "@envoye/features/waitlist/components/upcoming-feature"
+import CountdownClock from "@envoye/features/waitlist/components/countdown-clock.tsx"
+import { FeatureRequestModal } from "@envoye/features/waitlist/components/feature-request-modal"
+import JoinWaitListForm from "@envoye/features/waitlist/components/join-form"
 import {
 	PlannedFeature,
 	PlannedFeatureSkeleton,
 } from "@envoye/features/waitlist/components/planned-feature.tsx"
-import { Loader } from "lucide-react"
-import type { RoadmapFeature } from "@envoye/features/waitlist/interfaces/roadmap-feature"
+import {
+	UpcomingFeature,
+	UpcomingFeatureSkeleton,
+} from "@envoye/features/waitlist/components/upcoming-feature"
 import { RoadmapFeatureStage } from "@envoye/features/waitlist/enums/roadmap-feautre-stage"
+import type { RoadmapFeature } from "@envoye/features/waitlist/interfaces/roadmap-feature"
+import { useWaitlistStore } from "@envoye/features/waitlist/store/useWaitlistStatus"
+import { Loader } from "lucide-react"
 import { useState } from "react"
-import { FeatureRequestModal } from "@envoye/features/waitlist/components/feature-request-modal"
 import { useTranslation } from "react-i18next"
 
 function filterFeaturesByStage(
@@ -24,7 +24,7 @@ function filterFeaturesByStage(
 	return features.filter((feature: RoadmapFeature) => feature.stage === stage)
 }
 
-function WaitListPage() {
+function LegacyComponent() {
 	const { t, i18n } = useTranslation("waitlist")
 	const hasJoined = useWaitlistStore((state) => state.hasJoined)
 	const emptyUpcomingFeatures = new Array(3)
@@ -139,4 +139,4 @@ function WaitListPage() {
 	)
 }
 
-export default WaitListPage
+export default LegacyComponent
