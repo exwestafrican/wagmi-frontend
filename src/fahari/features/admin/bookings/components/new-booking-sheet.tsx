@@ -220,7 +220,11 @@ function ClientPickupFields() {
 						<FormItem className="gap-1.5">
 							<FormLabel className={fieldLabelClassName}>Pickup date</FormLabel>
 							<FormControl>
-								<Input type="date" className="fahari-field-input text-xs md:text-xs" {...field} />
+								<Input
+									type="date"
+									className="fahari-field-input text-xs md:text-xs"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage className="mt-1 text-[11px] text-red-500" />
 						</FormItem>
@@ -233,7 +237,11 @@ function ClientPickupFields() {
 						<FormItem className="gap-1.5">
 							<FormLabel className={fieldLabelClassName}>Pickup time</FormLabel>
 							<FormControl>
-								<Input type="time" className="fahari-field-input text-xs md:text-xs" {...field} />
+								<Input
+									type="time"
+									className="fahari-field-input text-xs md:text-xs"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage className="mt-1 text-[11px] text-red-500" />
 						</FormItem>
