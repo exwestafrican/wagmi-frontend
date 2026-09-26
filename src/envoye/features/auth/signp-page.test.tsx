@@ -1,19 +1,19 @@
-import { beforeEach, describe, expect, test, vi } from "vitest"
-import type { SignupData } from "@envoye/features/auth/schema/signupSchema.ts"
+import { CHECK_MAIL_REASON } from "@common/constants.ts"
+import { apiClient } from "@common/lib/api-client"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@common/renderWithQueryClient.tsx"
+import { mockError, mockGetUrls } from "@common/test/helpers/mocks.ts"
+import { Pages } from "@common/utils/pages.ts"
+import { ApiPaths } from "@envoye/constants.ts"
+import type { SignupData } from "@envoye/features/auth/schema/signupSchema.ts"
+import { makeAuthTestRouter } from "@envoye/test/helpers/navigate"
+import { RouterProvider } from "@tanstack/react-router"
+import { screen, waitFor } from "@testing-library/react"
 import type { UserEvent } from "@testing-library/user-event"
 import userEvent from "@testing-library/user-event"
-import { screen, waitFor } from "@testing-library/react"
 import { HttpStatusCode } from "axios"
-import { RouterProvider } from "@tanstack/react-router"
-import { apiClient } from "@common/lib/api-client"
-import { Pages } from "@common/utils/pages.ts"
-import { mockError, mockGetUrls } from "@common/test/helpers/mocks.ts"
-import { makeAuthTestRouter } from "@envoye/test/helpers/navigate"
-import { CHECK_MAIL_REASON } from "@common/constants.ts"
-import { ApiPaths } from "@envoye/constants.ts"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 
 vi.mock("@common/hooks/use-debounce", () => ({
 	useDebounce: (value: unknown) => value,
@@ -279,7 +279,7 @@ describe("Signup page", () => {
 					mockError(HttpStatusCode.Unauthorized),
 				)
 			})
-			test("when user is unauthorized we transition to waitlist page", async () => {
+			test("when user is unauthorized we transition to the link tree", async () => {
 				mockUsernameAvailable()
 				const queryClient = createTestQueryClient()
 				const router = makeAuthTestRouter(queryClient)
@@ -298,7 +298,7 @@ describe("Signup page", () => {
 
 				await waitFor(() => {
 					expect(navigateSpy).toHaveBeenCalledWith(
-						expect.objectContaining({ to: Pages.WAITLIST }),
+						expect.objectContaining({ to: Pages.LINK_TREE }),
 					)
 				})
 			})
