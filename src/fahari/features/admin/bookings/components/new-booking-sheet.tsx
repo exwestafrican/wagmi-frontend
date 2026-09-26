@@ -28,6 +28,10 @@ import {
 import { Textarea } from "@common/components/ui/textarea"
 import { cn } from "@common/lib/utils.ts"
 import {
+	toCreateClientPickupPayload,
+	useCreateClientPickup,
+} from "@fahari/features/admin/bookings/api/create-client-pickup.ts"
+import {
 	type ClientPickupData,
 	clientPickupSchema,
 } from "@fahari/features/admin/bookings/schema.ts"
@@ -36,19 +40,17 @@ import { Link, Plus } from "lucide-react"
 import type { ComponentProps, ReactNode } from "react"
 import { useState } from "react"
 import { useForm, useFormContext, useFormState } from "react-hook-form"
+import { toast } from "sonner"
 
 const USE_THE_FLEET = "use-the-fleet"
 const CLIENT_PICKUP = "client-pickup"
 
-const fieldLabelClassName =
-	"text-[10px] font-semibold text-slate-500 uppercase tracking-wide"
-
-const optionalMark = (
-	<span className="font-normal text-slate-400 normal-case">(optional)</span>
-)
-
-const submitButtonClassName =
-	"h-auto cursor-pointer rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-none hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+function labelClassName(className?: string) {
+	return cn(
+		"text-[10px] font-semibold text-slate-500 uppercase tracking-wide",
+		className,
+	)
+}
 
 const defaultValues: ClientPickupData = {
 	firstName: "",
@@ -61,20 +63,81 @@ const defaultValues: ClientPickupData = {
 	note: "",
 }
 
+function OptionalMark() {
+	return (
+		<span className="font-normal text-slate-400 normal-case">(optional)</span>
+	)
+}
+
+function BookingLabel({
+	optional,
+	className,
+	children,
+	...props
+}: ComponentProps<typeof Label> & { optional?: boolean }) {
+	return (
+		<Label className={labelClassName(className)} {...props}>
+			{children}
+			{optional ? <OptionalMark /> : null}
+		</Label>
+	)
+}
+
+function BookingLabelText({
+	className,
+	children,
+}: {
+	className?: string
+	children: ReactNode
+}) {
+	return <span className={labelClassName(className)}>{children}</span>
+}
+
+function BookingFormLabel({
+	optional,
+	className,
+	children,
+	...props
+}: ComponentProps<typeof FormLabel> & { optional?: boolean }) {
+	return (
+		<FormLabel className={labelClassName(className)} {...props}>
+			{children}
+			{optional ? <OptionalMark /> : null}
+		</FormLabel>
+	)
+}
+
+function BookingSubmitButton({
+	className,
+	...props
+}: ComponentProps<typeof Button>) {
+	return (
+		<Button
+			className={cn(
+				"h-auto cursor-pointer rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-none hover:bg-black disabled:cursor-not-allowed disabled:opacity-60",
+				className,
+			)}
+			{...props}
+		/>
+	)
+}
+
 function Field({
 	id,
 	label,
+	optional,
 	children,
 }: {
 	id: string
 	label: ReactNode
+	optional?: boolean
 	children: ReactNode
 }) {
 	return (
 		<div className="flex flex-col gap-1.5">
-			<Label htmlFor={id} className={fieldLabelClassName}>
+			<BookingLabel htmlFor={id} optional={optional}>
 				{label}
-			</Label>
+			</BookingLabel>
 			{children}
 		</div>
 	)
@@ -95,18 +158,22 @@ function BookingTabsTrigger({
 	)
 }
 
-function ClientPickupFields() {
+function ClientPickupFields({
+	onSubmit,
+}: {
+	onSubmit: (data: ClientPickupData) => void
+}) {
 	const form = useFormContext<ClientPickupData>()
 
 	return (
 		<form
 			id="client-pickup-form"
 			noValidate
-			onSubmit={form.handleSubmit(() => undefined)}
+			onSubmit={form.handleSubmit(onSubmit)}
 			className="space-y-5"
 		>
 			<div className="flex flex-col gap-1.5">
-				<span className={fieldLabelClassName}>Client name</span>
+				<BookingLabelText>Client name</BookingLabelText>
 				<div className="grid grid-cols-2 gap-2">
 					<FormField
 						control={form.control}
@@ -151,7 +218,7 @@ function ClientPickupFields() {
 				name="clientEmail"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>Client email</FormLabel>
+						<BookingFormLabel>Client email</BookingFormLabel>
 						<FormControl>
 							<Input
 								type="email"
@@ -171,9 +238,7 @@ function ClientPickupFields() {
 				name="pickupLocation"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>
-							Pickup location
-						</FormLabel>
+						<BookingFormLabel>Pickup location</BookingFormLabel>
 						<FormControl>
 							<Input
 								placeholder="e.g. JKIA Terminal 1, Nairobi"
@@ -191,7 +256,7 @@ function ClientPickupFields() {
 				name="locationUrl"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>Location URL</FormLabel>
+						<BookingFormLabel>Location URL</BookingFormLabel>
 						<div className="relative">
 							<Link
 								aria-hidden="true"
@@ -218,7 +283,7 @@ function ClientPickupFields() {
 					name="pickupDate"
 					render={({ field }) => (
 						<FormItem className="gap-1.5">
-							<FormLabel className={fieldLabelClassName}>Pickup date</FormLabel>
+							<BookingFormLabel>Pickup date</BookingFormLabel>
 							<FormControl>
 								<Input
 									type="date"
@@ -235,7 +300,7 @@ function ClientPickupFields() {
 					name="pickupTime"
 					render={({ field }) => (
 						<FormItem className="gap-1.5">
-							<FormLabel className={fieldLabelClassName}>Pickup time</FormLabel>
+							<BookingFormLabel>Pickup time</BookingFormLabel>
 							<FormControl>
 								<Input
 									type="time"
@@ -265,9 +330,7 @@ function ClientPickupFields() {
 				name="note"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>
-							Note {optionalMark}
-						</FormLabel>
+						<BookingFormLabel optional>Note</BookingFormLabel>
 						<FormControl>
 							<Textarea
 								placeholder="Did the client ask for anything specific?"
@@ -283,7 +346,10 @@ function ClientPickupFields() {
 }
 
 export function NewBookingSheet() {
+	const [open, setOpen] = useState(false)
 	const [tab, setTab] = useState(USE_THE_FLEET)
+	const [selectedChauffeurId] = useState<number | null>(null)
+	const { mutate, isPending } = useCreateClientPickup()
 	const form = useForm<ClientPickupData>({
 		resolver: zodResolver(clientPickupSchema),
 		defaultValues,
@@ -291,15 +357,29 @@ export function NewBookingSheet() {
 	})
 	const { isValid } = useFormState({ control: form.control })
 
-	function handleOpenChange(open: boolean) {
-		if (!open) {
+	function handleOpenChange(nextOpen: boolean) {
+		setOpen(nextOpen)
+		if (!nextOpen) {
 			form.reset(defaultValues)
 			setTab(USE_THE_FLEET)
 		}
 	}
 
+	function onSubmit(data: ClientPickupData) {
+		if (selectedChauffeurId === null) return
+		mutate(toCreateClientPickupPayload(data, selectedChauffeurId), {
+			onSuccess: () => {
+				toast.success("Pickup booked")
+				handleOpenChange(false)
+			},
+			onError: () => {
+				toast.error("Could not book pickup")
+			},
+		})
+	}
+
 	return (
-		<Sheet onOpenChange={handleOpenChange}>
+		<Sheet open={open} onOpenChange={handleOpenChange}>
 			<SheetTrigger asChild>
 				<Button
 					type="button"
@@ -371,7 +451,7 @@ export function NewBookingSheet() {
 									/>
 								</Field>
 							</div>
-							<Field id="new-booking-note" label={<>Note {optionalMark}</>}>
+							<Field id="new-booking-note" label="Note" optional>
 								<Textarea
 									id="new-booking-note"
 									placeholder="Any details about this booking…"
@@ -384,7 +464,7 @@ export function NewBookingSheet() {
 							value={CLIENT_PICKUP}
 							className="mt-5 min-h-0 overflow-y-auto"
 						>
-							<ClientPickupFields />
+							<ClientPickupFields onSubmit={onSubmit} />
 						</TabsContent>
 					</Tabs>
 
@@ -399,18 +479,15 @@ export function NewBookingSheet() {
 							</Button>
 						</SheetClose>
 						{tab === CLIENT_PICKUP ? (
-							<Button
+							<BookingSubmitButton
 								type="submit"
 								form="client-pickup-form"
-								disabled={!isValid}
-								className={submitButtonClassName}
+								disabled={!isValid || isPending || selectedChauffeurId === null}
 							>
 								Book pickup
-							</Button>
+							</BookingSubmitButton>
 						) : (
-							<Button type="button" className={submitButtonClassName}>
-								Book time
-							</Button>
+							<BookingSubmitButton type="button">Book time</BookingSubmitButton>
 						)}
 					</SheetFooter>
 				</Form>
