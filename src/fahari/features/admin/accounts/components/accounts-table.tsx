@@ -9,7 +9,13 @@ function driverName(account: DriverAccount) {
 	return `${account.firstName} ${account.lastName}`
 }
 
-export function AccountsTable({ accounts }: { accounts: DriverAccount[] }) {
+export function AccountsTable({
+	accounts,
+	onProvision,
+}: {
+	accounts: DriverAccount[]
+	onProvision: (account: DriverAccount) => void
+}) {
 	return (
 		<div className="overflow-hidden rounded-lg border border-slate-900 bg-white">
 			<div className="grid grid-cols-[1fr_200px_36px] border-b border-slate-900 bg-slate-50/60 px-4 py-2.5">
@@ -52,9 +58,16 @@ export function AccountsTable({ accounts }: { accounts: DriverAccount[] }) {
 										{account.accountNumber}
 									</span>
 								) : (
-									<span className="rounded-md border border-dashed border-slate-200 px-2 py-1 text-[10px] text-slate-400">
+									<button
+										type="button"
+										onClick={(event) => {
+											event.stopPropagation()
+											onProvision(account)
+										}}
+										className="rounded-md border border-dashed border-slate-200 px-2 py-1 text-[10px] text-slate-400 hover:border-slate-400 hover:text-slate-700"
+									>
 										Provision account
-									</span>
+									</button>
 								)}
 							</div>
 							<div className="flex justify-end opacity-0 transition-opacity group-hover:opacity-100">
