@@ -28,6 +28,10 @@ import {
 import { Textarea } from "@common/components/ui/textarea"
 import { cn } from "@common/lib/utils.ts"
 import {
+	toCreateClientPickupPayload,
+	useCreateClientPickup,
+} from "@fahari/features/admin/bookings/api/create-client-pickup.ts"
+import {
 	type ClientPickupData,
 	clientPickupSchema,
 } from "@fahari/features/admin/bookings/schema.ts"
@@ -36,6 +40,7 @@ import { Link, Plus } from "lucide-react"
 import type { ComponentProps, ReactNode } from "react"
 import { useState } from "react"
 import { useForm, useFormContext, useFormState } from "react-hook-form"
+import { toast } from "sonner"
 
 const USE_THE_FLEET = "use-the-fleet"
 const CLIENT_PICKUP = "client-pickup"
@@ -95,14 +100,18 @@ function BookingTabsTrigger({
 	)
 }
 
-function ClientPickupFields() {
+function ClientPickupFields({
+	onSubmit,
+}: {
+	onSubmit: (data: ClientPickupData) => void
+}) {
 	const form = useFormContext<ClientPickupData>()
 
 	return (
 		<form
 			id="client-pickup-form"
 			noValidate
-			onSubmit={form.handleSubmit(() => undefined)}
+			onSubmit={form.handleSubmit(onSubmit)}
 			className="space-y-5"
 		>
 			<div className="flex flex-col gap-1.5">
@@ -283,7 +292,10 @@ function ClientPickupFields() {
 }
 
 export function NewBookingSheet() {
+	const [open, setOpen] = useState(false)
 	const [tab, setTab] = useState(USE_THE_FLEET)
+	const [selectedChauffeurId] = useState<number | null>(null)
+	const { mutate, isPending } = useCreateClientPickup()
 	const form = useForm<ClientPickupData>({
 		resolver: zodResolver(clientPickupSchema),
 		defaultValues,
@@ -291,15 +303,29 @@ export function NewBookingSheet() {
 	})
 	const { isValid } = useFormState({ control: form.control })
 
-	function handleOpenChange(open: boolean) {
-		if (!open) {
+	function handleOpenChange(nextOpen: boolean) {
+		setOpen(nextOpen)
+		if (!nextOpen) {
 			form.reset(defaultValues)
 			setTab(USE_THE_FLEET)
 		}
 	}
 
+	function onSubmit(data: ClientPickupData) {
+		if (selectedChauffeurId === null) return
+		mutate(toCreateClientPickupPayload(data, selectedChauffeurId), {
+			onSuccess: () => {
+				toast.success("Pickup booked")
+				handleOpenChange(false)
+			},
+			onError: () => {
+				toast.error("Could not book pickup")
+			},
+		})
+	}
+
 	return (
-		<Sheet onOpenChange={handleOpenChange}>
+		<Sheet open={open} onOpenChange={handleOpenChange}>
 			<SheetTrigger asChild>
 				<Button
 					type="button"
@@ -384,7 +410,7 @@ export function NewBookingSheet() {
 							value={CLIENT_PICKUP}
 							className="mt-5 min-h-0 overflow-y-auto"
 						>
-							<ClientPickupFields />
+							<ClientPickupFields onSubmit={onSubmit} />
 						</TabsContent>
 					</Tabs>
 
@@ -402,7 +428,7 @@ export function NewBookingSheet() {
 							<Button
 								type="submit"
 								form="client-pickup-form"
-								disabled={!isValid}
+								disabled={!isValid || isPending || selectedChauffeurId === null}
 								className={submitButtonClassName}
 							>
 								Book pickup
