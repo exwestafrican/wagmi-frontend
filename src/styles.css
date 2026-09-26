@@ -147,6 +147,11 @@ code {
 	@apply focus-visible:border-0 focus-visible:ring-[3px] focus-visible:ring-[#3B82F6]/35;
 }
 
+@utility fahari-field-input {
+	@apply h-auto w-full rounded-md border border-slate-200 bg-transparent px-3 py-2 text-xs text-slate-800 shadow-none placeholder:text-slate-300;
+	@apply hover:border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0 focus-visible:outline-none;
+}
+
 /*Add fonts*/
 .archivo-narrow-font {
 	font-family: "Archivo Narrow", sans-serif;
