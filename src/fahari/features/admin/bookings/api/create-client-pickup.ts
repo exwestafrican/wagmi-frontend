@@ -18,21 +18,20 @@ export function toCreateClientPickupPayload(
 	data: ClientPickupData,
 	userId: number,
 ): CreateClientPickupPayload {
-	const payload: CreateClientPickupPayload = {
-		userId,
-		startDateTime: new Date(
-			`${data.pickupDate}T${data.pickupTime}`,
-		).toISOString(),
-		firstName: data.firstName,
-		pickupLocation: data.pickupLocation,
-		email: data.clientEmail,
-		locationUrl: data.locationUrl,
-	}
+	const startDateTime = new Date(`${data.pickupDate}T${data.pickupTime}`)
 	const lastName = data.lastName.trim()
 	const note = data.note.trim()
-	if (lastName) payload.lastName = lastName
-	if (note) payload.note = note
-	return payload
+
+	return {
+		userId,
+		startDateTime: startDateTime.toISOString(),
+		firstName: data.firstName.trim(),
+		pickupLocation: data.pickupLocation.trim(),
+		email: data.clientEmail.trim(),
+		locationUrl: data.locationUrl,
+		...(lastName && { lastName }),
+		...(note && { note }),
+	}
 }
 
 export function useCreateClientPickup() {
