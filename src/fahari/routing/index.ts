@@ -1,8 +1,10 @@
 import { FahariAdminPages } from "@fahari/constants.ts"
 import { AdminAccountsPage } from "@fahari/features/admin/accounts/page.tsx"
 import AdminDashboardPage from "@fahari/features/admin/admin-dashboard.page.tsx"
+import { currentAdminQueryOptions } from "@fahari/features/admin/api/current-admin.ts"
 import { AdminBookingsPage } from "@fahari/features/admin/bookings/page.tsx"
 import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx"
+import { AdminDashboardPending } from "@fahari/features/admin/components/admin-dashboard-pending.tsx"
 import { handleAuthToken } from "@fahari/features/admin/hooks/handle-auth-token.ts"
 import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
@@ -46,6 +48,10 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		beforeLoad: ({ location }) => {
 			handleAuthToken(location, FahariAdminPages.LOGIN)
 		},
+		loader: async ({ context: { queryClient } }) => {
+			await queryClient.ensureQueryData(currentAdminQueryOptions())
+		},
+		pendingComponent: AdminDashboardPending,
 		component: AdminDashboardPage,
 	})
 
