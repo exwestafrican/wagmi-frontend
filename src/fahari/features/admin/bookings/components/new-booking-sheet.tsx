@@ -45,15 +45,12 @@ import { toast } from "sonner"
 const USE_THE_FLEET = "use-the-fleet"
 const CLIENT_PICKUP = "client-pickup"
 
-const fieldLabelClassName =
-	"text-[10px] font-semibold text-slate-500 uppercase tracking-wide"
-
-const optionalMark = (
-	<span className="font-normal text-slate-400 normal-case">(optional)</span>
-)
-
-const submitButtonClassName =
-	"h-auto cursor-pointer rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-none hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+function labelClassName(className?: string) {
+	return cn(
+		"text-[10px] font-semibold text-slate-500 uppercase tracking-wide",
+		className,
+	)
+}
 
 const defaultValues: ClientPickupData = {
 	firstName: "",
@@ -66,20 +63,81 @@ const defaultValues: ClientPickupData = {
 	note: "",
 }
 
+function OptionalMark() {
+	return (
+		<span className="font-normal text-slate-400 normal-case">(optional)</span>
+	)
+}
+
+function BookingLabel({
+	optional,
+	className,
+	children,
+	...props
+}: ComponentProps<typeof Label> & { optional?: boolean }) {
+	return (
+		<Label className={labelClassName(className)} {...props}>
+			{children}
+			{optional ? <OptionalMark /> : null}
+		</Label>
+	)
+}
+
+function BookingLabelText({
+	className,
+	children,
+}: {
+	className?: string
+	children: ReactNode
+}) {
+	return <span className={labelClassName(className)}>{children}</span>
+}
+
+function BookingFormLabel({
+	optional,
+	className,
+	children,
+	...props
+}: ComponentProps<typeof FormLabel> & { optional?: boolean }) {
+	return (
+		<FormLabel className={labelClassName(className)} {...props}>
+			{children}
+			{optional ? <OptionalMark /> : null}
+		</FormLabel>
+	)
+}
+
+function BookingSubmitButton({
+	className,
+	...props
+}: ComponentProps<typeof Button>) {
+	return (
+		<Button
+			className={cn(
+				"h-auto cursor-pointer rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-none hover:bg-black disabled:cursor-not-allowed disabled:opacity-60",
+				className,
+			)}
+			{...props}
+		/>
+	)
+}
+
 function Field({
 	id,
 	label,
+	optional,
 	children,
 }: {
 	id: string
 	label: ReactNode
+	optional?: boolean
 	children: ReactNode
 }) {
 	return (
 		<div className="flex flex-col gap-1.5">
-			<Label htmlFor={id} className={fieldLabelClassName}>
+			<BookingLabel htmlFor={id} optional={optional}>
 				{label}
-			</Label>
+			</BookingLabel>
 			{children}
 		</div>
 	)
@@ -115,7 +173,7 @@ function ClientPickupFields({
 			className="space-y-5"
 		>
 			<div className="flex flex-col gap-1.5">
-				<span className={fieldLabelClassName}>Client name</span>
+				<BookingLabelText>Client name</BookingLabelText>
 				<div className="grid grid-cols-2 gap-2">
 					<FormField
 						control={form.control}
@@ -160,7 +218,7 @@ function ClientPickupFields({
 				name="clientEmail"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>Client email</FormLabel>
+						<BookingFormLabel>Client email</BookingFormLabel>
 						<FormControl>
 							<Input
 								type="email"
@@ -180,9 +238,7 @@ function ClientPickupFields({
 				name="pickupLocation"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>
-							Pickup location
-						</FormLabel>
+						<BookingFormLabel>Pickup location</BookingFormLabel>
 						<FormControl>
 							<Input
 								placeholder="e.g. JKIA Terminal 1, Nairobi"
@@ -200,7 +256,7 @@ function ClientPickupFields({
 				name="locationUrl"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>Location URL</FormLabel>
+						<BookingFormLabel>Location URL</BookingFormLabel>
 						<div className="relative">
 							<Link
 								aria-hidden="true"
@@ -227,7 +283,7 @@ function ClientPickupFields({
 					name="pickupDate"
 					render={({ field }) => (
 						<FormItem className="gap-1.5">
-							<FormLabel className={fieldLabelClassName}>Pickup date</FormLabel>
+							<BookingFormLabel>Pickup date</BookingFormLabel>
 							<FormControl>
 								<Input
 									type="date"
@@ -244,7 +300,7 @@ function ClientPickupFields({
 					name="pickupTime"
 					render={({ field }) => (
 						<FormItem className="gap-1.5">
-							<FormLabel className={fieldLabelClassName}>Pickup time</FormLabel>
+							<BookingFormLabel>Pickup time</BookingFormLabel>
 							<FormControl>
 								<Input
 									type="time"
@@ -274,9 +330,7 @@ function ClientPickupFields({
 				name="note"
 				render={({ field }) => (
 					<FormItem className="gap-1.5">
-						<FormLabel className={fieldLabelClassName}>
-							Note {optionalMark}
-						</FormLabel>
+						<BookingFormLabel optional>Note</BookingFormLabel>
 						<FormControl>
 							<Textarea
 								placeholder="Did the client ask for anything specific?"
@@ -397,7 +451,7 @@ export function NewBookingSheet() {
 									/>
 								</Field>
 							</div>
-							<Field id="new-booking-note" label={<>Note {optionalMark}</>}>
+							<Field id="new-booking-note" label="Note" optional>
 								<Textarea
 									id="new-booking-note"
 									placeholder="Any details about this booking…"
@@ -425,18 +479,15 @@ export function NewBookingSheet() {
 							</Button>
 						</SheetClose>
 						{tab === CLIENT_PICKUP ? (
-							<Button
+							<BookingSubmitButton
 								type="submit"
 								form="client-pickup-form"
 								disabled={!isValid || isPending || selectedChauffeurId === null}
-								className={submitButtonClassName}
 							>
 								Book pickup
-							</Button>
+							</BookingSubmitButton>
 						) : (
-							<Button type="button" className={submitButtonClassName}>
-								Book time
-							</Button>
+							<BookingSubmitButton type="button">Book time</BookingSubmitButton>
 						)}
 					</SheetFooter>
 				</Form>
