@@ -1,3 +1,5 @@
+import { ScheduleTime } from "@fahari/features/booking/components/schedule-time.tsx"
+import { StaySummary } from "@fahari/features/booking/components/stay-summary.tsx"
 import {
 	formatNightlyPrice,
 	formatStaySummary,
@@ -48,35 +50,17 @@ export function BookingPanel({
 				className="flex items-start gap-5 self-stretch rounded-xl bg-[#10241c] p-3.5"
 				style={{ fontFamily: "Inter, sans-serif" }}
 			>
-				<div className="flex flex-[1_0_0] flex-col items-start self-stretch">
-					<p className="text-[9px] font-semibold uppercase leading-tight text-[#F7F9E4]">
-						Check-in
-					</p>
-					<p className="text-xs font-semibold leading-tight text-[#F7F9E4]">
-						From {listing.schedule.startTime}
-					</p>
-				</div>
-				<div className="flex flex-[1_0_0] flex-col items-start self-stretch">
-					<p className="text-[9px] font-semibold uppercase leading-tight text-[#F7F9E4]">
-						Check-out
-					</p>
-					<p className="text-xs font-semibold leading-tight text-[#F7F9E4]">
-						By {listing.schedule.endTime}
-					</p>
-				</div>
+				<ScheduleTime
+					label="Check-in"
+					detail={`From ${listing.schedule.startTime}`}
+				/>
+				<ScheduleTime
+					label="Check-out"
+					detail={`By ${listing.schedule.endTime}`}
+				/>
 			</div>
 			<GuestPicker adults={adults} onAdultsChange={onAdultsChange} />
-			{summary ? (
-				<div>
-					<p
-						className="text-xs tracking-tight text-slate-600"
-						style={{ fontFamily: "Inter, sans-serif" }}
-					>
-						{summary}
-					</p>
-					<hr className="mt-2.5 border-slate-200" />
-				</div>
-			) : null}
+			{summary && <StaySummary summary={summary} />}
 		</section>
 	)
 }
