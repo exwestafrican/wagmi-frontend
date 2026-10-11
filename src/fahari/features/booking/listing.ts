@@ -12,15 +12,21 @@ export type MeetingPoint = {
 	name: string
 }
 
-export type ListingRide = {
-	provider: string
-	oneWayTrip: number
-	returnTrip: number
-	maximumCapacity: number
+export type DurationBasedPricing = {
+	durationUnit: "nights" | "days" | "hours"
+	basePrice: number
+	additionalNightPrice: number
 }
 
-export type AdditionalServices = {
-	rides: ListingRide[]
+export type ResortBilling = {
+	accommodation: DurationBasedPricing
+}
+
+export type ProviderPolicy = {
+	provider: string
+	maximumCapacity: number
+	sameDayReturnPrice: number
+	otherDayReturnPrice: number
 }
 
 export type Experience = {
@@ -32,9 +38,10 @@ export type Experience = {
 	category: string
 	bookingPolicy: BookingPolicy
 	schedule: Schedule
+	billing: ResortBilling
 	meetingPoint: MeetingPoint
 	onlyRideBooking: boolean
-	additionalServices: AdditionalServices
+	rideProviders: ProviderPolicy[]
 }
 
 export type Listing = Experience

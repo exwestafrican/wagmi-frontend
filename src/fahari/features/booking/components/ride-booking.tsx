@@ -3,11 +3,7 @@ import {
 	FieldButton,
 	FieldInput,
 } from "@fahari/features/booking/components/field-button.tsx"
-import {
-	formatNightlyPrice,
-	formatStayDate,
-} from "@fahari/features/booking/format.ts"
-import type { Listing } from "@fahari/features/booking/listing.ts"
+import { formatStayDate } from "@fahari/features/booking/format.ts"
 import {
 	ArrowDownLeft,
 	ArrowUpRight,
@@ -23,20 +19,20 @@ function DateIcon() {
 }
 
 export function RideBooking({
-	listing,
+	meetingPointName,
+	startTime,
+	endTime,
 	stay,
 }: {
-	listing: Listing
+	meetingPointName: string
+	startTime: string
+	endTime: string
 	stay: DateRange | undefined
 }) {
 	const [enabled, setEnabled] = useState(true)
 	const [pickupAddress, setPickupAddress] = useState("")
-	const [pickupTime, setPickupTime] = useState(listing.schedule.startTime)
-	const [departureTime, setDepartureTime] = useState(listing.schedule.endTime)
-	const ride = listing.additionalServices.rides[0]
-	const roundTripPrice = ride
-		? formatNightlyPrice(ride.returnTrip, listing.currency)
-		: null
+	const [pickupTime, setPickupTime] = useState(startTime)
+	const [departureTime, setDepartureTime] = useState(endTime)
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -45,7 +41,6 @@ export function RideBooking({
 					<Checkbox
 						id="add-car"
 						checked={enabled}
-						disabled={listing.onlyRideBooking}
 						onCheckedChange={(checked) => setEnabled(checked === true)}
 						className="mt-0.5 size-5 rounded-[6px] border-[#7eaea0] disabled:opacity-100 data-[state=checked]:border-[#7eaea0] data-[state=checked]:bg-[#7eaea0]"
 					/>
@@ -56,11 +51,6 @@ export function RideBooking({
 						<span className="block text-xs text-slate-500">
 							Optional private ride to the resort and back
 						</span>
-						{!enabled && roundTripPrice ? (
-							<span className="block text-[11px] leading-[normal] text-slate-500">
-								{roundTripPrice} / round trip · not added
-							</span>
-						) : null}
 					</label>
 				</div>
 				<Car className="size-5 shrink-0 text-[#7eaea0]" aria-hidden />
@@ -111,9 +101,7 @@ export function RideBooking({
 						<ArrowDownLeft className="size-4" aria-hidden />
 						Leaving the resort
 					</p>
-					<p className="text-xs text-slate-600">
-						Pickup: {listing.meetingPoint.name}
-					</p>
+					<p className="text-xs text-slate-600">Pickup: {meetingPointName}</p>
 					<div className="flex gap-1.5">
 						<div className="flex min-w-0 flex-1">
 							<FieldButton
@@ -139,6 +127,10 @@ export function RideBooking({
 					</div>
 					<p className="text-xs text-slate-500">
 						Return to your original pickup location.
+					</p>
+					<p className="text-xs text-slate-500">
+						Your selected car includes pickup to the resort and the return ride.
+						This is included in the booking total below.
 					</p>
 				</div>
 			) : null}
