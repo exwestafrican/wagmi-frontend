@@ -41,7 +41,7 @@ export function BookingPanel({
 			<StayDateRange
 				value={stay}
 				onChange={onStayChange}
-				maximumNights={listing.maximumNights}
+				maximumNights={listing.bookingPolicy.maximumNights}
 				maxAdvanceBookingDays={listing.bookingPolicy.maxAdvanceBookingDays}
 			/>
 			<div

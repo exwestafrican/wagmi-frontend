@@ -10,11 +10,11 @@ export type Listing = {
 	tagLine: string
 	code: string
 	pricePerNight: number
-	maximumNights: number
 	currency: string
 	category: string
 	onlyRideBooking: boolean
 	bookingPolicy: {
+		maximumNights: number
 		maxAdvanceBookingDays: number
 	}
 	schedule: {
@@ -32,11 +32,11 @@ const listings: Listing[] = [
 		tagLine: "Reconnection with nature, culture, and silliness.",
 		code: "araiye",
 		pricePerNight: 150000,
-		maximumNights: 2,
 		currency: "NGN",
 		category: "resort",
 		onlyRideBooking: false,
 		bookingPolicy: {
+			maximumNights: 2,
 			maxAdvanceBookingDays: 40,
 		},
 		schedule: {
