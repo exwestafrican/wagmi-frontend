@@ -1,3 +1,17 @@
+export type Schedule = {
+	startTime: string
+	endTime: string
+}
+
+export type BookingPolicy = {
+	maximumNights: number
+	maxAdvanceBookingDays: number
+}
+
+export type MeetingPoint = {
+	name: string
+}
+
 export type ListingRide = {
 	provider: string
 	oneWayTrip: number
@@ -5,23 +19,22 @@ export type ListingRide = {
 	maximumCapacity: number
 }
 
-export type Listing = {
+export type AdditionalServices = {
+	rides: ListingRide[]
+}
+
+export type Experience = {
 	name: string
 	tagLine: string
 	code: string
 	pricePerNight: number
 	currency: string
 	category: string
+	bookingPolicy: BookingPolicy
+	schedule: Schedule
+	meetingPoint: MeetingPoint
 	onlyRideBooking: boolean
-	bookingPolicy: {
-		maximumNights: number
-		maxAdvanceBookingDays: number
-	}
-	schedule: {
-		startTime: string
-		endTime: string
-	}
-	additionalServices: {
-		rides: ListingRide[]
-	}
+	additionalServices: AdditionalServices
 }
+
+export type Listing = Experience

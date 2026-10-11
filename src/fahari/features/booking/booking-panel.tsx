@@ -1,3 +1,4 @@
+import { RideBooking } from "@fahari/features/booking/components/ride-booking.tsx"
 import { ScheduleTime } from "@fahari/features/booking/components/schedule-time.tsx"
 import { StaySummary } from "@fahari/features/booking/components/stay-summary.tsx"
 import {
@@ -61,6 +62,9 @@ export function BookingPanel({
 			</div>
 			<GuestPicker adults={adults} onAdultsChange={onAdultsChange} />
 			{summary && <StaySummary summary={summary} />}
+			{listing.additionalServices.rides.length > 0 && (
+				<RideBooking listing={listing} stay={stay} />
+			)}
 		</section>
 	)
 }
