@@ -31,16 +31,6 @@ export const bookingCalendarStyle = {
 	fontFamily: '"DM Sans", sans-serif',
 } as CSSProperties
 
-export const bookingCalendarStyles = {
-	month_caption: { fontWeight: 500, fontSize: "13px" },
-	weekday: { fontSize: "10px" },
-	day: { fontSize: "12px" },
-}
-
-export const bookingCalendarModifiersStyles = {
-	selected: { fontWeight: 500, fontSize: "12px" },
-}
-
 function DateIcon() {
 	return <Calendar className="size-4 shrink-0 text-[#10241c]" aria-hidden />
 }
@@ -104,8 +94,14 @@ export function StayDateRange({
 					}}
 					defaultMonth={value?.from ?? new Date()}
 					style={bookingCalendarStyle}
-					styles={bookingCalendarStyles}
-					modifiersStyles={bookingCalendarModifiersStyles}
+					styles={{
+						month_caption: { fontWeight: 500, fontSize: "13px" },
+						weekday: { fontSize: "10px" },
+						day: { fontSize: "12px" },
+					}}
+					modifiersStyles={{
+						selected: { fontWeight: 500, fontSize: "12px" },
+					}}
 				/>
 			</PopoverContent>
 		</Popover>
