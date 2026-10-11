@@ -55,7 +55,7 @@ export function RideBooking({
 				</div>
 				<Car className="size-5 shrink-0 text-[#7eaea0]" aria-hidden />
 			</div>
-			{enabled ? (
+			{enabled && (
 				<div className="flex flex-col gap-3 rounded-xl border border-[#89C9CA] p-3">
 					<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
 						<ArrowUpRight className="size-4" aria-hidden />
@@ -133,7 +133,7 @@ export function RideBooking({
 						This is included in the booking total below.
 					</p>
 				</div>
-			) : null}
+			)}
 		</div>
 	)
 }
