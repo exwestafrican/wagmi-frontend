@@ -7,6 +7,7 @@ import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx
 import { AdminDashboardPending } from "@fahari/features/admin/components/admin-dashboard-pending.tsx"
 import { handleAuthToken } from "@fahari/features/admin/hooks/handle-auth-token.ts"
 import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
+import { BookingPage } from "@fahari/features/booking/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
 import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
 import { z } from "zod"
@@ -22,6 +23,15 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		getParentRoute: () => fahariLayoutRoute,
 		path: "/",
 		component: FahariHomePage,
+	})
+
+	const fahariBookingRoute = createRoute({
+		getParentRoute: () => fahariLayoutRoute,
+		path: "booking",
+		validateSearch: z.object({
+			code: z.string(),
+		}),
+		component: BookingPage,
 	})
 
 	const fahariAdminLoginRoute = createRoute({
@@ -69,6 +79,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 
 	return fahariLayoutRoute.addChildren([
 		fahariIndexRoute,
+		fahariBookingRoute,
 		fahariAdminLoginRoute,
 		fahariAdminCheckEmailRoute,
 		fahariAdminDashboardLayoutRoute.addChildren([

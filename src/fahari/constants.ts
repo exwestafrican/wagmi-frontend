@@ -1,5 +1,9 @@
 export const FAHARI_WORKSPACE_CODE = ""
 
+export const FahariPages = {
+	BOOKING: "/fahari/booking",
+} as const
+
 export const FahariAdminPages = {
 	LOGIN: "/fahari/admin",
 	CHECK_EMAIL: "/fahari/admin/check-email",
