@@ -4,6 +4,10 @@ export const FahariPages = {
 	BOOKING: "/fahari/booking",
 } as const
 
+export const FahariApiPaths = {
+	BOOKING: "booking",
+} as const
+
 export const FahariAdminPages = {
 	LOGIN: "/fahari/admin",
 	CHECK_EMAIL: "/fahari/admin/check-email",

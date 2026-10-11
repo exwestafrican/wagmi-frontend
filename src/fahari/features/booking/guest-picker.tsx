@@ -13,7 +13,10 @@ export function GuestPicker({
 }) {
 	return (
 		<div className="flex items-center justify-between self-stretch rounded-[8px] border border-[#89C9CA] bg-white p-3">
-			<div className="flex flex-col gap-1" style={{ fontFamily: "Inter, sans-serif" }}>
+			<div
+				className="flex flex-col gap-1"
+				style={{ fontFamily: "Inter, sans-serif" }}
+			>
 				<p className="text-[11px] leading-[normal] font-semibold text-[#012420] uppercase">
 					Guests
 				</p>

@@ -7,6 +7,9 @@ import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx
 import { AdminDashboardPending } from "@fahari/features/admin/components/admin-dashboard-pending.tsx"
 import { handleAuthToken } from "@fahari/features/admin/hooks/handle-auth-token.ts"
 import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
+import { listingQueryOptions } from "@fahari/features/booking/api/get-listing.ts"
+import { BookingError } from "@fahari/features/booking/components/booking-error.tsx"
+import { BookingPending } from "@fahari/features/booking/components/booking-pending.tsx"
 import { BookingPage } from "@fahari/features/booking/page.tsx"
 import FahariHomePage from "@fahari/features/home/page.tsx"
 import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
@@ -31,6 +34,11 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		validateSearch: z.object({
 			code: z.string(),
 		}),
+		loaderDeps: ({ search: { code } }) => ({ code }),
+		loader: ({ context: { queryClient }, deps: { code } }) =>
+			queryClient.ensureQueryData(listingQueryOptions(code)),
+		pendingComponent: BookingPending,
+		errorComponent: BookingError,
 		component: BookingPage,
 	})
 
