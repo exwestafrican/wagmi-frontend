@@ -26,7 +26,7 @@ export type ProviderPolicy = {
 	provider: string
 	maximumCapacity: number
 	sameDayReturnPrice: number
-	otherDayReturnPrice: number
+	multipleDaysReturnPrice: number
 }
 
 export type Experience = {
