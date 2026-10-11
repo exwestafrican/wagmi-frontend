@@ -91,6 +91,7 @@ export function RideBooking({
 								placeholder="Add date"
 								icon={<DateIcon />}
 								compact
+								onClick={() => {}}
 							/>
 						</div>
 						<div className="flex min-w-0 flex-1">
@@ -121,6 +122,7 @@ export function RideBooking({
 								placeholder="Add date"
 								icon={<DateIcon />}
 								compact
+								onClick={() => {}}
 							/>
 						</div>
 						<div className="flex min-w-0 flex-1">

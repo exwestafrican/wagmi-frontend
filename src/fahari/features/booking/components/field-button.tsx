@@ -1,24 +1,20 @@
 import { cn } from "@common/lib/utils.ts"
 import type { ReactNode } from "react"
 
-export function FieldButton({
+function FieldContent({
 	label,
 	value,
 	placeholder,
 	icon,
-	open = false,
-	compact = false,
-	onClick,
+	compact,
 }: {
 	label: string
 	value?: string
 	placeholder: string
 	icon: ReactNode
-	open?: boolean
-	compact?: boolean
-	onClick?: () => void
+	compact: boolean
 }) {
-	const content = (
+	return (
 		<>
 			<span className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
 				{label}
@@ -37,21 +33,29 @@ export function FieldButton({
 			</span>
 		</>
 	)
+}
+
+export function FieldButton({
+	label,
+	value,
+	placeholder,
+	icon,
+	open = false,
+	compact = false,
+	onClick,
+}: {
+	label: string
+	value?: string
+	placeholder: string
+	icon: ReactNode
+	open?: boolean
+	compact?: boolean
+	onClick: () => void
+}) {
 	const className = cn(
 		"flex w-full flex-[1_0_0] flex-col items-start rounded-xl border border-[#d7e1e8] bg-white text-left",
 		compact ? "gap-0 p-2" : "gap-0.5 p-3",
 	)
-
-	if (!onClick) {
-		return (
-			<div
-				className={className}
-				style={{ fontFamily: '"DM Sans", sans-serif' }}
-			>
-				{content}
-			</div>
-		)
-	}
 
 	return (
 		<button
@@ -62,7 +66,13 @@ export function FieldButton({
 			className={className}
 			style={{ fontFamily: '"DM Sans", sans-serif' }}
 		>
-			{content}
+			<FieldContent
+				label={label}
+				value={value}
+				placeholder={placeholder}
+				icon={icon}
+				compact={compact}
+			/>
 		</button>
 	)
 }
