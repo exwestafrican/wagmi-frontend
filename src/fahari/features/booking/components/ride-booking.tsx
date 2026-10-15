@@ -23,13 +23,18 @@ export function RideBooking({
 	startTime,
 	endTime,
 	stay,
+	enabled,
+	available,
+	onEnabledChange,
 }: {
 	meetingPointName: string
 	startTime: string
 	endTime: string
 	stay: DateRange | undefined
+	enabled: boolean
+	available: boolean
+	onEnabledChange: (enabled: boolean) => void
 }) {
-	const [enabled, setEnabled] = useState(true)
 	const [pickupAddress, setPickupAddress] = useState("")
 	const [pickupTime, setPickupTime] = useState(startTime)
 	const [departureTime, setDepartureTime] = useState(endTime)
@@ -41,8 +46,8 @@ export function RideBooking({
 					<Checkbox
 						id="add-car"
 						checked={enabled}
-						onCheckedChange={(checked) => setEnabled(checked === true)}
-						className="mt-0.5 size-5 rounded-[6px] border-[#7eaea0] disabled:opacity-100 data-[state=checked]:border-[#7eaea0] data-[state=checked]:bg-[#7eaea0]"
+						onCheckedChange={(checked) => onEnabledChange(checked === true)}
+						className="mt-0.5 size-5 rounded-[6px] border-[#7eaea0] data-[state=checked]:border-[#7eaea0] data-[state=checked]:bg-[#7eaea0]"
 					/>
 					<label htmlFor="add-car">
 						<span className="block text-sm font-semibold text-[#012420]">
@@ -128,12 +133,17 @@ export function RideBooking({
 					<p className="text-xs text-slate-500">
 						Return to your original pickup location.
 					</p>
-					<p className="text-xs text-slate-500">
+				</div>
+			)}
+			{available && enabled ? (
+				<>
+					<p className="text-[11px] leading-snug text-slate-500">
 						Your selected car includes pickup to the resort and the return ride.
 						This is included in the booking total below.
 					</p>
-				</div>
-			)}
+					<hr className="border-slate-200" />
+				</>
+			) : null}
 		</div>
 	)
 }
