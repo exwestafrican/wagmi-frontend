@@ -1,8 +1,11 @@
 import renderWithQueryClient from "@common/renderWithQueryClient.tsx"
 import { AdminBookingsPage } from "@fahari/features/admin/bookings/page.tsx"
+import { fahariAdminApiClient } from "@fahari/lib/fahari-admin-api-client.ts"
 import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, test } from "vitest"
+import { describe, expect, test, vi } from "vitest"
+
+const mockFahariAdminApiClientPost = vi.mocked(fahariAdminApiClient.post)
 
 describe("Fahari admin bookings", () => {
 	test("opens the new booking sheet from the header button", async () => {
@@ -82,5 +85,30 @@ describe("Fahari admin bookings", () => {
 			expect(screen.queryByText("Enter a valid URL")).not.toBeInTheDocument()
 		})
 		expect(bookPickup).toBeDisabled()
+	})
+
+	test("does not book a pickup until a chauffeur can be chosen", async () => {
+		const user = userEvent.setup()
+		renderWithQueryClient(<AdminBookingsPage />)
+
+		await user.click(screen.getByRole("button", { name: "New booking" }))
+		await user.click(screen.getByRole("tab", { name: "Client pickup" }))
+
+		await user.type(screen.getByPlaceholderText("First name"), "Amara")
+		await user.type(screen.getByLabelText("Client email"), "t@fahari.co")
+		await user.type(
+			screen.getByLabelText("Pickup location"),
+			"JKIA Terminal 1, Nairobi",
+		)
+		await user.type(
+			screen.getByLabelText("Location URL"),
+			"https://maps.google.com/?q=JKIA",
+		)
+		await user.type(screen.getByLabelText("Pickup date"), "2026-09-16")
+		await user.type(screen.getByLabelText("Pickup time"), "08:30")
+
+		const bookPickup = screen.getByRole("button", { name: "Book pickup" })
+		expect(bookPickup).toBeDisabled()
+		expect(mockFahariAdminApiClientPost).not.toHaveBeenCalled()
 	})
 })

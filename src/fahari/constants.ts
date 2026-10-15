@@ -22,4 +22,5 @@ export const FahariAdminApiPaths = {
 	USERS: "fahari/admin/users",
 	RESERVED_ACCOUNT: "fahari/admin/users/reserved-account",
 	PROVISION_RESERVED_ACCOUNT: "fahari/admin/users/provision-reserved-account",
+	CLIENT_PICKUP: "client-pickup",
 } as const
