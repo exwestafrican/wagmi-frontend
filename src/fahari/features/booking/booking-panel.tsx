@@ -1,3 +1,4 @@
+import { ResortOrderSummary } from "@fahari/features/booking/components/resort-order-summary.tsx"
 import { RideBooking } from "@fahari/features/booking/components/ride-booking.tsx"
 import { ScheduleTime } from "@fahari/features/booking/components/schedule-time.tsx"
 import { StaySummary } from "@fahari/features/booking/components/stay-summary.tsx"
@@ -8,6 +9,8 @@ import {
 import { GuestPicker } from "@fahari/features/booking/guest-picker.tsx"
 import type { Listing } from "@fahari/features/booking/listing.ts"
 import { StayDateRange } from "@fahari/features/booking/stay-date-range.tsx"
+import { differenceInCalendarDays } from "date-fns"
+import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 
 export function BookingPanel({
@@ -23,10 +26,12 @@ export function BookingPanel({
 	adults: number
 	onAdultsChange: (adults: number) => void
 }) {
+	const [includeRide, setIncludeRide] = useState(true)
 	const price = formatNightlyPrice(listing.pricePerNight, listing.currency)
 	const summary =
 		stay?.from && stay.to ? formatStaySummary(stay.from, stay.to) : null
-	const provider = listing.rideProviders[0]
+	const nights =
+		stay?.from && stay.to ? differenceInCalendarDays(stay.to, stay.from) : 0
 
 	return (
 		<section className="flex min-h-dvh w-full flex-col gap-2.5 bg-white p-4 md:min-h-0 md:rounded-xl">
@@ -63,14 +68,21 @@ export function BookingPanel({
 			</div>
 			<GuestPicker adults={adults} onAdultsChange={onAdultsChange} />
 			{summary && <StaySummary summary={summary} />}
-			{provider ? (
-				<RideBooking
-					meetingPointName={listing.meetingPoint.name}
-					startTime={listing.schedule.startTime}
-					endTime={listing.schedule.endTime}
-					stay={stay}
-				/>
-			) : null}
+			<RideBooking
+				meetingPointName={listing.meetingPoint.name}
+				startTime={listing.schedule.startTime}
+				endTime={listing.schedule.endTime}
+				stay={stay}
+				enabled={includeRide}
+				onEnabledChange={setIncludeRide}
+			/>
+			<ResortOrderSummary
+				resortCode={listing.code}
+				numberOfNights={nights}
+				numberOfGuests={adults}
+				currency={listing.currency}
+				includeRide={includeRide}
+			/>
 		</section>
 	)
 }
