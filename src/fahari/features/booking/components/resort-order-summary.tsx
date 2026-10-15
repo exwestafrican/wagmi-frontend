@@ -63,7 +63,7 @@ export function ResortOrderSummary({
 	const failed = accommodation.isError || (includeRide && ride.isError)
 	const accommodationAmount = accommodation.data?.amount ?? 0
 	const rideAmount = includeRide ? (ride.data?.amount ?? 0) : 0
-	const total = accommodationAmount + (rideAmount ?? 0)
+	const total = accommodationAmount + rideAmount
 
 	if (failed) {
 		return <p className="text-xs text-slate-600">Couldn't price this stay.</p>
