@@ -32,9 +32,6 @@ export function BookingPanel({
 		stay?.from && stay.to ? formatStaySummary(stay.from, stay.to) : null
 	const nights =
 		stay?.from && stay.to ? differenceInCalendarDays(stay.to, stay.from) : 0
-	const rideAvailable = listing.rideProviders.some(
-		(provider) => provider.maximumCapacity >= adults,
-	)
 
 	return (
 		<section className="flex min-h-dvh w-full flex-col gap-2.5 bg-white p-4 md:min-h-0 md:rounded-xl">
@@ -77,7 +74,6 @@ export function BookingPanel({
 				endTime={listing.schedule.endTime}
 				stay={stay}
 				enabled={includeRide}
-				available={rideAvailable}
 				onEnabledChange={setIncludeRide}
 			/>
 			<ResortOrderSummary
@@ -85,8 +81,7 @@ export function BookingPanel({
 				numberOfNights={nights}
 				numberOfGuests={adults}
 				currency={listing.currency}
-				includeRide={rideAvailable && includeRide}
-				rideUnavailable={includeRide && !rideAvailable}
+				includeRide={includeRide}
 			/>
 		</section>
 	)

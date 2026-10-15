@@ -24,7 +24,6 @@ export function RideBooking({
 	endTime,
 	stay,
 	enabled,
-	available,
 	onEnabledChange,
 }: {
 	meetingPointName: string
@@ -32,7 +31,6 @@ export function RideBooking({
 	endTime: string
 	stay: DateRange | undefined
 	enabled: boolean
-	available: boolean
 	onEnabledChange: (enabled: boolean) => void
 }) {
 	const [pickupAddress, setPickupAddress] = useState("")
@@ -135,7 +133,7 @@ export function RideBooking({
 					</p>
 				</div>
 			)}
-			{available && enabled ? (
+			{enabled ? (
 				<>
 					<p className="text-[11px] leading-snug text-slate-500">
 						Your selected car includes pickup to the resort and the return ride.

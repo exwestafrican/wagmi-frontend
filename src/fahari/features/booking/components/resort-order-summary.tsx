@@ -6,14 +6,9 @@ import { ArrowRight } from "lucide-react"
 function Amount({
 	amount,
 	currency,
-	className,
-}: {
-	amount: number | undefined
-	currency: string
-	className?: string
-}) {
+}: { amount: number | undefined; currency: string }) {
 	if (amount === undefined) {
-		return <Skeleton className={className ?? "h-3 w-16"} aria-hidden />
+		return <Skeleton className="h-3 w-16" aria-hidden />
 	}
 
 	return <span>{formatNightlyPrice(amount, currency)}</span>
@@ -42,14 +37,12 @@ export function ResortOrderSummary({
 	numberOfGuests,
 	currency,
 	includeRide,
-	rideUnavailable,
 }: {
 	resortCode: string
 	numberOfNights: number
 	numberOfGuests: number
 	currency: string
 	includeRide: boolean
-	rideUnavailable: boolean
 }) {
 	const accommodation = useBilling(
 		resortCode,
@@ -68,13 +61,9 @@ export function ResortOrderSummary({
 	const nightLabel =
 		numberOfNights === 1 ? "1 night" : `${numberOfNights} nights`
 	const failed = accommodation.isError || (includeRide && ride.isError)
-	const accommodationAmount = accommodation.data?.amount
-	const rideAmount = includeRide ? ride.data?.amount : undefined
-	const total =
-		accommodationAmount === undefined ||
-		(includeRide && rideAmount === undefined)
-			? undefined
-			: accommodationAmount + (rideAmount ?? 0)
+	const accommodationAmount = accommodation.data?.amount ?? 0
+	const rideAmount = includeRide ? (ride.data?.amount ?? 0) : 0
+	const total = accommodationAmount + (rideAmount ?? 0)
 
 	if (failed) {
 		return <p className="text-xs text-slate-600">Couldn't price this stay.</p>
@@ -90,27 +79,28 @@ export function ResortOrderSummary({
 				amount={accommodationAmount}
 				currency={currency}
 			/>
-			{rideUnavailable ? (
-				<div className="flex items-center justify-between text-xs text-red-600">
-					<span>Car / return ride</span>
-					<span>Not available for this guest size.</span>
-				</div>
-			) : includeRide ? (
-				<SummaryRow
-					label="Car / return ride"
-					amount={rideAmount}
-					currency={currency}
-				/>
-			) : null}
+			{includeRide &&
+				(ride.isSuccess ? (
+					<SummaryRow
+						label="Car / return ride"
+						amount={rideAmount}
+						currency={currency}
+					/>
+				) : (
+					<div className="flex items-center justify-between text-xs text-red-600">
+						<span>Car / return ride</span>
+						<span>Not available for this guest size.</span>
+					</div>
+				))}
 			<hr className="border-slate-200" />
 			<div className="flex items-center justify-between">
 				<span className="text-sm font-semibold">Booking total</span>
 				<span className="text-lg leading-[normal] font-semibold">
-					<Amount amount={total} currency={currency} className="h-5 w-24" />
+					<Amount amount={total} currency={currency} />
 				</span>
 			</div>
 			<p className="text-[11px] leading-[normal] text-slate-500">
-				{includeRide
+				{includeRide && ride.isSuccess
 					? "Includes cleaning and selected car"
 					: "Includes cleaning"}
 			</p>
@@ -121,9 +111,6 @@ export function ResortOrderSummary({
 				Request this stay
 				<ArrowRight className="size-3.5" aria-hidden />
 			</button>
-			<p className="text-center text-[11px] leading-[normal] text-slate-400">
-				Prototype only · no booking or payment is made.
-			</p>
 		</div>
 	)
 }
