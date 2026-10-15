@@ -6,8 +6,14 @@ import {
 	formatNightlyPrice,
 	formatStaySummary,
 } from "@fahari/features/booking/format.ts"
-import { GuestPicker } from "@fahari/features/booking/guest-picker.tsx"
-import type { Listing } from "@fahari/features/booking/listing.ts"
+import {
+	CapacityNote,
+	GuestPicker,
+} from "@fahari/features/booking/guest-picker.tsx"
+import {
+	type Listing,
+	maximumRideCapacity,
+} from "@fahari/features/booking/listing.ts"
 import { StayDateRange } from "@fahari/features/booking/stay-date-range.tsx"
 import { differenceInCalendarDays } from "date-fns"
 import { useState } from "react"
@@ -27,6 +33,7 @@ export function BookingPanel({
 	onAdultsChange: (adults: number) => void
 }) {
 	const [includeRide, setIncludeRide] = useState(true)
+	const maxGuests = maximumRideCapacity(listing)
 	const price = formatNightlyPrice(listing.pricePerNight, listing.currency)
 	const summary =
 		stay?.from && stay.to ? formatStaySummary(stay.from, stay.to) : null
@@ -66,7 +73,12 @@ export function BookingPanel({
 					detail={`By ${listing.schedule.endTime}`}
 				/>
 			</div>
-			<GuestPicker adults={adults} onAdultsChange={onAdultsChange} />
+			<GuestPicker
+				adults={adults}
+				onAdultsChange={onAdultsChange}
+				max={maxGuests}
+			/>
+			<CapacityNote max={maxGuests} />
 			{summary && <StaySummary summary={summary} />}
 			<RideBooking
 				meetingPointName={listing.meetingPoint.name}
