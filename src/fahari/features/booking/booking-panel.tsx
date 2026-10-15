@@ -1,3 +1,4 @@
+import { RideBooking } from "@fahari/features/booking/components/ride-booking.tsx"
 import { ScheduleTime } from "@fahari/features/booking/components/schedule-time.tsx"
 import { StaySummary } from "@fahari/features/booking/components/stay-summary.tsx"
 import {
@@ -25,6 +26,7 @@ export function BookingPanel({
 	const price = formatNightlyPrice(listing.pricePerNight, listing.currency)
 	const summary =
 		stay?.from && stay.to ? formatStaySummary(stay.from, stay.to) : null
+	const provider = listing.rideProviders[0]
 
 	return (
 		<section className="flex min-h-dvh w-full flex-col gap-2.5 bg-white p-4 md:min-h-0 md:rounded-xl">
@@ -61,6 +63,14 @@ export function BookingPanel({
 			</div>
 			<GuestPicker adults={adults} onAdultsChange={onAdultsChange} />
 			{summary && <StaySummary summary={summary} />}
+			{provider ? (
+				<RideBooking
+					meetingPointName={listing.meetingPoint.name}
+					startTime={listing.schedule.startTime}
+					endTime={listing.schedule.endTime}
+					stay={stay}
+				/>
+			) : null}
 		</section>
 	)
 }
