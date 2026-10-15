@@ -1,4 +1,4 @@
-import { rootRoute } from "@envoye/routing/root.ts"
+import { envoyeLayoutRoute } from "@envoye/routing/root.ts"
 import NotFound from "@envoye/features/not-found.tsx"
 import { z } from "zod"
 import { AdminPages } from "@common/utils/pages.ts"
@@ -14,7 +14,7 @@ import { ENVOYE_WORKSPACE_CODE } from "@envoye/constants.ts"
 import { permissionQueryOptions } from "@envoye/features/permission/api/permissions.ts"
 
 export const adminLayoutRoute = createRoute({
-	getParentRoute: () => rootRoute,
+	getParentRoute: () => envoyeLayoutRoute,
 	path: "admin",
 	notFoundComponent: NotFound,
 	beforeLoad: async ({ location, context }) => {
@@ -37,7 +37,7 @@ const adminIndexRoute = createRoute({
 })
 
 export const adminLogin = createRoute({
-	getParentRoute: () => rootRoute,
+	getParentRoute: () => envoyeLayoutRoute,
 	path: "admin/login",
 	validateSearch: (search) =>
 		z.object({ redirect: z.string().optional() }).parse(search),

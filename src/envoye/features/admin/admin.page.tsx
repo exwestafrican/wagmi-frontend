@@ -10,17 +10,17 @@ export function AdminPage() {
 	const options = [
 		{
 			name: "feature flags",
-			path: "/admin/feature-flag",
+			path: "/envoye/admin/feature-flag",
 		},
 		{
 			name: "backfill",
-			path: "/admin/backfill",
+			path: "/envoye/admin/backfill",
 		},
 		...(permissions.includes(Permissions.MANAGE_DEVICES)
 			? [
 					{
 						name: "devices",
-						path: "/admin/devices",
+						path: "/envoye/admin/devices",
 					},
 				]
 			: []),

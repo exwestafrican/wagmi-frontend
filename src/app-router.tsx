@@ -14,7 +14,7 @@ const defaultRouterOptions = {
 export function createAppRouter(queryClient: QueryClient) {
 	const routeTree = rootRoute.addChildren([
 		...getEnvoyeRouteChildren(),
-		createFahariRouteTree(rootRoute),
+		...createFahariRouteTree(rootRoute),
 	])
 
 	return createRouter({

@@ -11,25 +11,12 @@ import { listingQueryOptions } from "@fahari/features/booking/api/get-listing.ts
 import { BookingError } from "@fahari/features/booking/components/booking-error.tsx"
 import { BookingPending } from "@fahari/features/booking/components/booking-pending.tsx"
 import { BookingPage } from "@fahari/features/booking/page.tsx"
-import FahariHomePage from "@fahari/features/home/page.tsx"
-import { type AnyRoute, Outlet, createRoute } from "@tanstack/react-router"
+import { type AnyRoute, createRoute } from "@tanstack/react-router"
 import { z } from "zod"
 
 export function createFahariRouteTree(parentRoute: AnyRoute) {
-	const fahariLayoutRoute = createRoute({
-		getParentRoute: () => parentRoute,
-		path: "fahari",
-		component: Outlet,
-	})
-
-	const fahariIndexRoute = createRoute({
-		getParentRoute: () => fahariLayoutRoute,
-		path: "/",
-		component: FahariHomePage,
-	})
-
 	const fahariBookingRoute = createRoute({
-		getParentRoute: () => fahariLayoutRoute,
+		getParentRoute: () => parentRoute,
 		path: "booking",
 		validateSearch: z.object({
 			code: z.string(),
@@ -43,7 +30,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 	})
 
 	const fahariAdminLoginRoute = createRoute({
-		getParentRoute: () => fahariLayoutRoute,
+		getParentRoute: () => parentRoute,
 		path: "admin",
 		validateSearch: z.object({
 			redirect: z.string().optional(),
@@ -52,7 +39,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 	})
 
 	const fahariAdminCheckEmailRoute = createRoute({
-		getParentRoute: () => fahariLayoutRoute,
+		getParentRoute: () => parentRoute,
 		path: "admin/check-email",
 		validateSearch: z.object({
 			email: z.email(),
@@ -61,7 +48,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 	})
 
 	const fahariAdminDashboardLayoutRoute = createRoute({
-		getParentRoute: () => fahariLayoutRoute,
+		getParentRoute: () => parentRoute,
 		id: "fahari-admin-dashboard",
 		beforeLoad: ({ location }) => {
 			handleAuthToken(location, FahariAdminPages.LOGIN)
@@ -85,8 +72,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		component: AdminBookingsPage,
 	})
 
-	return fahariLayoutRoute.addChildren([
-		fahariIndexRoute,
+	return [
 		fahariBookingRoute,
 		fahariAdminLoginRoute,
 		fahariAdminCheckEmailRoute,
@@ -94,5 +80,5 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 			fahariAdminAccountsRoute,
 			fahariAdminBookingsRoute,
 		]),
-	])
+	]
 }
