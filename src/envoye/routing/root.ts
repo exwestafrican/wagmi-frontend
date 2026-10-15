@@ -10,7 +10,12 @@ import { ExistingWorkspaceSetup } from "@envoye/features/workspace/existing-work
 import SetupWorkspacePage from "@envoye/features/workspace/new-workspace-setup.tsx"
 import { RootRouteComponent } from "@envoye/routing/root-route-component.tsx"
 import type { QueryClient } from "@tanstack/react-query"
-import { createRootRouteWithContext, createRoute } from "@tanstack/react-router"
+import {
+	Outlet,
+	createRootRouteWithContext,
+	createRoute,
+	redirect,
+} from "@tanstack/react-router"
 import { z } from "zod"
 
 export type RouterContext = {
@@ -22,10 +27,24 @@ export const rootRoute = createRootRouteWithContext<RouterContext>()({
 	notFoundComponent: NotFound,
 })
 
+export const envoyeLayoutRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "envoye",
+	component: Outlet,
+})
+
 export const indexRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
 	component: LinkTree,
+})
+
+export const envoyeIndexRedirectRoute = createRoute({
+	getParentRoute: () => envoyeLayoutRoute,
+	path: "/",
+	beforeLoad: () => {
+		throw redirect({ to: "/", replace: true })
+	},
 })
 
 export const signupRoute = createRoute({
@@ -62,7 +81,7 @@ export const existingWorkspaceSetupRoute = createRoute({
 
 export const acceptInviteRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/workspace-invite",
+	path: "workspace-invite",
 	validateSearch: z.object({
 		inviteCode: z.string(),
 	}),
@@ -71,7 +90,7 @@ export const acceptInviteRoute = createRoute({
 
 export const checkEmailRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/check-email",
+	path: "check-email",
 	validateSearch: z.object({
 		email: z.email(),
 		type: z.string(),

@@ -15,7 +15,7 @@ const OTP_LENGTH = 6
 
 export function AdminCheckEmailPage() {
 	const navigate = useNavigate()
-	const { email } = useSearch({ from: "/fahari/admin/check-email" })
+	const { email } = useSearch({ from: "/admin/check-email" })
 	const { mutate: verifyOtp, isPending } = useVerifyOtp()
 	const otpRef = useRef<OtpInputHandle>(null)
 

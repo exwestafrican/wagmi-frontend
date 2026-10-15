@@ -11,7 +11,7 @@ function defaultStay(): DateRange {
 }
 
 export function BookingPage() {
-	const { code } = useSearch({ from: "/fahari/booking" })
+	const { code } = useSearch({ from: "/booking" })
 	const { data: listing } = useListing(code)
 	const [stay, setStay] = useState<DateRange | undefined>(defaultStay)
 	const [adults, setAdults] = useState(1)

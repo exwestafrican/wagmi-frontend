@@ -11,6 +11,6 @@ export const Pages = {
 }
 
 export const AdminPages = {
-	LOGIN: "/admin/login",
-	HOME: "/admin/",
+	LOGIN: "/envoye/admin/login",
+	HOME: "/envoye/admin/",
 }

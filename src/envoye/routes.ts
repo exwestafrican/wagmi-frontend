@@ -1,6 +1,8 @@
 import {
 	acceptInviteRoute,
 	checkEmailRoute,
+	envoyeIndexRedirectRoute,
+	envoyeLayoutRoute,
 	existingWorkspaceSetupRoute,
 	indexRoute,
 	loginRoute,
@@ -20,6 +22,6 @@ export function getEnvoyeRouteChildren() {
 		acceptInviteRoute,
 		checkEmailRoute,
 		workspaceRouteTree,
-		adminRouteTree,
+		envoyeLayoutRoute.addChildren([envoyeIndexRedirectRoute, adminRouteTree]),
 	]
 }
