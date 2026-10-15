@@ -22,9 +22,6 @@ export function getEnvoyeRouteChildren() {
 		acceptInviteRoute,
 		checkEmailRoute,
 		workspaceRouteTree,
-		envoyeLayoutRoute.addChildren([
-			envoyeIndexRedirectRoute,
-			adminRouteTree,
-		]),
+		envoyeLayoutRoute.addChildren([envoyeIndexRedirectRoute, adminRouteTree]),
 	]
 }
