@@ -20,7 +20,6 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		path: "booking",
 		validateSearch: z.object({
 			code: z.string(),
-			rideOnly: z.boolean().default(false),
 		}),
 		loaderDeps: ({ search: { code } }) => ({ code }),
 		loader: ({ context: { queryClient }, deps: { code } }) =>

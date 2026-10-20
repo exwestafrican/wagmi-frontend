@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-const contactSchema = z.object({
+export const contactSchema = z.object({
 	firstName: z.string().trim().nonempty({ message: "First name is required" }),
 	lastName: z.string().trim().nonempty({ message: "Last name is required" }),
 	email: z
@@ -31,21 +31,17 @@ const contactSchema = z.object({
 		),
 })
 
-export type ContactData = z.infer<typeof contactSchema>
+export const contactFormId = "ride-contact-details"
+
+type Contact = z.input<typeof contactSchema>
 
 const inputClassName =
 	"w-full rounded-[8px] border border-[#89C9CA] bg-white px-3 py-2.5 text-xs text-[#012420] outline-none placeholder:text-slate-400 aria-invalid:border-red-400"
 
 const labelClassName = "text-[11px] font-semibold text-[#012420]"
 
-export function ContactDetails({
-	formId,
-	onSubmit,
-}: {
-	formId: string
-	onSubmit: (data: ContactData) => void
-}) {
-	const form = useForm<ContactData>({
+export function ContactDetails() {
+	const form = useForm<Contact>({
 		resolver: zodResolver(contactSchema),
 		defaultValues: {
 			firstName: "",
@@ -72,9 +68,9 @@ export function ContactDetails({
 			</div>
 			<Form {...form}>
 				<form
-					id={formId}
+					id={contactFormId}
 					noValidate
-					onSubmit={form.handleSubmit(onSubmit)}
+					onSubmit={form.handleSubmit(() => undefined)}
 					className="flex flex-col gap-3"
 				>
 					<div className="flex gap-2">

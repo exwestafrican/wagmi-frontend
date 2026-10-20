@@ -1,45 +1,42 @@
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
-import { ContactDetails } from "@fahari/features/booking/components/contact-details.tsx"
-import { RideTripCard } from "@fahari/features/booking/components/ride-trip-card.tsx"
-import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
+import {
+	ContactDetails,
+	contactFormId,
+} from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
 	GuestPicker,
-} from "@fahari/features/booking/guest-picker.tsx"
+} from "@fahari/features/booking/components/guest-picker.tsx"
+import { RequestButton } from "@fahari/features/booking/components/request-button.tsx"
+import {
+	RideBooking,
+	type RideDates,
+	initialRideDates,
+	rideFormId,
+} from "@fahari/features/booking/components/ride-booking-card.tsx"
+import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
 import {
 	type Listing,
 	maximumRideCapacity,
 } from "@fahari/features/booking/listing.ts"
-import {
-	addDays,
-	differenceInCalendarDays,
-	isBefore,
-	startOfDay,
-} from "date-fns"
-import { ArrowRight, Car } from "lucide-react"
+import { differenceInCalendarDays } from "date-fns"
+import { Car } from "lucide-react"
 import { useState } from "react"
-
-const CONTACT_FORM_ID = "ride-contact-details"
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
 	const maxPassengers = maximumRideCapacity(listing)
 	const [passengers, setPassengers] = useState(1)
-	const [pickupDate, setPickupDate] = useState(() => startOfDay(new Date()))
-	const [departureDate, setDepartureDate] = useState(() =>
-		addDays(startOfDay(new Date()), 1),
+	const [rideDates, setRideDates] = useState<RideDates>(initialRideDates)
+	const days = differenceInCalendarDays(
+		rideDates.departureDate,
+		rideDates.pickupDate,
 	)
-	const days = differenceInCalendarDays(departureDate, pickupDate)
 	const ride = useBilling(listing.code, days, "ride", passengers, true)
 	const price =
 		ride.data === undefined
 			? undefined
 			: formatNightlyPrice(ride.data.amount, listing.currency)
-
-	const changePickupDate = (date: Date) => {
-		setPickupDate(date)
-		if (isBefore(departureDate, date)) setDepartureDate(date)
-	}
 
 	return (
 		<section
@@ -55,40 +52,30 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				</h1>
 				<Car className="mt-2.5 size-5 shrink-0 text-[#7eaea0]" aria-hidden />
 			</div>
-			<div className="flex flex-col gap-1">
-				<p className="flex items-baseline text-[#012420]">
-					{price ? (
-						<span className="text-[24px] leading-[normal] font-semibold">
-							{price}
-						</span>
-					) : (
-						<Skeleton className="h-6 w-28" aria-hidden />
-					)}
-					<span className="text-sm leading-[normal] font-normal">
-						&nbsp;/ round trip
-					</span>
-				</p>
-				<p className="text-xs text-slate-600">
-					Private ride to {listing.name} and back
-				</p>
-			</div>
+			<p className="flex items-baseline text-[#012420]">
+				{price ? (
+					<span className="text-xl leading-normal font-semibold">{price}</span>
+				) : (
+					<Skeleton className="h-5 w-24" aria-hidden />
+				)}
+				<span className="text-sm leading-normal font-normal">&nbsp;total</span>
+			</p>
+			<p className="text-xs text-slate-600">
+				Private ride to {listing.name} and back
+			</p>
 			<GuestPicker
-				label="Passengers"
-				adults={passengers}
-				onAdultsChange={setPassengers}
-				max={maxPassengers}
+				passengers={passengers}
+				maxCapacity={maxPassengers}
+				onPassengersChange={setPassengers}
 			/>
 			<CapacityNote max={maxPassengers} />
 			<hr className="border-slate-200" />
-			<RideTripCard
-				meetingPointName={listing.meetingPoint.name}
+			<RideBooking
 				destinationName={listing.name}
+				meetingPointName={listing.meetingPoint.name}
 				startTime={listing.schedule.startTime}
 				endTime={listing.schedule.endTime}
-				pickupDate={pickupDate}
-				departureDate={departureDate}
-				onPickupDateChange={changePickupDate}
-				onDepartureDateChange={setDepartureDate}
+				onDatesChange={setRideDates}
 			/>
 			{price && (
 				<p className="text-[11px] leading-snug text-slate-500">
@@ -97,7 +84,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				</p>
 			)}
 			<hr className="border-slate-200" />
-			<ContactDetails formId={CONTACT_FORM_ID} onSubmit={() => {}} />
+			<ContactDetails />
 			<div className="flex flex-col gap-2 text-[#012420]">
 				{ride.isError ? (
 					<div className="flex items-center justify-between text-xs text-red-600">
@@ -121,14 +108,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 						{price ? price : <Skeleton className="h-4 w-20" aria-hidden />}
 					</span>
 				</div>
-				<button
-					type="submit"
-					form={CONTACT_FORM_ID}
-					className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#10241c] px-4 py-2.5 text-[13px] font-semibold text-white"
-				>
-					Request this car
-					<ArrowRight className="size-3.5" aria-hidden />
-				</button>
+				<RequestButton formIds={[rideFormId, contactFormId]} />
 			</div>
 		</section>
 	)

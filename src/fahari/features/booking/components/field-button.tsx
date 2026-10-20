@@ -87,6 +87,8 @@ export function FieldInput({
 	autoComplete,
 	type = "text",
 	compact = false,
+	form,
+	invalid = false,
 }: {
 	id: string
 	label: string
@@ -97,6 +99,8 @@ export function FieldInput({
 	autoComplete?: string
 	type?: "text" | "time"
 	compact?: boolean
+	form?: string
+	invalid?: boolean
 }) {
 	return (
 		<label
@@ -104,6 +108,7 @@ export function FieldInput({
 			className={cn(
 				"flex w-full flex-col items-start rounded-xl border border-[#d7e1e8] bg-white text-left",
 				compact ? "gap-0 p-2" : "gap-0.5 p-3",
+				invalid && "border-red-400",
 			)}
 			style={{ fontFamily: '"DM Sans", sans-serif' }}
 		>
@@ -113,10 +118,12 @@ export function FieldInput({
 			<span className="flex w-full items-center justify-between gap-2">
 				<input
 					id={id}
+					form={form}
 					type={type}
 					value={value}
 					placeholder={placeholder}
 					autoComplete={autoComplete}
+					aria-invalid={invalid || undefined}
 					onChange={(event) => onChange(event.target.value)}
 					className={cn(
 						"min-w-0 flex-[1_0_0] bg-transparent leading-[normal] font-medium text-[#012420] outline-none placeholder:text-slate-400 [&::-webkit-calendar-picker-indicator]:cursor-pointer",
