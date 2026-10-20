@@ -12,7 +12,7 @@ function defaultStay(): DateRange {
 }
 
 export function BookingPage() {
-	const { code, rideOnly } = useSearch({ from: "/booking" })
+	const { code } = useSearch({ from: "/booking" })
 	const { data: listing } = useListing(code)
 	const [stay, setStay] = useState<DateRange | undefined>(defaultStay)
 	const [adults, setAdults] = useState(1)
@@ -20,7 +20,7 @@ export function BookingPage() {
 	return (
 		<main className="flex min-h-dvh justify-center bg-white md:bg-[#FCFBF8] md:px-4 md:py-10">
 			<div className="w-full md:max-w-[360px]">
-				{rideOnly ? (
+				{listing.onlyRideBooking ? (
 					<RideOnlyPanel listing={listing} />
 				) : (
 					<BookingPanel
