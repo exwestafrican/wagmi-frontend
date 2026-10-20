@@ -45,3 +45,10 @@ export type Experience = {
 }
 
 export type Listing = Experience
+
+export function maximumRideCapacity(listing: Listing) {
+	return Math.max(
+		1,
+		...listing.rideProviders.map((provider) => provider.maximumCapacity),
+	)
+}
