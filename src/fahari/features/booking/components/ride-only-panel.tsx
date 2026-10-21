@@ -1,19 +1,16 @@
+import { Button } from "@common/components/ui/button.tsx"
+import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
-import {
-	ContactDetails,
-	contactFormId,
-} from "@fahari/features/booking/components/contact-fields.tsx"
+import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
-import { RequestButton } from "@fahari/features/booking/components/request-button.tsx"
 import {
 	RideBooking,
 	type RideDates,
 	initialRideDates,
-	rideFormId,
 } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
 import {
@@ -21,7 +18,7 @@ import {
 	maximumRideCapacity,
 } from "@fahari/features/booking/listing.ts"
 import { differenceInCalendarDays } from "date-fns"
-import { Car } from "lucide-react"
+import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
@@ -69,7 +66,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				onPassengersChange={setPassengers}
 			/>
 			<CapacityNote max={maxPassengers} />
-			<hr className="border-slate-200" />
+			<Separator />
 			<RideBooking
 				destinationName={listing.name}
 				meetingPointName={listing.meetingPoint.name}
@@ -83,7 +80,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					covers both journeys.
 				</p>
 			)}
-			<hr className="border-slate-200" />
+			<Separator />
 			<ContactDetails />
 			<div className="flex flex-col gap-2 text-[#012420]">
 				{ride.isError ? (
@@ -101,14 +98,20 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 						)}
 					</div>
 				)}
-				<hr className="border-slate-200" />
+				<Separator />
 				<div className="flex items-center justify-between">
 					<span className="text-sm font-semibold">Car booking total</span>
 					<span className="text-lg leading-[normal] font-semibold">
 						{price ? price : <Skeleton className="h-4 w-20" aria-hidden />}
 					</span>
 				</div>
-				<RequestButton formIds={[rideFormId, contactFormId]} />
+				<Button
+					type="button"
+					className="w-full bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
+				>
+					Request this car
+					<ArrowRight />
+				</Button>
 			</div>
 		</section>
 	)

@@ -6,6 +6,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@common/components/ui/form"
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@common/components/ui/input-group.tsx"
+import { Input } from "@common/components/ui/input.tsx"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -36,7 +42,7 @@ export const contactFormId = "ride-contact-details"
 type Contact = z.input<typeof contactSchema>
 
 const inputClassName =
-	"w-full rounded-[8px] border border-[#89C9CA] bg-white px-3 py-2.5 text-xs text-[#012420] outline-none placeholder:text-slate-400 aria-invalid:border-red-400"
+	"h-auto w-full rounded-[8px] border-[#89C9CA] bg-white px-3 py-2.5 text-xs text-[#012420] shadow-none placeholder:text-slate-400 aria-invalid:border-red-400 aria-invalid:ring-0 md:text-xs"
 
 const labelClassName = "text-[11px] font-semibold text-[#012420]"
 
@@ -81,7 +87,7 @@ export function ContactDetails() {
 								<FormItem className="min-w-0 flex-1 gap-1.5">
 									<FormLabel className={labelClassName}>First name *</FormLabel>
 									<FormControl>
-										<input
+										<Input
 											autoComplete="given-name"
 											placeholder="Enter first name"
 											className={inputClassName}
@@ -99,7 +105,7 @@ export function ContactDetails() {
 								<FormItem className="min-w-0 flex-1 gap-1.5">
 									<FormLabel className={labelClassName}>Last name *</FormLabel>
 									<FormControl>
-										<input
+										<Input
 											autoComplete="family-name"
 											placeholder="Enter last name"
 											className={inputClassName}
@@ -120,7 +126,7 @@ export function ContactDetails() {
 									Email address *
 								</FormLabel>
 								<FormControl>
-									<input
+									<Input
 										type="email"
 										autoComplete="email"
 										placeholder="you@example.com"
@@ -138,21 +144,21 @@ export function ContactDetails() {
 						render={({ field }) => (
 							<FormItem className="gap-1.5">
 								<FormLabel className={labelClassName}>Phone number *</FormLabel>
-								<div className="flex items-stretch rounded-[8px] border border-[#89C9CA] bg-white has-[[aria-invalid=true]]:border-red-400">
-									<span className="flex items-center border-r border-[#d7e1e8] px-3 text-xs text-[#012420]">
+								<InputGroup className="h-auto rounded-[8px] border-[#89C9CA] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+									<InputGroupAddon className="border-r border-[#d7e1e8] text-xs text-[#012420]">
 										Nigeria +234
-									</span>
+									</InputGroupAddon>
 									<FormControl>
-										<input
+										<InputGroupInput
 											type="tel"
 											autoComplete="tel-national"
 											inputMode="tel"
 											placeholder="0803 123 4567"
-											className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-xs text-[#012420] outline-none placeholder:text-slate-400"
+											className="h-auto px-3 py-2.5 text-xs text-[#012420] md:text-xs"
 											{...field}
 										/>
 									</FormControl>
-								</div>
+								</InputGroup>
 								<FormMessage className="text-[11px]" />
 							</FormItem>
 						)}

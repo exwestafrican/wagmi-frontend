@@ -1,42 +1,32 @@
+import { Button } from "@common/components/ui/button.tsx"
+import { Calendar } from "@common/components/ui/calendar.tsx"
+import { Card, CardContent } from "@common/components/ui/card.tsx"
 import {
 	Form,
+	FormControl,
 	FormField,
 	FormItem,
+	FormLabel,
 	FormMessage,
 } from "@common/components/ui/form"
 import {
-	Popover,
-	PopoverAnchor,
-	PopoverContent,
-} from "@common/components/ui/popover.tsx"
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@common/components/ui/input-group.tsx"
 import {
-	FieldButton,
-	FieldInput,
-} from "@fahari/features/booking/components/field-button.tsx"
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@common/components/ui/popover.tsx"
+import { Separator } from "@common/components/ui/separator.tsx"
 import { formatStayDate } from "@fahari/features/booking/format.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { addDays, isBefore, startOfDay } from "date-fns"
-import { ArrowDownLeft, ArrowUpRight, Calendar, MapPin } from "lucide-react"
-import { type CSSProperties, useState } from "react"
-import { DayPicker } from "react-day-picker"
+import { ArrowDownLeft, ArrowUpRight, CalendarIcon, MapPin } from "lucide-react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import "react-day-picker/style.css"
 import { z } from "zod"
-
-const bookingCalendarStyle = {
-	"--rdp-accent-color": "#10241c",
-	"--rdp-accent-background-color": "#e7f0ec",
-	"--rdp-today-color": "#10241c",
-	"--rdp-range_middle-background-color": "#e7f0ec",
-	"--rdp-range_middle-color": "#10241c",
-	"--rdp-range_start-date-background-color": "#10241c",
-	"--rdp-range_end-date-background-color": "#10241c",
-	"--rdp-day-height": "36px",
-	"--rdp-day-width": "36px",
-	"--rdp-day_button-height": "32px",
-	"--rdp-day_button-width": "32px",
-	fontFamily: '"DM Sans", sans-serif',
-} as CSSProperties
 
 export const rideFormId = "ride-booking"
 
@@ -69,9 +59,11 @@ export function initialRideDates(): RideDates {
 	return { pickupDate, departureDate: addDays(pickupDate, 1) }
 }
 
-function DateIcon() {
-	return <Calendar className="size-3.5 shrink-0 text-[#10241c]" aria-hidden />
-}
+const fieldLabelClassName =
+	"text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500"
+
+const groupClassName =
+	"h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0"
 
 function RideDateField({
 	label,
@@ -87,43 +79,38 @@ function RideDateField({
 	const [open, setOpen] = useState(false)
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverAnchor asChild>
-				<div className="flex w-full">
-					<FieldButton
-						label={label}
-						value={formatStayDate(value)}
-						placeholder="Add date"
-						icon={<DateIcon />}
-						open={open}
-						compact
-						onClick={() => setOpen(true)}
+		<FormItem className="min-w-0 flex-1 gap-1.5">
+			<FormLabel className="text-[11px] font-semibold text-[#012420]">
+				{label}
+			</FormLabel>
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<FormControl>
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full justify-start px-2 font-normal text-[#012420]"
+						>
+							<CalendarIcon />
+							{formatStayDate(value)}
+						</Button>
+					</FormControl>
+				</PopoverTrigger>
+				<PopoverContent align="start" className="w-auto p-0">
+					<Calendar
+						mode="single"
+						selected={value}
+						onSelect={(date) => {
+							if (!date) return
+							onChange(date)
+							setOpen(false)
+						}}
+						disabled={{ before: earliest }}
+						defaultMonth={value}
 					/>
-				</div>
-			</PopoverAnchor>
-			<PopoverContent align="start" className="w-auto p-3">
-				<DayPicker
-					mode="single"
-					required
-					selected={value}
-					onSelect={(date) => {
-						onChange(date)
-						setOpen(false)
-					}}
-					disabled={(date) => isBefore(date, earliest)}
-					defaultMonth={value}
-					style={bookingCalendarStyle}
-					styles={{
-						month_caption: { fontWeight: 500, fontSize: "13px" },
-						weekday: { fontSize: "10px" },
-						day: { fontSize: "12px" },
-					}}
-					modifiersStyles={{
-						selected: { fontWeight: 500, fontSize: "12px" },
-					}}
-				/>
-			</PopoverContent>
-		</Popover>
+				</PopoverContent>
+			</Popover>
+		</FormItem>
 	)
 }
 
@@ -166,105 +153,137 @@ export function RideBooking({
 				id={rideFormId}
 				noValidate
 				onSubmit={form.handleSubmit(() => undefined)}
-				className="flex flex-col gap-3 rounded-xl border border-[#89C9CA] p-3"
 			>
-				<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
-					<ArrowUpRight className="size-4" aria-hidden />
-					Going to the resort
-				</p>
-				<FormField
-					control={form.control}
-					name="pickupAddress"
-					render={({ field, fieldState }) => (
-						<FormItem className="gap-1.5">
-							<FieldInput
-								id="pickup-address"
-								label="Pick me up from"
-								value={field.value}
-								placeholder="Add pickup"
-								autoComplete="street-address"
-								invalid={fieldState.invalid}
-								onChange={field.onChange}
-								icon={
-									<MapPin
-										className="size-4 shrink-0 text-[#10241c]"
-										aria-hidden
+				<Card className="gap-3 border-[#89C9CA] py-3 shadow-none">
+					<CardContent className="flex flex-col gap-3 px-3">
+						<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
+							<ArrowUpRight className="size-4" aria-hidden />
+							Going to the resort
+						</p>
+						<FormField
+							control={form.control}
+							name="pickupAddress"
+							render={({ field }) => (
+								<FormItem className="gap-1.5">
+									<InputGroup className={groupClassName}>
+										<InputGroupAddon
+											align="block-start"
+											className="px-2 pt-2 pb-0"
+										>
+											<FormLabel className={fieldLabelClassName}>
+												Pick me up from
+											</FormLabel>
+										</InputGroupAddon>
+										<div className="flex w-full items-center gap-2 px-2 pb-2">
+											<FormControl>
+												<InputGroupInput
+													autoComplete="street-address"
+													placeholder="Add pickup"
+													className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
+													{...field}
+												/>
+											</FormControl>
+											<InputGroupAddon align="inline-end" className="p-0">
+												<MapPin
+													className="size-4 shrink-0 text-[#10241c]"
+													aria-hidden
+												/>
+											</InputGroupAddon>
+										</div>
+									</InputGroup>
+									<FormMessage className="text-[11px]" />
+								</FormItem>
+							)}
+						/>
+						<p className="text-xs text-slate-500">
+							Your home, hotel or airport
+						</p>
+						<div className="flex items-start gap-1.5">
+							<FormField
+								control={form.control}
+								name="pickupDate"
+								render={() => (
+									<RideDateField
+										label="Pickup date"
+										value={pickupDate}
+										earliest={today}
+										onChange={(date) => changeDates(date, departureDate)}
 									/>
-								}
+								)}
 							/>
-							<FormMessage className="text-[11px]" />
-						</FormItem>
-					)}
-				/>
-				<p className="text-xs text-slate-500">Your home, hotel or airport</p>
-				<div className="flex gap-1.5">
-					<div className="flex min-w-0 flex-1">
-						<RideDateField
-							label="Pickup date"
-							value={pickupDate}
-							earliest={today}
-							onChange={(date) => changeDates(date, departureDate)}
-						/>
-					</div>
-					<FormField
-						control={form.control}
-						name="pickupTime"
-						render={({ field, fieldState }) => (
-							<FormItem className="min-w-0 flex-1 gap-1.5">
-								<FieldInput
-									id="pickup-time"
-									type="time"
-									label="Pickup time"
-									value={field.value}
-									placeholder="Add time"
-									invalid={fieldState.invalid}
-									onChange={field.onChange}
-									compact
-								/>
-								<FormMessage className="text-[11px]" />
-							</FormItem>
-						)}
-					/>
-				</div>
-				<p className="text-xs text-slate-600">Destination: {destinationName}</p>
-				<hr className="border-slate-200" />
-				<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
-					<ArrowDownLeft className="size-4" aria-hidden />
-					Leaving the resort
-				</p>
-				<p className="text-xs text-slate-600">Pickup: {meetingPointName}</p>
-				<div className="flex gap-1.5">
-					<div className="flex min-w-0 flex-1">
-						<RideDateField
-							label="Departure date"
-							value={departureDate}
-							earliest={pickupDate}
-							onChange={(date) => changeDates(pickupDate, date)}
-						/>
-					</div>
-					<FormField
-						control={form.control}
-						name="departureTime"
-						render={({ field, fieldState }) => (
-							<FormItem className="min-w-0 flex-1 gap-1.5">
-								<FieldInput
-									id="departure-time"
-									type="time"
-									label="Departure time"
-									value={field.value}
-									placeholder="Add time"
-									invalid={fieldState.invalid}
-									onChange={field.onChange}
-									compact
-								/>
-								<FormMessage className="text-[11px]" />
-							</FormItem>
-						)}
-					/>
-				</div>
-				<p className="text-xs text-slate-500">
-					Return to your original pickup location.
-				</p>
+							<FormField
+								control={form.control}
+								name="pickupTime"
+								render={({ field }) => (
+									<FormItem className="min-w-0 flex-1 gap-1.5">
+										<FormLabel className="text-[11px] font-semibold text-[#012420]">
+											Pickup time
+										</FormLabel>
+										<InputGroup className="h-9 rounded-md border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+											<FormControl>
+												<InputGroupInput
+													type="time"
+													placeholder="Add time"
+													className="h-9 px-2 text-sm font-normal text-[#012420] md:text-sm"
+													{...field}
+												/>
+											</FormControl>
+										</InputGroup>
+										<FormMessage className="text-[11px]" />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<p className="text-xs text-slate-600">
+							Destination: {destinationName}
+						</p>
+						<Separator />
+						<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
+							<ArrowDownLeft className="size-4" aria-hidden />
+							Leaving the resort
+						</p>
+						<p className="text-xs text-slate-600">Pickup: {meetingPointName}</p>
+						<div className="flex items-start gap-1.5">
+							<FormField
+								control={form.control}
+								name="departureDate"
+								render={() => (
+									<RideDateField
+										label="Departure date"
+										value={departureDate}
+										earliest={pickupDate}
+										onChange={(date) => changeDates(pickupDate, date)}
+									/>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="departureTime"
+								render={({ field }) => (
+									<FormItem className="min-w-0 flex-1 gap-1.5">
+										<FormLabel className="text-[11px] font-semibold text-[#012420]">
+											Departure time
+										</FormLabel>
+										<InputGroup className="h-9 rounded-md border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+											<FormControl>
+												<InputGroupInput
+													type="time"
+													placeholder="Add time"
+													className="h-9 px-2 text-sm font-normal text-[#012420] md:text-sm"
+													{...field}
+												/>
+											</FormControl>
+										</InputGroup>
+										<FormMessage className="text-[11px]" />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<p className="text-xs text-slate-500">
+							Return to your original pickup location.
+						</p>
+					</CardContent>
+				</Card>
 			</form>
 		</Form>
 	)
