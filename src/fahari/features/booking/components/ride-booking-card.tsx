@@ -99,8 +99,8 @@ export function RideBooking({
 
 	const changeDates = (pickup: Date, departure: Date) => {
 		const nextDeparture = isBefore(departure, pickup) ? pickup : departure
-		form.setValue("pickupDate", pickup)
-		form.setValue("departureDate", nextDeparture)
+		form.setValue("pickupDate", pickup, { shouldValidate: true })
+		form.setValue("departureDate", nextDeparture, { shouldValidate: true })
 	}
 
 	return (
