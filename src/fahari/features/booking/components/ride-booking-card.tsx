@@ -36,12 +36,6 @@ export function initialRideDates(): RideDates {
 	return { pickupDate, departureDate: addDays(pickupDate, 1) }
 }
 
-const fieldLabelClassName =
-	"text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500"
-
-const groupClassName =
-	"h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0"
-
 function RideDateField({
 	label,
 	value,
@@ -121,9 +115,9 @@ export function RideBooking({
 					name="pickupAddress"
 					render={({ field }) => (
 						<FormItem className="gap-1.5">
-							<InputGroup className={groupClassName}>
+							<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
 								<InputGroupAddon align="block-start" className="px-2 pt-2 pb-0">
-									<FormLabel className={fieldLabelClassName}>
+									<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
 										Pick me up from
 									</FormLabel>
 								</InputGroupAddon>
