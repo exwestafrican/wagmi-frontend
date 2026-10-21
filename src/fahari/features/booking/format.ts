@@ -24,18 +24,7 @@ export function formatDateTime(
 }
 
 export function formatRideDateTime(date: Date, time: string) {
-	const [hourText, minuteText] = time.trim().split(":")
-	const hour = Number(hourText)
-	const minute = Number(minuteText)
-	if (
-		!hourText ||
-		minuteText === undefined ||
-		minuteText === "" ||
-		Number.isNaN(hour) ||
-		Number.isNaN(minute)
-	) {
-		return undefined
-	}
+	const [hour, minute] = time.split(":").map(Number)
 	return formatDateTime(
 		date.getDate(),
 		date.getMonth() + 1,

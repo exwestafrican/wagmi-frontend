@@ -31,14 +31,6 @@ function toPhoneNumber(phone: string) {
 	}
 }
 
-function toIsoDateTime(date: Date, time: string) {
-	const formatted = formatRideDateTime(date, time)
-	if (!formatted) {
-		throw new Error("A pickup and departure time are required")
-	}
-	return formatted
-}
-
 export function toCreateRideRequest(
 	booking: Booking,
 	experienceCode: string,
@@ -48,8 +40,8 @@ export function toCreateRideRequest(
 		experienceCode,
 		numberOfPassengers,
 		pickupLocation: booking.pickupAddress.trim(),
-		pickupDateTime: toIsoDateTime(booking.pickupDate, booking.pickupTime),
-		departureDateTime: toIsoDateTime(
+		pickupDateTime: formatRideDateTime(booking.pickupDate, booking.pickupTime),
+		departureDateTime: formatRideDateTime(
 			booking.departureDate,
 			booking.departureTime,
 		),
