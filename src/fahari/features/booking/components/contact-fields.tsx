@@ -11,31 +11,8 @@ import {
 	InputGroupInput,
 } from "@common/components/ui/input-group.tsx"
 import { Input } from "@common/components/ui/input.tsx"
+import type { Contact } from "@fahari/features/booking/schema/contact.schema.ts"
 import { useFormContext } from "react-hook-form"
-import { z } from "zod"
-
-export const contactSchema = z.object({
-	firstName: z.string().trim().nonempty({ message: "First name is required" }),
-	lastName: z.string().trim().nonempty({ message: "Last name is required" }),
-	email: z
-		.string()
-		.trim()
-		.nonempty({ message: "Email address is required" })
-		.pipe(z.email({ message: "Enter a valid email address" })),
-	phone: z
-		.string()
-		.transform((value) => value.replace(/\s/g, ""))
-		.pipe(
-			z
-				.string()
-				.nonempty({ message: "Phone number is required" })
-				.regex(/^0?[789]\d{9}$/, {
-					message: "Enter a valid Nigerian phone number",
-				}),
-		),
-})
-
-type Contact = z.input<typeof contactSchema>
 
 const inputClassName =
 	"h-auto w-full rounded-[8px] border-[#89C9CA] bg-white px-3 py-2.5 text-xs text-[#012420] shadow-none placeholder:text-slate-400 aria-invalid:border-red-400 aria-invalid:ring-0 md:text-xs"

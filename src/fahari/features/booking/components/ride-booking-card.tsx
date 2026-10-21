@@ -20,30 +20,11 @@ import {
 } from "@common/components/ui/popover.tsx"
 import { Separator } from "@common/components/ui/separator.tsx"
 import { formatStayDate } from "@fahari/features/booking/format.ts"
+import type { RideFormValues } from "@fahari/features/booking/schema/trip.schema.ts"
 import { addDays, isBefore, startOfDay } from "date-fns"
 import { ArrowDownLeft, ArrowUpRight, CalendarIcon, MapPin } from "lucide-react"
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
-import { z } from "zod"
-
-export const tripSchema = z.object({
-	pickupAddress: z
-		.string()
-		.trim()
-		.nonempty({ message: "Pickup address is required" }),
-	pickupDate: z.date(),
-	pickupTime: z
-		.string()
-		.trim()
-		.nonempty({ message: "Pickup time is required" }),
-	departureDate: z.date(),
-	departureTime: z
-		.string()
-		.trim()
-		.nonempty({ message: "Departure time is required" }),
-})
-
-type RideFormValues = z.infer<typeof tripSchema>
 
 export type RideDates = {
 	pickupDate: Date

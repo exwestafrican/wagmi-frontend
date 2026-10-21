@@ -3,7 +3,6 @@ import { Form } from "@common/components/ui/form"
 import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
-import { contactSchema } from "@fahari/features/booking/components/contact-fields.tsx"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
@@ -12,22 +11,21 @@ import {
 import {
 	RideBooking,
 	initialRideDates,
-	tripSchema,
 } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
 import {
 	type Listing,
 	maximumRideCapacity,
 } from "@fahari/features/booking/listing.ts"
+import {
+	type Booking,
+	bookingSchema,
+} from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import type { z } from "zod"
-
-const bookingSchema = tripSchema.extend(contactSchema.shape)
-type Booking = z.input<typeof bookingSchema>
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
 	const maxPassengers = maximumRideCapacity(listing)
