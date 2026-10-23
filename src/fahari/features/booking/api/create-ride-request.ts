@@ -26,7 +26,7 @@ function toPhoneNumber(phone: string) {
 		throw new Error("A valid phone number is required")
 	}
 	return {
-		countryCallingCode: parsed.countryCallingCode,
+		countryCallingCode: `+${parsed.countryCallingCode}`,
 		nationalNumber: parsed.nationalNumber,
 	}
 }

@@ -160,21 +160,26 @@ describe("Fahari booking", () => {
 					lastName: "Okafor",
 					email: "ada.okafor@gmail.com",
 					phoneNumber: {
-						countryCallingCode: "234",
+						countryCallingCode: "+234",
 						nationalNumber: "8031234567",
 					},
 				},
 			)
 		})
 		expect(
-			screen.getByRole("button", { name: "Request this car" }),
-		).toBeDisabled()
+			await screen.findByRole("heading", {
+				name: /Your ride request is successful/,
+			}),
+		).toBeInTheDocument()
 		expect(await screen.findByText("Ride requested")).toBeInTheDocument()
 		expect(
 			await screen.findByText(
 				"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
 			),
 		).toBeInTheDocument()
+		expect(
+			screen.getByRole("link", { name: "humans@fahari.io" }),
+		).toHaveAttribute("href", "mailto:humans@fahari.io")
 	})
 
 	test("failed ride request shows an error", async () => {
