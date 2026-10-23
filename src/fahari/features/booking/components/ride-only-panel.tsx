@@ -4,6 +4,7 @@ import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
+import { FahariPages } from "@fahari/constants.ts"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
 import {
 	toCreateRideRequest,
@@ -28,6 +29,7 @@ import {
 	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useNavigate } from "@tanstack/react-router"
 import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
@@ -35,6 +37,7 @@ import { useForm, useFormState } from "react-hook-form"
 import { sileo } from "sileo"
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
+	const navigate = useNavigate()
 	const maxPassengers = maximumRideCapacity(listing)
 	const spinnerVerb = useSpinnerVerbs()
 	const [passengers, setPassengers] = useState(1)
@@ -68,44 +71,48 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 			: formatNightlyPrice(ride.data.amount, listing.currency)
 
 	function onSubmit(values: Booking) {
-		void sileo.promise(
-			createRideRequest(toCreateRideRequest(values, listing.code, passengers)),
-			{
-				position: "top-center",
-				loading: { title: "Requesting this car" },
-				success: {
-					title: "Ride requested",
-					description:
-						"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+		void sileo
+			.promise(
+				createRideRequest(
+					toCreateRideRequest(values, listing.code, passengers),
+				),
+				{
+					position: "top-center",
+					loading: { title: "Requesting this car" },
+					success: { title: "Ride requested" },
+					error: {
+						title: "Couldn't request this ride",
+						description: (
+							<>
+								Please reach out to us at{" "}
+								<a
+									href="mailto:humans@fahari.io"
+									data-sileo-button
+									onClick={(event) => event.stopPropagation()}
+									style={{
+										display: "inline",
+										height: "auto",
+										marginTop: 0,
+										padding: 0,
+										borderRadius: 0,
+										background: "transparent",
+										fontSize: "inherit",
+										fontWeight: "inherit",
+										textDecoration: "underline",
+									}}
+								>
+									humans@fahari.io
+								</a>
+							</>
+						),
+					},
 				},
-				error: {
-					title: "Couldn't request this ride",
-					description: (
-						<>
-							Please reach out to us at{" "}
-							<a
-								href="mailto:humans@fahari.io"
-								data-sileo-button
-								onClick={(event) => event.stopPropagation()}
-								style={{
-									display: "inline",
-									height: "auto",
-									marginTop: 0,
-									padding: 0,
-									borderRadius: 0,
-									background: "transparent",
-									fontSize: "inherit",
-									fontWeight: "inherit",
-									textDecoration: "underline",
-								}}
-							>
-								humans@fahari.io
-							</a>
-						</>
-					),
-				},
-			},
-		)
+			)
+			.then(() => {
+				sileo.clear()
+				navigate({ to: FahariPages.BOOKING_SUCCESS })
+			})
+			.catch(() => undefined)
 	}
 
 	return (

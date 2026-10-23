@@ -2,6 +2,7 @@ export const FAHARI_WORKSPACE_CODE = ""
 
 export const FahariPages = {
 	BOOKING: "/booking",
+	BOOKING_SUCCESS: "/booking/success",
 } as const
 
 export const FahariApiPaths = {

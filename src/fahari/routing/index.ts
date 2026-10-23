@@ -1,4 +1,4 @@
-import { FahariAdminPages } from "@fahari/constants.ts"
+import { FahariAdminPages, FahariPages } from "@fahari/constants.ts"
 import { AdminAccountsPage } from "@fahari/features/admin/accounts/page.tsx"
 import AdminDashboardPage from "@fahari/features/admin/admin-dashboard.page.tsx"
 import { currentAdminQueryOptions } from "@fahari/features/admin/api/current-admin.ts"
@@ -11,6 +11,7 @@ import { listingQueryOptions } from "@fahari/features/booking/api/get-listing.ts
 import { BookingError } from "@fahari/features/booking/components/booking-error.tsx"
 import { BookingPending } from "@fahari/features/booking/components/booking-pending.tsx"
 import { BookingPage } from "@fahari/features/booking/page.tsx"
+import { BookingSuccessPage } from "@fahari/features/booking/success-page.tsx"
 import { type AnyRoute, createRoute } from "@tanstack/react-router"
 import { z } from "zod"
 
@@ -27,6 +28,12 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		pendingComponent: BookingPending,
 		errorComponent: BookingError,
 		component: BookingPage,
+	})
+
+	const fahariBookingSuccessRoute = createRoute({
+		getParentRoute: () => parentRoute,
+		path: FahariPages.BOOKING_SUCCESS,
+		component: BookingSuccessPage,
 	})
 
 	const fahariAdminLoginRoute = createRoute({
@@ -73,6 +80,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 	})
 
 	return [
+		fahariBookingSuccessRoute,
 		fahariBookingRoute,
 		fahariAdminLoginRoute,
 		fahariAdminCheckEmailRoute,
