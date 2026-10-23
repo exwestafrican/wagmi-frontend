@@ -1,3 +1,4 @@
+import { isValidPhoneNumber } from "libphonenumber-js"
 import { z } from "zod"
 
 export const contactSchema = z.object({
@@ -10,15 +11,11 @@ export const contactSchema = z.object({
 		.pipe(z.email({ message: "Enter a valid email address" })),
 	phone: z
 		.string()
-		.transform((value) => value.replace(/\s/g, ""))
-		.pipe(
-			z
-				.string()
-				.nonempty({ message: "Phone number is required" })
-				.regex(/^0?[789]\d{9}$/, {
-					message: "Enter a valid Nigerian phone number",
-				}),
-		),
+		.trim()
+		.nonempty({ message: "Phone number is required" })
+		.refine((value) => isValidPhoneNumber(value, "NG"), {
+			message: "Enter a valid Nigerian phone number",
+		}),
 })
 
 export type Contact = z.input<typeof contactSchema>

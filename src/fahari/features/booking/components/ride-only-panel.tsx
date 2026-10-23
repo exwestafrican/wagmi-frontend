@@ -2,7 +2,13 @@ import { Button } from "@common/components/ui/button.tsx"
 import { Form } from "@common/components/ui/form"
 import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
+import { Spinner } from "@common/components/ui/spinner.tsx"
+import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
+import {
+	toCreateRideRequest,
+	useCreateRideRequest,
+} from "@fahari/features/booking/api/create-ride-request.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
@@ -25,13 +31,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useFormState } from "react-hook-form"
+import { sileo } from "sileo"
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
 	const maxPassengers = maximumRideCapacity(listing)
+	const spinnerVerb = useSpinnerVerbs()
 	const [passengers, setPassengers] = useState(1)
 	const form = useForm<Booking>({
 		resolver: zodResolver(bookingSchema),
+		mode: "onChange",
 		defaultValues: {
 			pickupAddress: "",
 			...initialRideDates(),
@@ -43,6 +52,12 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 			phone: "",
 		},
 	})
+	const { isValid } = useFormState({ control: form.control })
+	const {
+		mutateAsync: createRideRequest,
+		isPending,
+		isSuccess,
+	} = useCreateRideRequest()
 	const pickupDate = form.watch("pickupDate")
 	const departureDate = form.watch("departureDate")
 	const days = differenceInCalendarDays(departureDate, pickupDate)
@@ -52,11 +67,52 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 			? undefined
 			: formatNightlyPrice(ride.data.amount, listing.currency)
 
+	function onSubmit(values: Booking) {
+		void sileo.promise(
+			createRideRequest(toCreateRideRequest(values, listing.code, passengers)),
+			{
+				position: "top-center",
+				loading: { title: "Requesting this car" },
+				success: {
+					title: "Ride requested",
+					description:
+						"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+				},
+				error: {
+					title: "Couldn't request this ride",
+					description: (
+						<>
+							Please reach out to us at{" "}
+							<a
+								href="mailto:humans@fahari.io"
+								data-sileo-button
+								onClick={(event) => event.stopPropagation()}
+								style={{
+									display: "inline",
+									height: "auto",
+									marginTop: 0,
+									padding: 0,
+									borderRadius: 0,
+									background: "transparent",
+									fontSize: "inherit",
+									fontWeight: "inherit",
+									textDecoration: "underline",
+								}}
+							>
+								humans@fahari.io
+							</a>
+						</>
+					),
+				},
+			},
+		)
+	}
+
 	return (
 		<Form {...form}>
 			<form
 				noValidate
-				onSubmit={(event) => event.preventDefault()}
+				onSubmit={form.handleSubmit(onSubmit)}
 				className="flex min-h-dvh w-full flex-col gap-2.5 bg-white p-4 md:min-h-0 md:rounded-xl"
 				style={{ fontFamily: "Inter, sans-serif" }}
 			>
@@ -102,7 +158,11 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</p>
 				)}
 				<Separator />
-				<ContactDetails />
+				<div className="mb-2">
+					<ContactDetails />
+				</div>
+
+				<Separator />
 				<div className="flex flex-col gap-2 text-[#012420]">
 					{ride.isError ? (
 						<div className="flex items-center justify-between text-xs text-red-600">
@@ -119,7 +179,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 							)}
 						</div>
 					)}
-					<Separator />
+					<Separator className="mb-2" />
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold">Car booking total</span>
 						<span className="text-lg leading-[normal] font-semibold">
@@ -127,11 +187,21 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 						</span>
 					</div>
 					<Button
-						type="button"
-						className="w-full bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
+						type="submit"
+						disabled={!isValid || isPending || isSuccess || ride.isError}
+						className="w-full cursor-pointer bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
 					>
-						Request this car
-						<ArrowRight />
+						{isPending ? (
+							<>
+								<Spinner />
+								{spinnerVerb}...
+							</>
+						) : (
+							<>
+								Request this car
+								<ArrowRight />
+							</>
+						)}
 					</Button>
 				</div>
 			</form>
