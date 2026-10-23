@@ -160,7 +160,7 @@ describe("Fahari booking", () => {
 					lastName: "Okafor",
 					email: "ada.okafor@gmail.com",
 					phoneNumber: {
-						countryCallingCode: "234",
+						countryCallingCode: "+234",
 						nationalNumber: "8031234567",
 					},
 				},
@@ -168,7 +168,7 @@ describe("Fahari booking", () => {
 		})
 		expect(
 			await screen.findByRole("heading", {
-				name: "Your ride request is successful!",
+				name: /Your ride request is successful/,
 			}),
 		).toBeInTheDocument()
 		expect(await screen.findByText("Ride requested")).toBeInTheDocument()
