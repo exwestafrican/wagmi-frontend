@@ -32,7 +32,7 @@ import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm, useFormState } from "react-hook-form"
-import { toast } from "sonner"
+import { sileo } from "sileo"
 
 export function RideOnlyPanel({ listing }: { listing: Listing }) {
 	const maxPassengers = maximumRideCapacity(listing)
@@ -54,7 +54,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 	})
 	const { isValid } = useFormState({ control: form.control })
 	const {
-		mutate: createRideRequest,
+		mutateAsync: createRideRequest,
 		isPending,
 		isSuccess,
 	} = useCreateRideRequest()
@@ -68,14 +68,44 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 			: formatNightlyPrice(ride.data.amount, listing.currency)
 
 	function onSubmit(values: Booking) {
-		createRideRequest(toCreateRideRequest(values, listing.code, passengers), {
-			onSuccess: () => {
-				toast.success("Ride requested")
+		void sileo.promise(
+			createRideRequest(toCreateRideRequest(values, listing.code, passengers)),
+			{
+				position: "top-center",
+				loading: { title: "Requesting this car" },
+				success: {
+					title: "Ride requested",
+					description:
+						"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+				},
+				error: {
+					title: "Couldn't request this ride",
+					description: (
+						<>
+							Please reach out to us at{" "}
+							<a
+								href="mailto:humans@fahari.io"
+								data-sileo-button
+								onClick={(event) => event.stopPropagation()}
+								style={{
+									display: "inline",
+									height: "auto",
+									marginTop: 0,
+									padding: 0,
+									borderRadius: 0,
+									background: "transparent",
+									fontSize: "inherit",
+									fontWeight: "inherit",
+									textDecoration: "underline",
+								}}
+							>
+								humans@fahari.io
+							</a>
+						</>
+					),
+				},
 			},
-			onError: () => {
-				toast.error("Could not request this car")
-			},
-		})
+		)
 	}
 
 	return (
@@ -128,7 +158,11 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</p>
 				)}
 				<Separator />
-				<ContactDetails />
+				<div className="mb-2">
+					<ContactDetails />
+				</div>
+
+				<Separator />
 				<div className="flex flex-col gap-2 text-[#012420]">
 					{ride.isError ? (
 						<div className="flex items-center justify-between text-xs text-red-600">
@@ -145,7 +179,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 							)}
 						</div>
 					)}
-					<Separator />
+					<Separator  className="mb-2"/>
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold">Car booking total</span>
 						<span className="text-lg leading-[normal] font-semibold">

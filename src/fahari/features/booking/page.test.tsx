@@ -7,6 +7,7 @@ import { formatRideDateTime } from "@fahari/features/booking/format.ts"
 import { listingFactory } from "@fahari/test/factory/listing.ts"
 import { act, screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
+import { HttpStatusCode } from "axios"
 import { beforeEach, describe, expect, test, vi } from "vitest"
 
 describe("Fahari booking", () => {
@@ -159,7 +160,7 @@ describe("Fahari booking", () => {
 					lastName: "Okafor",
 					email: "ada.okafor@gmail.com",
 					phoneNumber: {
-						countryCallingCode: "+234",
+						countryCallingCode: "234",
 						nationalNumber: "8031234567",
 					},
 				},
@@ -168,5 +169,51 @@ describe("Fahari booking", () => {
 		expect(
 			screen.getByRole("button", { name: "Request this car" }),
 		).toBeDisabled()
+		expect(await screen.findByText("Ride requested")).toBeInTheDocument()
+		expect(
+			await screen.findByText(
+				"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+			),
+		).toBeInTheDocument()
+	})
+
+	test("failed ride request shows an error", async () => {
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.fail(HttpStatusCode.BadRequest)
+			.apply()
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Pick me up from" }),
+			"12 Admiralty Way, Lekki",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "First name *" }),
+			"Ada",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Last name *" }),
+			"Okafor",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Email address *" }),
+			"ada.okafor@gmail.com",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Phone number *" }),
+			"08031234567",
+		)
+
+		await user.click(screen.getByRole("button", { name: "Request this car" }))
+
+		expect(
+			await screen.findByText("Couldn't request this ride"),
+		).toBeInTheDocument()
+		const email = await screen.findByRole("link", { name: "humans@fahari.io" })
+		expect(email).toHaveAttribute("href", "mailto:humans@fahari.io")
+		expect(email.closest("[data-sileo-description]")).toHaveTextContent(
+			"Please reach out to us at humans@fahari.io",
+		)
 	})
 })
