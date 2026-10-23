@@ -14,21 +14,15 @@ export function BookingSuccessPage() {
 					<span className="text-[#2f6a58]">successful</span>!
 				</h1>
 				<p className="text-sm leading-relaxed">
-					We'll be in touch within 48 hours to confirm your booking and guide
-					you through the payment process.
-				</p>
-				<p className="text-sm leading-relaxed font-semibold">
-					Planning a group trip, hosting an event, or managing a resort?
-				</p>
-				<p className="text-sm leading-relaxed">
-					We'd love to work with you. Reach out to us at{" "}
+					Planning a group trip, an event, or managing a resort? Reach out to the
+					team at{" "}
 					<a
 						href="mailto:humans@fahari.io"
 						className="text-[#2f6a58] underline"
 					>
 						humans@fahari.io
 					</a>
-					.
+					. We'll be happy to work with you.
 				</p>
 			</div>
 		</main>
