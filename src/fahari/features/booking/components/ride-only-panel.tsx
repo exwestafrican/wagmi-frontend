@@ -179,7 +179,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 							)}
 						</div>
 					)}
-					<Separator  className="mb-2"/>
+					<Separator className="mb-2" />
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold">Car booking total</span>
 						<span className="text-lg leading-[normal] font-semibold">
