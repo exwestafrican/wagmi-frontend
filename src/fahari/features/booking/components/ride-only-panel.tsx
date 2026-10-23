@@ -127,10 +127,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				style={{ fontFamily: "Inter, sans-serif" }}
 			>
 				<div className="flex items-start justify-between gap-3">
-					<h1
-						className="text-[27px] leading-normal font-normal text-[#012420]"
-						style={{ fontFamily: "Lora, Georgia, serif" }}
-					>
+					<h1 className="text-[27px] leading-normal font-black text-[#012420]">
 						Make this your ride
 					</h1>
 					<Car className="mt-2.5 size-5 shrink-0 text-[#7eaea0]" aria-hidden />
