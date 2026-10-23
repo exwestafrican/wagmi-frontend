@@ -171,6 +171,12 @@ describe("Fahari booking", () => {
 				name: "Your ride request is successful!",
 			}),
 		).toBeInTheDocument()
+		expect(await screen.findByText("Ride requested")).toBeInTheDocument()
+		expect(
+			await screen.findByText(
+				"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+			),
+		).toBeInTheDocument()
 		expect(
 			screen.getByRole("link", { name: "humans@fahari.io" }),
 		).toHaveAttribute("href", "mailto:humans@fahari.io")

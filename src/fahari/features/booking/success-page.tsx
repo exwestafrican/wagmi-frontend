@@ -1,6 +1,10 @@
+import { Toaster } from "sileo"
+import "sileo/styles.css"
+
 export function BookingSuccessPage() {
 	return (
 		<main className="flex min-h-dvh items-center justify-center bg-white px-6 md:bg-[#FCFBF8]">
+			<Toaster position="top-center" theme="light" />
 			<div
 				className="flex w-full max-w-sm flex-col items-center gap-4 text-center text-[#012420]"
 				style={{ fontFamily: "Inter, sans-serif" }}

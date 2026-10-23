@@ -79,7 +79,11 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				{
 					position: "top-center",
 					loading: { title: "Requesting this car" },
-					success: { title: "Ride requested" },
+					success: {
+						title: "Ride requested",
+						description:
+							"Your ride has been successfully requested. The team has been notified and will reach out within 48 hours. \u2728",
+					},
 					error: {
 						title: "Couldn't request this ride",
 						description: (
@@ -109,7 +113,6 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				},
 			)
 			.then(() => {
-				sileo.clear()
 				navigate({ to: FahariPages.BOOKING_SUCCESS })
 			})
 			.catch(() => undefined)
