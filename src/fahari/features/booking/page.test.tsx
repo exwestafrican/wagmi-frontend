@@ -57,18 +57,21 @@ describe("Fahari booking", () => {
 		await openAraIyeBooking()
 
 		const pickup = screen.getByRole("textbox", { name: "Pick me up from" })
+		const landmark = screen.getByRole("textbox", { name: "Nearest landmark" })
 		const firstName = screen.getByRole("textbox", { name: "First name *" })
 		const lastName = screen.getByRole("textbox", { name: "Last name *" })
 		const email = screen.getByRole("textbox", { name: "Email address *" })
 		const phone = screen.getByRole("textbox", { name: "Phone number *" })
 
 		await user.type(pickup, "12 Admiralty Way, Lekki")
+		await user.type(landmark, "Opposite Shoprite")
 		await user.type(firstName, "Ada")
 		await user.type(lastName, "Okafor")
 		await user.type(email, "ada.okafor@gmail.com")
 		await user.type(phone, "08031234567")
 
 		expect(pickup).toHaveValue("12 Admiralty Way, Lekki")
+		expect(landmark).toHaveValue("Opposite Shoprite")
 		expect(firstName).toHaveValue("Ada")
 		expect(lastName).toHaveValue("Okafor")
 		expect(email).toHaveValue("ada.okafor@gmail.com")
@@ -106,6 +109,13 @@ describe("Fahari booking", () => {
 			"08031234567",
 		)
 
+		expect(request).toBeDisabled()
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
+		)
+
 		expect(request).toBeEnabled()
 	})
 
@@ -121,6 +131,10 @@ describe("Fahari booking", () => {
 		await user.type(
 			screen.getByRole("textbox", { name: "Pick me up from" }),
 			"12 Admiralty Way, Lekki",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
 		)
 		await user.type(
 			screen.getByRole("textbox", { name: "First name *" }),
@@ -148,6 +162,7 @@ describe("Fahari booking", () => {
 					experienceCode: araIye.code,
 					numberOfPassengers: 1,
 					pickupLocation: "12 Admiralty Way, Lekki",
+					nearestLandmark: "Opposite Shoprite",
 					pickupDateTime: formatRideDateTime(
 						pickupDate,
 						araIye.schedule.startTime,
@@ -192,6 +207,10 @@ describe("Fahari booking", () => {
 		await user.type(
 			screen.getByRole("textbox", { name: "Pick me up from" }),
 			"12 Admiralty Way, Lekki",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
 		)
 		await user.type(
 			screen.getByRole("textbox", { name: "First name *" }),

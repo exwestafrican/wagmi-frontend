@@ -46,6 +46,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 		mode: "onChange",
 		defaultValues: {
 			pickupAddress: "",
+			nearestLandmark: "",
 			...initialRideDates(),
 			pickupTime: listing.schedule.startTime,
 			departureTime: listing.schedule.endTime,

@@ -143,6 +143,31 @@ export function RideBooking({
 					)}
 				/>
 				<p className="text-xs text-slate-500">Your home, hotel or airport</p>
+				<FormField
+					control={form.control}
+					name="nearestLandmark"
+					render={({ field }) => (
+						<FormItem className="gap-1.5">
+							<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+								<InputGroupAddon align="block-start" className="px-2 pt-2 pb-0">
+									<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
+										Nearest landmark
+									</FormLabel>
+								</InputGroupAddon>
+								<div className="flex w-full items-center gap-2 px-2 pb-2">
+									<FormControl>
+										<InputGroupInput
+											placeholder="e.g. Opposite Shoprite"
+											className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
+											{...field}
+										/>
+									</FormControl>
+								</div>
+							</InputGroup>
+							<FormMessage className="text-[11px]" />
+						</FormItem>
+					)}
+				/>
 				<div className="flex items-start gap-1.5">
 					<FormField
 						control={form.control}
