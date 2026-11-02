@@ -36,6 +36,14 @@ describe("Fahari booking", () => {
 		).toBeInTheDocument()
 	}
 
+	test("tab title names the listing being booked", async () => {
+		await openAraIyeBooking()
+
+		await waitFor(() => {
+			expect(document.title).toBe("Fahari - Ara Iye")
+		})
+	})
+
 	test("user cannot add more passengers than the car capacity", async () => {
 		await openAraIyeBooking()
 

@@ -1,8 +1,9 @@
-import { createRouter } from "@tanstack/react-router"
-import type { QueryClient } from "@tanstack/react-query"
-import { rootRoute } from "@envoye/routing/root.ts"
+import type { Product } from "@common/hooks/use-product-branding.ts"
 import { getEnvoyeRouteChildren } from "@envoye/routes.ts"
+import { rootRoute } from "@envoye/routing/root.ts"
 import { createFahariRouteTree } from "@fahari/routing/index.ts"
+import type { QueryClient } from "@tanstack/react-query"
+import { createRouter } from "@tanstack/react-router"
 
 const defaultRouterOptions = {
 	defaultPreload: "intent" as const,
@@ -27,5 +28,9 @@ export function createAppRouter(queryClient: QueryClient) {
 declare module "@tanstack/react-router" {
 	interface Register {
 		router: ReturnType<typeof createAppRouter>
+	}
+
+	interface StaticDataRouteOption {
+		product?: Product
 	}
 }
