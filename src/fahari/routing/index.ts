@@ -1,3 +1,4 @@
+import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariAdminPages, FahariPages } from "@fahari/constants.ts"
 import { AdminAccountsPage } from "@fahari/features/admin/accounts/page.tsx"
 import AdminDashboardPage from "@fahari/features/admin/admin-dashboard.page.tsx"
@@ -27,7 +28,9 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		loader: ({ context: { queryClient }, deps: { code } }) =>
 			queryClient.ensureQueryData(listingQueryOptions(code)),
 		head: ({ loaderData }) => ({
-			meta: loaderData ? [{ title: `Fahari - ${loaderData.name}` }] : [],
+			meta: loaderData
+				? [{ title: `Fahari - ${titleCase(loaderData.name)}` }]
+				: [],
 		}),
 		pendingComponent: BookingPending,
 		errorComponent: BookingError,

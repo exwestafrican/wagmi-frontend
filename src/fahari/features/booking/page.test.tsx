@@ -17,8 +17,10 @@ describe("Fahari booking", () => {
 		user = userEvent.setup()
 	})
 
-	async function openAraIyeBooking() {
-		const araIye = listingFactory.build()
+	async function openAraIyeBooking(
+		overrides: Parameters<typeof listingFactory.build>[0] = {},
+	) {
+		const araIye = listingFactory.build(overrides)
 		await act(async () => {
 			mockGetUrls()
 				.url(FahariApiPaths.BOOKING)
@@ -36,12 +38,20 @@ describe("Fahari booking", () => {
 		).toBeInTheDocument()
 	}
 
-	test("tab title names the listing being booked", async () => {
-		await openAraIyeBooking()
+	test("listing names are title-cased in the tab and on the page", async () => {
+		await openAraIyeBooking({
+			name: "ara iye",
+			meetingPoint: { name: "ara iye reception" },
+		})
 
 		await waitFor(() => {
 			expect(document.title).toBe("Fahari - Ara Iye")
 		})
+		expect(
+			screen.getByText("Private ride to Ara Iye and back"),
+		).toBeInTheDocument()
+		expect(screen.getByText("Destination: Ara Iye")).toBeInTheDocument()
+		expect(screen.getByText("Pickup: Ara Iye Reception")).toBeInTheDocument()
 	})
 
 	test("user cannot add more passengers than the car capacity", async () => {
