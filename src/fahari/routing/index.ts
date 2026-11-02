@@ -1,3 +1,4 @@
+import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariAdminPages, FahariPages } from "@fahari/constants.ts"
 import { AdminAccountsPage } from "@fahari/features/admin/accounts/page.tsx"
 import AdminDashboardPage from "@fahari/features/admin/admin-dashboard.page.tsx"
@@ -18,6 +19,7 @@ import { z } from "zod"
 export function createFahariRouteTree(parentRoute: AnyRoute) {
 	const fahariBookingRoute = createRoute({
 		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
 		path: "booking",
 		validateSearch: z.object({
 			code: z.string(),
@@ -25,6 +27,11 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		loaderDeps: ({ search: { code } }) => ({ code }),
 		loader: ({ context: { queryClient }, deps: { code } }) =>
 			queryClient.ensureQueryData(listingQueryOptions(code)),
+		head: ({ loaderData }) => ({
+			meta: loaderData
+				? [{ title: `Fahari - ${titleCase(loaderData.name)}` }]
+				: [],
+		}),
 		pendingComponent: BookingPending,
 		errorComponent: BookingError,
 		component: BookingPage,
@@ -32,12 +39,14 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 
 	const fahariBookingSuccessRoute = createRoute({
 		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
 		path: FahariPages.BOOKING_SUCCESS,
 		component: BookingSuccessPage,
 	})
 
 	const fahariAdminLoginRoute = createRoute({
 		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
 		path: "admin",
 		validateSearch: z.object({
 			redirect: z.string().optional(),
@@ -47,6 +56,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 
 	const fahariAdminCheckEmailRoute = createRoute({
 		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
 		path: "admin/check-email",
 		validateSearch: z.object({
 			email: z.email(),
@@ -56,6 +66,7 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 
 	const fahariAdminDashboardLayoutRoute = createRoute({
 		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
 		id: "fahari-admin-dashboard",
 		beforeLoad: ({ location }) => {
 			handleAuthToken(location, FahariAdminPages.LOGIN)

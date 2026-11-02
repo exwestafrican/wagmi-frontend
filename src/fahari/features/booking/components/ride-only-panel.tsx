@@ -4,6 +4,7 @@ import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
+import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariPages } from "@fahari/constants.ts"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
 import {
@@ -146,7 +147,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</span>
 				</p>
 				<p className="text-xs text-slate-600">
-					Private ride to {listing.name} and back
+					Private ride to {titleCase(listing.name)} and back
 				</p>
 				<GuestPicker
 					passengers={passengers}
@@ -156,8 +157,8 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				<CapacityNote max={maxPassengers} />
 				<Separator />
 				<RideBooking
-					destinationName={listing.name}
-					meetingPointName={listing.meetingPoint.name}
+					destinationName={titleCase(listing.name)}
+					meetingPointName={titleCase(listing.meetingPoint.name)}
 				/>
 				{price && (
 					<p className="text-[11px] leading-snug text-slate-500">
