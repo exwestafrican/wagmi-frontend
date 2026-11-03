@@ -8,7 +8,7 @@ import { screen, waitFor } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
 describe("createAppRouter", () => {
-	it("renders the Envoye link tree at /", async () => {
+	it("renders the Envoye login page at /", async () => {
 		const queryClient = createTestQueryClient()
 		const router = createAppRouter(queryClient)
 		await router.navigate({ to: "/" })
@@ -22,12 +22,10 @@ describe("createAppRouter", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByRole("heading", { name: "Envoye" }),
+				screen.getByRole("heading", { name: "Welcome back" }),
 			).toBeInTheDocument()
 		})
-		expect(
-			screen.getByRole("link", { name: /Sign in to Envoye/ }),
-		).toBeInTheDocument()
+		expect(router.state.location.pathname).toBe("/")
 	})
 
 	it("renders the Envoye login page at /login", async () => {
@@ -74,7 +72,7 @@ describe("createAppRouter", () => {
 
 	it("brands the tab as Fahari on Fahari routes", async () => {
 		const queryClient = createTestQueryClient()
-		const router = createAppRouter(queryClient)
+		const router = createAppRouter(queryClient, "fahari")
 		await router.navigate({ to: "/admin" })
 
 		renderWithQueryClient(

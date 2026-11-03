@@ -25,7 +25,7 @@ describe("Fahari admin login", () => {
 	async function setupLoginPage() {
 		user = userEvent.setup()
 		const queryClient = createTestQueryClient()
-		const router = createAppRouter(queryClient)
+		const router = createAppRouter(queryClient, "fahari")
 		await router.navigate({ to: FahariAdminPages.LOGIN })
 
 		renderWithQueryClient(

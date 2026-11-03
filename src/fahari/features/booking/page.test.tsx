@@ -31,6 +31,7 @@ describe("Fahari booking", () => {
 			await navigateToTestPage({
 				to: "/booking",
 				search: { code: araIye.code },
+				product: "fahari",
 			})
 		})
 		expect(
