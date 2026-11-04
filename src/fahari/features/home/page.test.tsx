@@ -3,16 +3,15 @@ import LanguageProvider from "@common/i18n/LanguageProvider.tsx"
 import renderWithQueryClient, {
 	createTestQueryClient,
 } from "@common/renderWithQueryClient.tsx"
-import { Pages } from "@common/utils/pages.ts"
 import { RouterProvider } from "@tanstack/react-router"
 import { screen, waitFor } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
-describe("LinkTree", () => {
-	async function renderLinkTree() {
+describe("Fahari home", () => {
+	it("shows the link tree without sign in to Envoye", async () => {
 		const queryClient = createTestQueryClient()
-		const router = createAppRouter(queryClient)
-		await router.navigate({ to: Pages.LINK_TREE })
+		const router = createAppRouter(queryClient, "fahari")
+		await router.navigate({ to: "/" })
 
 		renderWithQueryClient(
 			<LanguageProvider>
@@ -20,24 +19,21 @@ describe("LinkTree", () => {
 			</LanguageProvider>,
 			{ queryClient },
 		)
-	}
-
-	it("links sign in to login and contact us to email", async () => {
-		await renderLinkTree()
 
 		await waitFor(() => {
 			expect(
-				screen.getByRole("link", { name: /Sign in to Envoye/ }),
-			).toHaveAttribute("href", Pages.LOGIN)
+				screen.getByRole("heading", { name: "Fahari" }),
+			).toBeInTheDocument()
 		})
+		expect(screen.getByText("F")).toBeInTheDocument()
+		expect(screen.getByText("Your booking, simplified.")).toBeInTheDocument()
 		expect(
-			screen.getByRole("link", { name: /Sign in to Envoye/ }),
-		).toHaveAttribute("target", "_blank")
-
+			screen.queryByRole("link", { name: /Sign in to Envoye/ }),
+		).not.toBeInTheDocument()
 		expect(
 			screen.getByRole("button", { name: /Fahari Bookings/ }),
 		).toBeDisabled()
-		expect(screen.getByText("Book a ride from our fleets")).toBeInTheDocument()
+		expect(screen.getByText("Book a group trip")).toBeInTheDocument()
 		const contactUs = screen.getByRole("link", { name: /Contact Us/ })
 		expect(contactUs).toHaveAttribute("href", "mailto:hellofahari@gmail.com")
 		expect(contactUs).toHaveAttribute("target", "_blank")

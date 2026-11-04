@@ -9,6 +9,8 @@ pnpm install
 pnpm start
 ```
 
+Local, one `pnpm dev` on port 3000: http://envoye.localhost:3000 and http://fahari.localhost:3000. Plain http://localhost:3000 loads Envoye.
+
 # Building For Production
 
 To build this application for production:
