@@ -5,6 +5,13 @@ export const tripSchema = z.object({
 		.string()
 		.trim()
 		.nonempty({ message: "Pickup address is required" }),
+	pickupPlace: z
+		.object({
+			placeId: z.string(),
+			latitude: z.number(),
+			longitude: z.number(),
+		})
+		.optional(),
 	nearestLandmark: z
 		.string()
 		.trim()
