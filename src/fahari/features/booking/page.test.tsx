@@ -8,13 +8,55 @@ import { listingFactory } from "@fahari/test/factory/listing.ts"
 import { act, screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
-import { beforeEach, describe, expect, test, vi } from "vitest"
+import type { ReactNode } from "react"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+
+const googleMaps = vi.hoisted(() => ({
+	places: null as unknown,
+	status: "LOADED",
+}))
+
+vi.mock("@vis.gl/react-google-maps", () => ({
+	APILoadingStatus: { LOADED: "LOADED", AUTH_FAILURE: "AUTH_FAILURE" },
+	APIProvider: ({ children }: { children: ReactNode }) => children,
+	useMapsLibrary: () => googleMaps.places,
+	useApiLoadingStatus: () => googleMaps.status,
+	Map: ({ children }: { children: ReactNode }) => children,
+	AdvancedMarker: () => null,
+}))
+
+function fakePlaces(addresses: string[]) {
+	const fetchAutocompleteSuggestions = vi.fn().mockResolvedValue({
+		suggestions: addresses.map((address) => ({
+			placePrediction: {
+				placeId: address,
+				text: { text: address },
+				toPlace: () => ({
+					id: address,
+					location: { lat: () => 6.4281, lng: () => 3.4219 },
+					fetchFields: vi.fn().mockResolvedValue({}),
+				}),
+			},
+		})),
+	})
+	return {
+		AutocompleteSessionToken: class {},
+		AutocompleteSuggestion: { fetchAutocompleteSuggestions },
+	}
+}
 
 describe("Fahari booking", () => {
 	let user: UserEvent
 
 	beforeEach(() => {
 		user = userEvent.setup()
+		vi.stubEnv("VITE_GOOGLE_MAPS_API_KEY", "test-maps-key")
+		googleMaps.places = null
+		googleMaps.status = "LOADED"
+	})
+
+	afterEach(() => {
+		vi.unstubAllEnvs()
 	})
 
 	async function openAraIyeBooking(
@@ -95,6 +137,257 @@ describe("Fahari booking", () => {
 		expect(lastName).toHaveValue("Okafor")
 		expect(email).toHaveValue("ada.okafor@gmail.com")
 		expect(phone).toHaveValue("08031234567")
+	})
+
+	test("guest picks a suggested pickup and sees it on the map", async () => {
+		const places = fakePlaces([
+			"Admiralty Way, Lekki, Nigeria",
+			"Admiralty Road, Lekki Phase 1, Nigeria",
+		])
+		googleMaps.places = places
+		await openAraIyeBooking()
+
+		const pickup = screen.getByRole("combobox", { name: "Pick me up from" })
+		await user.type(pickup, "Admiralty")
+		await user.click(
+			await screen.findByRole("option", {
+				name: "Admiralty Road, Lekki Phase 1, Nigeria",
+			}),
+		)
+
+		expect(pickup).toHaveValue("Admiralty Road, Lekki Phase 1, Nigeria")
+		expect(
+			await screen.findByRole("region", { name: "Pickup on the map" }),
+		).toBeInTheDocument()
+		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+		expect(
+			places.AutocompleteSuggestion.fetchAutocompleteSuggestions,
+		).toHaveBeenCalledWith(
+			expect.objectContaining({
+				input: "Admiralty",
+				includedRegionCodes: ["ng"],
+			}),
+		)
+	})
+
+	test("a picked pickup is sent as the address text only", async () => {
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.respond({ id: 1 })
+			.apply()
+		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("combobox", { name: "Pick me up from" }),
+			"Admiralty",
+		)
+		await user.click(
+			await screen.findByRole("option", {
+				name: "Admiralty Way, Lekki, Nigeria",
+			}),
+		)
+		await screen.findByRole("region", { name: "Pickup on the map" })
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "First name *" }),
+			"Ada",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Last name *" }),
+			"Okafor",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Email address *" }),
+			"ada.okafor@gmail.com",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Phone number *" }),
+			"08031234567",
+		)
+
+		await user.click(screen.getByRole("button", { name: "Request this car" }))
+
+		await waitFor(() => {
+			expect(vi.mocked(apiClient.post)).toHaveBeenCalled()
+		})
+		const [, rideRequest] = vi.mocked(apiClient.post).mock.calls[0]
+		expect(rideRequest).toMatchObject({
+			pickupLocation: "Admiralty Way, Lekki, Nigeria",
+		})
+		expect(rideRequest).not.toHaveProperty("pickupPlace")
+	})
+
+	test("guest can choose a suggestion with the keyboard", async () => {
+		googleMaps.places = fakePlaces([
+			"Admiralty Way, Lekki, Nigeria",
+			"Admiralty Road, Lekki Phase 1, Nigeria",
+		])
+		await openAraIyeBooking()
+
+		const pickup = screen.getByRole("combobox", { name: "Pick me up from" })
+		await user.type(pickup, "Admiralty")
+		await screen.findByRole("listbox", { name: "Pickup suggestions" })
+		await user.keyboard("{ArrowDown}{ArrowDown}{Enter}")
+
+		expect(pickup).toHaveValue("Admiralty Road, Lekki Phase 1, Nigeria")
+		expect(
+			await screen.findByRole("region", { name: "Pickup on the map" }),
+		).toBeInTheDocument()
+	})
+
+	test("guest can still type a pickup when Google refuses suggestions", async () => {
+		const places = fakePlaces([])
+		places.AutocompleteSuggestion.fetchAutocompleteSuggestions.mockRejectedValue(
+			new Error("Places API has been disabled"),
+		)
+		googleMaps.places = places
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("combobox", { name: "Pick me up from" }),
+			"12 Admiralty Way, Lekki",
+		)
+
+		const pickup = await screen.findByRole("textbox", {
+			name: "Pick me up from",
+		})
+		expect(pickup).toHaveValue("12 Admiralty Way, Lekki")
+		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+	})
+
+	test("pickup is a plain field without a map when Google is switched off", async () => {
+		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
+		googleMaps.status = "AUTH_FAILURE"
+		await openAraIyeBooking()
+
+		const pickup = screen.getByRole("textbox", { name: "Pick me up from" })
+		await user.type(pickup, "12 Admiralty Way, Lekki")
+
+		expect(pickup).toHaveValue("12 Admiralty Way, Lekki")
+		expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+		expect(
+			screen.queryByRole("region", { name: "Pickup on the map" }),
+		).not.toBeInTheDocument()
+	})
+
+	async function fillLandmarkAndContactDetails() {
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "First name *" }),
+			"Ada",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Last name *" }),
+			"Okafor",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Email address *" }),
+			"ada.okafor@gmail.com",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Phone number *" }),
+			"08031234567",
+		)
+	}
+
+	async function expectRideRequestFrom(pickupLocation: string) {
+		await user.click(screen.getByRole("button", { name: "Request this car" }))
+		await waitFor(() => {
+			expect(vi.mocked(apiClient.post)).toHaveBeenCalledWith(
+				FahariApiPaths.RIDE_REQUESTS,
+				expect.objectContaining({ pickupLocation }),
+			)
+		})
+	}
+
+	test("ride request still goes through when Google is switched off", async () => {
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.respond({ id: 1 })
+			.apply()
+		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
+		googleMaps.status = "AUTH_FAILURE"
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Pick me up from" }),
+			"12 Admiralty Way, Lekki",
+		)
+		await fillLandmarkAndContactDetails()
+
+		await expectRideRequestFrom("12 Admiralty Way, Lekki")
+	})
+
+	test("ride request still goes through when Google refuses suggestions mid-search", async () => {
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.respond({ id: 1 })
+			.apply()
+		const places = fakePlaces([])
+		places.AutocompleteSuggestion.fetchAutocompleteSuggestions.mockRejectedValue(
+			new Error("Places API has been disabled"),
+		)
+		googleMaps.places = places
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("combobox", { name: "Pick me up from" }),
+			"12 Admiralty Way, Lekki",
+		)
+		await screen.findByRole("textbox", { name: "Pick me up from" })
+		await fillLandmarkAndContactDetails()
+
+		await expectRideRequestFrom("12 Admiralty Way, Lekki")
+	})
+
+	test("a picked pickup is still sent when Google can't locate it for the map", async () => {
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.respond({ id: 1 })
+			.apply()
+		const places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
+		places.AutocompleteSuggestion.fetchAutocompleteSuggestions.mockResolvedValue(
+			{
+				suggestions: [
+					{
+						placePrediction: {
+							placeId: "admiralty",
+							text: { text: "Admiralty Way, Lekki, Nigeria" },
+							toPlace: () => ({
+								fetchFields: vi
+									.fn()
+									.mockRejectedValue(new Error("Places API has been disabled")),
+							}),
+						},
+					},
+				],
+			},
+		)
+		googleMaps.places = places
+		await openAraIyeBooking()
+
+		await user.type(
+			screen.getByRole("combobox", { name: "Pick me up from" }),
+			"Admiralty",
+		)
+		await user.click(
+			await screen.findByRole("option", {
+				name: "Admiralty Way, Lekki, Nigeria",
+			}),
+		)
+		await fillLandmarkAndContactDetails()
+
+		expect(
+			screen.queryByRole("region", { name: "Pickup on the map" }),
+		).not.toBeInTheDocument()
+		await expectRideRequestFrom("Admiralty Way, Lekki, Nigeria")
 	})
 
 	test("request stays disabled until the form is valid", async () => {
