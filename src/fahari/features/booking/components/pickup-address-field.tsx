@@ -85,8 +85,8 @@ function PickupAddressInput({
 		}
 		let cancelled = false
 		const timer = setTimeout(async () => {
-			sessionToken.current ??= new places.AutocompleteSessionToken()
 			try {
+				sessionToken.current ??= new places.AutocompleteSessionToken()
 				const response =
 					await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
 						input,
