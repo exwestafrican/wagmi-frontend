@@ -4,7 +4,6 @@ import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
-import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariPages } from "@fahari/constants.ts"
 import {
 	toCreateRideRequest,
@@ -18,9 +17,6 @@ import {
 	rideIntro,
 	ridePrice,
 	rideRequestValues,
-	showsGoing,
-	showsLeaving,
-	tripWindow,
 } from "@fahari/features/booking/chauffeur-client.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
@@ -30,7 +26,7 @@ import {
 import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import {
 	type Booking,
-	bookingFormSchema,
+	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
@@ -44,12 +40,9 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 	const maxPassengers = passengerCapacity(client)
 	const spinnerVerb = useSpinnerVerbs()
 	const [passengers, setPassengers] = useState(1)
-	const dates = tripWindow(client.bookingPolicy)
 	const intro = rideIntro(client)
-	const roundTrip = client.tripType.code === "round_trip"
-	const guestFillsLandmark = showsGoing(client)
 	const form = useForm<Booking>({
-		resolver: zodResolver(bookingFormSchema(guestFillsLandmark)),
+		resolver: zodResolver(bookingSchema),
 		mode: "onChange",
 		defaultValues: {
 			...initialBookingSchedule(client),
@@ -155,19 +148,7 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 				/>
 				<CapacityNote max={maxPassengers} />
 				<Separator />
-				<RideBooking
-					goingLabel="Going"
-					leavingLabel="Leaving"
-					showGoing={showsGoing(client)}
-					showLeaving={showsLeaving(client)}
-					destinationName={titleCase(client.meetupPoint.name)}
-					meetingPointName={titleCase(client.meetupPoint.name)}
-					pickupEarliest={dates.earliest}
-					pickupLatest={dates.latest}
-					returnWithinDays={
-						roundTrip ? client.bookingPolicy.maxDaysAfterPickup : undefined
-					}
-				/>
+				<RideBooking client={client} />
 				{client.fareNote && (
 					<p className="text-[11px] leading-snug text-slate-500">
 						{client.fareNote}

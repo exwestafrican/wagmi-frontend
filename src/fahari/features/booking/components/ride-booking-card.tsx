@@ -19,7 +19,14 @@ import {
 	PopoverTrigger,
 } from "@common/components/ui/popover.tsx"
 import { Separator } from "@common/components/ui/separator.tsx"
-import { departureIsAfterPickup } from "@fahari/features/booking/chauffeur-client.ts"
+import { titleCase } from "@common/utils/sentence-case.ts"
+import {
+	type ChauffeurClient,
+	departureIsAfterPickup,
+	showsGoing,
+	showsLeaving,
+	tripWindow,
+} from "@fahari/features/booking/chauffeur-client.ts"
 import { formatStayDate } from "@fahari/features/booking/format.ts"
 import type { RideFormValues } from "@fahari/features/booking/schema/trip.schema.ts"
 import { addDays, isAfter, isBefore, startOfDay } from "date-fns"
@@ -107,7 +114,7 @@ function RideDateField({
 	)
 }
 
-export function RideBooking({
+export function RideBookingCard({
 	goingLabel,
 	leavingLabel,
 	showGoing,
@@ -337,5 +344,27 @@ export function RideBooking({
 				)}
 			</CardContent>
 		</Card>
+	)
+}
+
+export function RideBooking({ client }: { client: ChauffeurClient }) {
+	const dates = tripWindow(client.bookingPolicy)
+	const meetup = titleCase(client.meetupPoint.name)
+	return (
+		<RideBookingCard
+			goingLabel="Going"
+			leavingLabel="Leaving"
+			showGoing={showsGoing(client)}
+			showLeaving={showsLeaving(client)}
+			destinationName={meetup}
+			meetingPointName={meetup}
+			pickupEarliest={dates.earliest}
+			pickupLatest={dates.latest}
+			returnWithinDays={
+				client.tripType.code === "round_trip"
+					? client.bookingPolicy.maxDaysAfterPickup
+					: undefined
+			}
+		/>
 	)
 }

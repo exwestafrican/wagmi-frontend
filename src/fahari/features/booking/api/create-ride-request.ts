@@ -37,7 +37,7 @@ export function toCreateRideRequest(
 	experienceCode: string,
 	numberOfPassengers: number,
 ): CreateRideRequest {
-	const nearestLandmark = booking.nearestLandmark.trim()
+	const nearestLandmark = booking.nearestLandmark?.trim()
 	return {
 		experienceCode,
 		numberOfPassengers,

@@ -17,7 +17,7 @@ import {
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
 import {
-	RideBooking,
+	RideBookingCard,
 	initialRideDates,
 } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
@@ -156,7 +156,7 @@ export function LegacyRideOnlyPanel({ listing }: { listing: Listing }) {
 				/>
 				<CapacityNote max={maxPassengers} />
 				<Separator />
-				<RideBooking
+				<RideBookingCard
 					goingLabel="Going to the resort"
 					leavingLabel="Leaving the resort"
 					showGoing
