@@ -6,7 +6,7 @@ export const GOING_PICKUP_TIME = "15:00"
 export const LEAVING_TIME = "11:00"
 export const SAME_DAY_LEAVING_TIME = "18:00"
 
-export type TripTypeCode = "inbound_only" | "outbound_only" | "round_trip"
+export type TripTypeCode = "pickup" | "dropoff" | "round_trip"
 
 export type TripType = {
 	code: TripTypeCode
@@ -45,19 +45,19 @@ export type ChauffeurClient = {
 }
 
 export function showsGoing(client: ChauffeurClient) {
-	return client.tripType.code !== "inbound_only"
+	return client.tripType.code !== "pickup"
 }
 
 export function showsLeaving(client: ChauffeurClient) {
-	return client.tripType.code !== "outbound_only"
+	return client.tripType.code !== "dropoff"
 }
 
 export function rideIntro(client: ChauffeurClient) {
 	const meetup = titleCase(client.meetupPoint.name)
 	switch (client.tripType.code) {
-		case "inbound_only":
+		case "pickup":
 			return `Private ride from ${meetup}`
-		case "outbound_only":
+		case "dropoff":
 			return `Private ride to ${meetup}`
 		case "round_trip":
 			return `Private ride to ${meetup} and back`
@@ -97,7 +97,7 @@ export function initialBookingSchedule(
 ) {
 	const tripDate = addDays(today, client.bookingPolicy.minDaysBeforeTrip)
 	switch (client.tripType.code) {
-		case "outbound_only": {
+		case "dropoff": {
 			const departure = shiftDateTime(tripDate, GOING_PICKUP_TIME, 1)
 			return {
 				pickupAddress: "",
@@ -108,7 +108,7 @@ export function initialBookingSchedule(
 				departureTime: departure.time,
 			}
 		}
-		case "inbound_only": {
+		case "pickup": {
 			const pickup = shiftDateTime(tripDate, LEAVING_TIME, -1)
 			return {
 				pickupAddress: client.meetupPoint.address || client.meetupPoint.name,
@@ -164,7 +164,7 @@ export function rideRequestValues(
 	client: ChauffeurClient,
 ): Booking {
 	switch (client.tripType.code) {
-		case "outbound_only": {
+		case "dropoff": {
 			const departure = shiftDateTime(booking.pickupDate, booking.pickupTime, 1)
 			return {
 				...booking,
@@ -172,7 +172,7 @@ export function rideRequestValues(
 				departureTime: departure.time,
 			}
 		}
-		case "inbound_only": {
+		case "pickup": {
 			const pickup = shiftDateTime(
 				booking.departureDate,
 				booking.departureTime,

@@ -163,7 +163,7 @@ describe("Fahari booking", () => {
 			code: "softdays",
 			tagLine: "Slow travel for creatives in africa",
 			tripType: {
-				code: "outbound_only",
+				code: "dropoff",
 				description: "take from home to meetup location",
 			},
 			fareNote: null,
