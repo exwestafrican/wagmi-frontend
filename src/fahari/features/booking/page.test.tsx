@@ -273,6 +273,13 @@ describe("Fahari booking", () => {
 			"08031234567",
 		)
 
+		expect(request).toBeDisabled()
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
+		)
+
 		expect(request).toBeEnabled()
 	})
 
