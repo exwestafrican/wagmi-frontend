@@ -5,10 +5,7 @@ export const tripSchema = z.object({
 		.string()
 		.trim()
 		.nonempty({ message: "Pickup address is required" }),
-	nearestLandmark: z
-		.string()
-		.trim()
-		.nonempty({ message: "Nearest landmark is required" }),
+	nearestLandmark: z.string().trim(),
 	pickupDate: z.date(),
 	pickupTime: z
 		.string()
