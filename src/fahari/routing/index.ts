@@ -8,7 +8,10 @@ import { AdminCheckEmailPage } from "@fahari/features/admin/check-email/page.tsx
 import { AdminDashboardPending } from "@fahari/features/admin/components/admin-dashboard-pending.tsx"
 import { handleAuthToken } from "@fahari/features/admin/hooks/handle-auth-token.ts"
 import { AdminLoginPage } from "@fahari/features/admin/login/page.tsx"
-import { listingQueryOptions } from "@fahari/features/booking/api/get-listing.ts"
+import {
+	chauffeurClientsQueryOptions,
+	requireChauffeurClient,
+} from "@fahari/features/booking/api/list-chauffeur-clients.ts"
 import { BookingError } from "@fahari/features/booking/components/booking-error.tsx"
 import { BookingPending } from "@fahari/features/booking/components/booking-pending.tsx"
 import { BookingPage } from "@fahari/features/booking/page.tsx"
@@ -33,8 +36,12 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 			code: z.string(),
 		}),
 		loaderDeps: ({ search: { code } }) => ({ code }),
-		loader: ({ context: { queryClient }, deps: { code } }) =>
-			queryClient.ensureQueryData(listingQueryOptions(code)),
+		loader: async ({ context: { queryClient }, deps: { code } }) => {
+			const clients = await queryClient.ensureQueryData(
+				chauffeurClientsQueryOptions(),
+			)
+			return requireChauffeurClient(clients, code)
+		},
 		head: ({ loaderData }) => ({
 			meta: loaderData
 				? [{ title: `Fahari - ${titleCase(loaderData.name)}` }]

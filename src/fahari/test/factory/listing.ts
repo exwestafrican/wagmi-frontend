@@ -1,4 +1,4 @@
-import type { Listing } from "@fahari/features/booking/listing.ts"
+import type { Listing } from "@fahari/features/booking/legacy-listing.ts"
 import { Factory } from "fishery"
 
 export const listingFactory = Factory.define<Listing>(() => ({

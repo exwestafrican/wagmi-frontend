@@ -1,6 +1,6 @@
 import { apiClient } from "@common/lib/api-client.ts"
 import { FahariApiPaths } from "@fahari/constants.ts"
-import type { Listing } from "@fahari/features/booking/listing.ts"
+import type { Listing } from "@fahari/features/booking/legacy-listing.ts"
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query"
 
 export const FAHARI_BOOKING = "fahari-booking"

@@ -6,51 +6,52 @@ import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
 import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariPages } from "@fahari/constants.ts"
-import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
 import {
 	toCreateRideRequest,
 	useCreateRideRequest,
 } from "@fahari/features/booking/api/create-ride-request.ts"
+import {
+	type ChauffeurClient,
+	departureIsAfterPickup,
+	initialBookingSchedule,
+	passengerCapacity,
+	rideIntro,
+	ridePrice,
+	rideRequestValues,
+	showsGoing,
+	showsLeaving,
+	tripWindow,
+} from "@fahari/features/booking/chauffeur-client.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
-import {
-	RideBooking,
-	initialRideDates,
-} from "@fahari/features/booking/components/ride-booking-card.tsx"
-import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
-import {
-	type Listing,
-	maximumRideCapacity,
-} from "@fahari/features/booking/listing.ts"
+import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import {
 	type Booking,
 	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
-import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm, useFormState } from "react-hook-form"
 import { sileo } from "sileo"
 
-export function RideOnlyPanel({ listing }: { listing: Listing }) {
+export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 	const navigate = useNavigate()
-	const maxPassengers = maximumRideCapacity(listing)
+	const maxPassengers = passengerCapacity(client)
 	const spinnerVerb = useSpinnerVerbs()
 	const [passengers, setPassengers] = useState(1)
+	const dates = tripWindow(client.bookingPolicy)
+	const intro = rideIntro(client)
+	const roundTrip = client.tripType.code === "round_trip"
 	const form = useForm<Booking>({
 		resolver: zodResolver(bookingSchema),
 		mode: "onChange",
 		defaultValues: {
-			pickupAddress: "",
-			nearestLandmark: "",
-			...initialRideDates(),
-			pickupTime: listing.schedule.startTime,
-			departureTime: listing.schedule.endTime,
+			...initialBookingSchedule(client),
 			firstName: "",
 			lastName: "",
 			email: "",
@@ -63,20 +64,19 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 		isPending,
 		isSuccess,
 	} = useCreateRideRequest()
-	const pickupDate = form.watch("pickupDate")
-	const departureDate = form.watch("departureDate")
-	const days = differenceInCalendarDays(departureDate, pickupDate)
-	const ride = useBilling(listing.code, days, "ride", passengers, true)
-	const price =
-		ride.data === undefined
-			? undefined
-			: formatNightlyPrice(ride.data.amount, listing.currency)
+	const values = form.watch()
+	const price = ridePrice(client, values.pickupDate, values.departureDate)
+	const timesOk = departureIsAfterPickup(rideRequestValues(values, client))
 
-	function onSubmit(values: Booking) {
+	function onSubmit(booking: Booking) {
 		void sileo
 			.promise(
 				createRideRequest(
-					toCreateRideRequest(values, listing.code, passengers),
+					toCreateRideRequest(
+						rideRequestValues(booking, client),
+						client.code,
+						passengers,
+					),
 				),
 				{
 					position: "top-center",
@@ -146,9 +146,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 						&nbsp;total
 					</span>
 				</p>
-				<p className="text-xs text-slate-600">
-					Private ride to {titleCase(listing.name)} and back
-				</p>
+				{intro && <p className="text-xs text-slate-600">{intro}</p>}
 				<GuestPicker
 					passengers={passengers}
 					maxCapacity={maxPassengers}
@@ -157,13 +155,21 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				<CapacityNote max={maxPassengers} />
 				<Separator />
 				<RideBooking
-					destinationName={titleCase(listing.name)}
-					meetingPointName={titleCase(listing.meetingPoint.name)}
+					goingLabel="Going"
+					leavingLabel="Leaving"
+					showGoing={showsGoing(client)}
+					showLeaving={showsLeaving(client)}
+					destinationName={titleCase(client.meetupPoint.name)}
+					meetingPointName={titleCase(client.meetupPoint.name)}
+					pickupEarliest={dates.earliest}
+					pickupLatest={dates.latest}
+					returnWithinDays={
+						roundTrip ? client.bookingPolicy.maxDaysAfterPickup : undefined
+					}
 				/>
-				{price && (
+				{client.fareNote && (
 					<p className="text-[11px] leading-snug text-slate-500">
-						Your car includes pickup to the resort and the return ride. {price}{" "}
-						covers both journeys.
+						{client.fareNote}
 					</p>
 				)}
 				<Separator />
@@ -173,21 +179,14 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 
 				<Separator />
 				<div className="flex flex-col gap-2 text-[#012420]">
-					{ride.isError ? (
-						<div className="flex items-center justify-between text-xs text-red-600">
-							<span>Car / return ride</span>
-							<span>Not available for this guest size.</span>
-						</div>
-					) : (
-						<div className="flex items-center justify-between text-xs">
-							<span>Car / return ride</span>
-							{price ? (
-								<span>{price}</span>
-							) : (
-								<Skeleton className="h-3 w-16" aria-hidden />
-							)}
-						</div>
-					)}
+					<div className="flex items-center justify-between text-xs">
+						<span>Car / return ride</span>
+						{price ? (
+							<span>{price}</span>
+						) : (
+							<Skeleton className="h-3 w-16" aria-hidden />
+						)}
+					</div>
 					<Separator className="mb-2" />
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold">Car booking total</span>
@@ -197,7 +196,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</div>
 					<Button
 						type="submit"
-						disabled={!isValid || isPending || isSuccess || ride.isError}
+						disabled={!isValid || !timesOk || !price || isPending || isSuccess}
 						className="w-full cursor-pointer bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
 					>
 						{isPending ? (
