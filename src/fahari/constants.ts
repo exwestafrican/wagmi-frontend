@@ -6,7 +6,6 @@ export const FahariPages = {
 } as const
 
 export const FahariApiPaths = {
-	BOOKING: "booking",
 	CHAUFFEUR_CLIENT: "booking/chauffeur-client",
 	CALCULATE: "booking/calculate",
 	RIDE_REQUESTS: "booking/ride-requests",

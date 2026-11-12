@@ -20,9 +20,17 @@ describe("Fahari booking", () => {
 		user = userEvent.setup()
 	})
 
-	async function openBooking(client = chauffeurClientFactory.build()) {
+	async function openBooking(
+		client = chauffeurClientFactory.build(),
+		amount = client.vehicles[0]?.sameDayPrice ?? "0.00",
+	) {
 		await act(async () => {
-			mockGetUrls().url(FahariApiPaths.CHAUFFEUR_CLIENT).respond(client).apply()
+			mockGetUrls()
+				.url(FahariApiPaths.CHAUFFEUR_CLIENT)
+				.respond(client)
+				.url(FahariApiPaths.CALCULATE)
+				.respond({ amount })
+				.apply()
 			await navigateToTestPage({
 				to: "/booking",
 				search: { code: client.code },
@@ -90,11 +98,17 @@ describe("Fahari booking", () => {
 			),
 		).toBeInTheDocument()
 		expect(screen.getAllByText(sameDayPrice).length).toBeGreaterThan(0)
-		expect(
-			screen.queryByText(
-				formatNightlyPrice(Number(araIye.vehicles[0].multiDayPrice), "NGN"),
-			),
-		).not.toBeInTheDocument()
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.CALCULATE,
+			{
+				params: {
+					resortCode: araIye.code,
+					numberOfNights: 0,
+					lineItem: "ride",
+					numberOfGuests: 1,
+				},
+			},
+		)
 		expect(
 			screen.queryByText("Departure must be after pickup."),
 		).not.toBeInTheDocument()
@@ -108,18 +122,24 @@ describe("Fahari booking", () => {
 				maxDaysBeforeTrip: 40,
 			},
 		})
-		await openBooking(araIye)
+		await openBooking(araIye, araIye.vehicles[0].multiDayPrice)
 
 		expect(
 			screen.getAllByText(
 				formatNightlyPrice(Number(araIye.vehicles[0].multiDayPrice), "NGN"),
 			).length,
 		).toBeGreaterThan(0)
-		expect(
-			screen.queryByText(
-				formatNightlyPrice(Number(araIye.vehicles[0].sameDayPrice), "NGN"),
-			),
-		).not.toBeInTheDocument()
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.CALCULATE,
+			{
+				params: {
+					resortCode: araIye.code,
+					numberOfNights: 1,
+					lineItem: "ride",
+					numberOfGuests: 1,
+				},
+			},
+		)
 		expect(
 			screen.queryByText("Departure must be after pickup."),
 		).not.toBeInTheDocument()
@@ -165,9 +185,17 @@ describe("Fahari booking", () => {
 		expect(
 			screen.getAllByText(formatNightlyPrice(75_000, "NGN")).length,
 		).toBeGreaterThan(0)
-		expect(
-			screen.queryByText(formatNightlyPrice(150_000, "NGN")),
-		).not.toBeInTheDocument()
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.CALCULATE,
+			{
+				params: {
+					resortCode: softDays.code,
+					numberOfNights: 0,
+					lineItem: "ride",
+					numberOfGuests: 1,
+				},
+			},
+		)
 	})
 
 	test("user cannot add more passengers than the car capacity", async () => {

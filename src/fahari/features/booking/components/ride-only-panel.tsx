@@ -5,6 +5,7 @@ import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
 import { FahariPages } from "@fahari/constants.ts"
+import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
 import {
 	toCreateRideRequest,
 	useCreateRideRequest,
@@ -15,7 +16,6 @@ import {
 	initialBookingSchedule,
 	passengerCapacity,
 	rideIntro,
-	ridePrice,
 	rideRequestValues,
 } from "@fahari/features/booking/chauffeur-client.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
@@ -24,12 +24,14 @@ import {
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
 import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
+import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
 import {
 	type Booking,
 	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
+import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm, useFormState } from "react-hook-form"
@@ -59,8 +61,17 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 		isSuccess,
 	} = useCreateRideRequest()
 	const values = form.watch()
-	const price = ridePrice(client, values.pickupDate, values.departureDate)
-	const timesOk = departureIsAfterPickup(rideRequestValues(values, client))
+	const scheduled = rideRequestValues(values, client)
+	const nights = differenceInCalendarDays(
+		scheduled.departureDate,
+		scheduled.pickupDate,
+	)
+	const ride = useBilling(client.code, nights, "ride", passengers, true)
+	const price =
+		ride.data === undefined
+			? undefined
+			: formatNightlyPrice(Number(ride.data.amount), "NGN")
+	const timesOk = departureIsAfterPickup(scheduled)
 
 	function onSubmit(booking: Booking) {
 		void sileo
@@ -128,7 +139,7 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 					</h1>
 					<Car className="mt-2.5 size-5 shrink-0 text-[#7eaea0]" aria-hidden />
 				</div>
-				<p className="flex items-baseline text-[#012420]">
+				<div className="flex items-baseline text-[#012420]">
 					{price ? (
 						<span className="text-xl leading-normal font-semibold">
 							{price}
@@ -139,7 +150,7 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 					<span className="text-sm leading-normal font-normal">
 						&nbsp;total
 					</span>
-				</p>
+				</div>
 				{intro && <p className="text-xs text-slate-600">{intro}</p>}
 				<GuestPicker
 					passengers={passengers}
@@ -161,14 +172,21 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 
 				<Separator />
 				<div className="flex flex-col gap-2 text-[#012420]">
-					<div className="flex items-center justify-between text-xs">
-						<span>Car / return ride</span>
-						{price ? (
-							<span>{price}</span>
-						) : (
-							<Skeleton className="h-3 w-16" aria-hidden />
-						)}
-					</div>
+					{ride.isError ? (
+						<div className="flex items-center justify-between text-xs text-red-600">
+							<span>Car / return ride</span>
+							<span>Not available for this guest size.</span>
+						</div>
+					) : (
+						<div className="flex items-center justify-between text-xs">
+							<span>Car / return ride</span>
+							{price ? (
+								<span>{price}</span>
+							) : (
+								<Skeleton className="h-3 w-16" aria-hidden />
+							)}
+						</div>
+					)}
 					<Separator className="mb-2" />
 					<div className="flex items-center justify-between">
 						<span className="text-sm font-semibold">Car booking total</span>
@@ -178,7 +196,14 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 					</div>
 					<Button
 						type="submit"
-						disabled={!isValid || !timesOk || !price || isPending || isSuccess}
+						disabled={
+							!isValid ||
+							!timesOk ||
+							!price ||
+							ride.isError ||
+							isPending ||
+							isSuccess
+						}
 						className="w-full cursor-pointer bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
 					>
 						{isPending ? (

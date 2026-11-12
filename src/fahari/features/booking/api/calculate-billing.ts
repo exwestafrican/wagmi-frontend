@@ -7,7 +7,7 @@ export const FAHARI_BILLING = "fahari-billing"
 export type LineItem = "accommodation" | "ride"
 
 type BillingAmount = {
-	amount: number
+	amount: string
 }
 
 export function billingQueryOptions(

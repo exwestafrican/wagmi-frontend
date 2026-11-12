@@ -1,7 +1,6 @@
 import { titleCase } from "@common/utils/sentence-case.ts"
-import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
 import type { Booking } from "@fahari/features/booking/schema/booking.schema.ts"
-import { addDays, differenceInCalendarDays, format, startOfDay } from "date-fns"
+import { addDays, format, startOfDay } from "date-fns"
 
 export const GOING_PICKUP_TIME = "15:00"
 export const LEAVING_TIME = "11:00"
@@ -189,21 +188,6 @@ export function rideRequestValues(
 		case "round_trip":
 			return booking
 	}
-}
-
-export function ridePrice(
-	client: ChauffeurClient,
-	pickupDate: Date,
-	departureDate: Date,
-) {
-	const vehicle = client.vehicles[0]
-	if (!vehicle) return undefined
-	const multiDay =
-		client.tripType.code === "round_trip" &&
-		differenceInCalendarDays(departureDate, pickupDate) > 0
-	const amount = Number(multiDay ? vehicle.multiDayPrice : vehicle.sameDayPrice)
-	if (!Number.isFinite(amount)) return undefined
-	return formatNightlyPrice(amount, "NGN")
 }
 
 export function passengerCapacity(client: ChauffeurClient) {

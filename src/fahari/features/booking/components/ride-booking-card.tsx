@@ -34,16 +34,6 @@ import { ArrowDownLeft, ArrowUpRight, CalendarIcon, MapPin } from "lucide-react"
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 
-export type RideDates = {
-	pickupDate: Date
-	departureDate: Date
-}
-
-export function initialRideDates(): RideDates {
-	const pickupDate = startOfDay(new Date())
-	return { pickupDate, departureDate: addDays(pickupDate, 1) }
-}
-
 function clampReturn(
 	pickup: Date,
 	departure: Date,
