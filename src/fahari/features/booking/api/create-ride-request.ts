@@ -9,7 +9,7 @@ export type CreateRideRequest = {
 	experienceCode: string
 	numberOfPassengers: number
 	pickupLocation: string
-	nearestLandmark: string
+	nearestLandmark?: string
 	pickupDateTime: string
 	departureDateTime: string
 	firstName: string
@@ -34,14 +34,15 @@ function toPhoneNumber(phone: string) {
 
 export function toCreateRideRequest(
 	booking: Booking,
-	experienceCode: string,
+	code: string,
 	numberOfPassengers: number,
 ): CreateRideRequest {
+	const nearestLandmark = booking.nearestLandmark?.trim()
 	return {
-		experienceCode,
+		experienceCode: code,
 		numberOfPassengers,
 		pickupLocation: booking.pickupAddress.trim(),
-		nearestLandmark: booking.nearestLandmark.trim(),
+		...(nearestLandmark ? { nearestLandmark } : {}),
 		pickupDateTime: formatRideDateTime(booking.pickupDate, booking.pickupTime),
 		departureDateTime: formatRideDateTime(
 			booking.departureDate,

@@ -4,33 +4,23 @@ import { queryOptions, useQuery } from "@tanstack/react-query"
 
 export const FAHARI_BILLING = "fahari-billing"
 
-export type LineItem = "accommodation" | "ride"
-
 type BillingAmount = {
-	amount: number
+	amount: string
 }
 
 export function billingQueryOptions(
-	resortCode: string,
-	numberOfNights: number,
-	lineItem: LineItem,
-	numberOfGuests: number,
+	clientCode: string,
+	pickupDateTime: string,
+	returnDateTime: string,
 ) {
 	return queryOptions({
-		queryKey: [
-			FAHARI_BILLING,
-			resortCode,
-			numberOfNights,
-			lineItem,
-			numberOfGuests,
-		],
+		queryKey: [FAHARI_BILLING, clientCode, pickupDateTime, returnDateTime],
 		queryFn: async () => {
-			const res = await apiClient.get<BillingAmount>(FahariApiPaths.CALCULATE, {
+			const res = await apiClient.get<BillingAmount>(FahariApiPaths.RIDE_FARE, {
 				params: {
-					resortCode,
-					numberOfNights,
-					lineItem,
-					numberOfGuests,
+					clientCode,
+					pickupDateTime,
+					returnDateTime,
 				},
 			})
 			return res.data
@@ -39,19 +29,13 @@ export function billingQueryOptions(
 }
 
 export function useBilling(
-	resortCode: string,
-	numberOfNights: number,
-	lineItem: LineItem,
-	numberOfGuests: number,
+	clientCode: string,
+	pickupDateTime: string,
+	returnDateTime: string,
 	enabled: boolean,
 ) {
 	return useQuery({
-		...billingQueryOptions(
-			resortCode,
-			numberOfNights,
-			lineItem,
-			numberOfGuests,
-		),
+		...billingQueryOptions(clientCode, pickupDateTime, returnDateTime),
 		enabled,
 	})
 }

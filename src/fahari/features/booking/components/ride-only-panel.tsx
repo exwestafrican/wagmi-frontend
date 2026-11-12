@@ -4,53 +4,52 @@ import { Separator } from "@common/components/ui/separator.tsx"
 import { Skeleton } from "@common/components/ui/skeleton.tsx"
 import { Spinner } from "@common/components/ui/spinner.tsx"
 import useSpinnerVerbs from "@common/hooks/spinner-verb.ts"
-import { titleCase } from "@common/utils/sentence-case.ts"
 import { FahariPages } from "@fahari/constants.ts"
 import { useBilling } from "@fahari/features/booking/api/calculate-billing.ts"
 import {
 	toCreateRideRequest,
 	useCreateRideRequest,
 } from "@fahari/features/booking/api/create-ride-request.ts"
+import {
+	type ChauffeurClient,
+	departureIsAfterPickup,
+	initialBookingSchedule,
+	passengerCapacity,
+	rideIntro,
+	rideRequestValues,
+} from "@fahari/features/booking/chauffeur-client.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
 	CapacityNote,
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
+import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import {
-	RideBooking,
-	initialRideDates,
-} from "@fahari/features/booking/components/ride-booking-card.tsx"
-import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
-import {
-	type Listing,
-	maximumRideCapacity,
-} from "@fahari/features/booking/listing.ts"
+	formatNightlyPrice,
+	formatRideDateTime,
+} from "@fahari/features/booking/format.ts"
 import {
 	type Booking,
 	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
-import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm, useFormState } from "react-hook-form"
 import { sileo } from "sileo"
 
-export function RideOnlyPanel({ listing }: { listing: Listing }) {
+export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 	const navigate = useNavigate()
-	const maxPassengers = maximumRideCapacity(listing)
+	const maxPassengers = passengerCapacity(client)
 	const spinnerVerb = useSpinnerVerbs()
 	const [passengers, setPassengers] = useState(1)
+	const intro = rideIntro(client)
 	const form = useForm<Booking>({
 		resolver: zodResolver(bookingSchema),
 		mode: "onChange",
 		defaultValues: {
-			pickupAddress: "",
-			nearestLandmark: "",
-			...initialRideDates(),
-			pickupTime: listing.schedule.startTime,
-			departureTime: listing.schedule.endTime,
+			...initialBookingSchedule(client),
 			firstName: "",
 			lastName: "",
 			email: "",
@@ -63,20 +62,29 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 		isPending,
 		isSuccess,
 	} = useCreateRideRequest()
-	const pickupDate = form.watch("pickupDate")
-	const departureDate = form.watch("departureDate")
-	const days = differenceInCalendarDays(departureDate, pickupDate)
-	const ride = useBilling(listing.code, days, "ride", passengers, true)
+	const values = form.watch()
+	const scheduled = rideRequestValues(values, client)
+	const ride = useBilling(
+		client.code,
+		formatRideDateTime(scheduled.pickupDate, scheduled.pickupTime),
+		formatRideDateTime(scheduled.departureDate, scheduled.departureTime),
+		true,
+	)
 	const price =
 		ride.data === undefined
 			? undefined
-			: formatNightlyPrice(ride.data.amount, listing.currency)
+			: formatNightlyPrice(Number(ride.data.amount), "NGN")
+	const timesOk = departureIsAfterPickup(scheduled)
 
-	function onSubmit(values: Booking) {
+	function onSubmit(booking: Booking) {
 		void sileo
 			.promise(
 				createRideRequest(
-					toCreateRideRequest(values, listing.code, passengers),
+					toCreateRideRequest(
+						rideRequestValues(booking, client),
+						client.code,
+						passengers,
+					),
 				),
 				{
 					position: "top-center",
@@ -134,7 +142,7 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</h1>
 					<Car className="mt-2.5 size-5 shrink-0 text-[#7eaea0]" aria-hidden />
 				</div>
-				<p className="flex items-baseline text-[#012420]">
+				<div className="flex items-baseline text-[#012420]">
 					{price ? (
 						<span className="text-xl leading-normal font-semibold">
 							{price}
@@ -145,10 +153,8 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					<span className="text-sm leading-normal font-normal">
 						&nbsp;total
 					</span>
-				</p>
-				<p className="text-xs text-slate-600">
-					Private ride to {titleCase(listing.name)} and back
-				</p>
+				</div>
+				{intro && <p className="text-xs text-slate-600">{intro}</p>}
 				<GuestPicker
 					passengers={passengers}
 					maxCapacity={maxPassengers}
@@ -156,14 +162,10 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 				/>
 				<CapacityNote max={maxPassengers} />
 				<Separator />
-				<RideBooking
-					destinationName={titleCase(listing.name)}
-					meetingPointName={titleCase(listing.meetingPoint.name)}
-				/>
-				{price && (
+				<RideBooking client={client} />
+				{client.fareNote && (
 					<p className="text-[11px] leading-snug text-slate-500">
-						Your car includes pickup to the resort and the return ride. {price}{" "}
-						covers both journeys.
+						{client.fareNote}
 					</p>
 				)}
 				<Separator />
@@ -197,7 +199,14 @@ export function RideOnlyPanel({ listing }: { listing: Listing }) {
 					</div>
 					<Button
 						type="submit"
-						disabled={!isValid || isPending || isSuccess || ride.isError}
+						disabled={
+							!isValid ||
+							!timesOk ||
+							!price ||
+							ride.isError ||
+							isPending ||
+							isSuccess
+						}
 						className="w-full cursor-pointer bg-[#10241c] text-[13px] font-semibold hover:bg-[#10241c]/90"
 					>
 						{isPending ? (

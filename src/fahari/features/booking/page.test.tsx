@@ -2,9 +2,12 @@ import { apiClient } from "@common/lib/api-client.ts"
 import { mockGetUrls, mockPostUrls } from "@common/test/helpers/mocks.ts"
 import { navigateToTestPage } from "@envoye/test/helpers/navigate.tsx"
 import { FahariApiPaths } from "@fahari/constants.ts"
-import { initialRideDates } from "@fahari/features/booking/components/ride-booking-card.tsx"
-import { formatRideDateTime } from "@fahari/features/booking/format.ts"
-import { listingFactory } from "@fahari/test/factory/listing.ts"
+import { initialBookingSchedule } from "@fahari/features/booking/chauffeur-client.ts"
+import {
+	formatNightlyPrice,
+	formatRideDateTime,
+} from "@fahari/features/booking/format.ts"
+import { chauffeurClientFactory } from "@fahari/test/factory/chauffeur-client.ts"
 import { act, screen, waitFor } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
 import { HttpStatusCode } from "axios"
@@ -17,63 +20,223 @@ describe("Fahari booking", () => {
 		user = userEvent.setup()
 	})
 
-	async function openAraIyeBooking(
-		overrides: Parameters<typeof listingFactory.build>[0] = {},
+	async function openBooking(
+		client = chauffeurClientFactory.build(),
+		amount = client.vehicles[0]?.sameDayPrice ?? "0.00",
 	) {
-		const araIye = listingFactory.build(overrides)
 		await act(async () => {
 			mockGetUrls()
-				.url(FahariApiPaths.BOOKING)
-				.respond(araIye)
-				.url(FahariApiPaths.CALCULATE)
-				.respond({ amount: 88245 })
+				.url(FahariApiPaths.CHAUFFEUR_CLIENT)
+				.respond(client)
+				.url(FahariApiPaths.RIDE_FARE)
+				.respond({ amount })
 				.apply()
 			await navigateToTestPage({
 				to: "/booking",
-				search: { code: araIye.code },
+				search: { code: client.code },
 				product: "fahari",
 			})
 		})
 		expect(
 			await screen.findByRole("heading", { name: "Make this your ride" }),
 		).toBeInTheDocument()
+		return client
 	}
 
-	test("listing names are title-cased in the tab and on the page", async () => {
-		await openAraIyeBooking({
-			name: "ara iye",
-			meetingPoint: { name: "ara iye reception" },
-		})
+	async function fillContact() {
+		await user.type(
+			screen.getByRole("textbox", { name: "First name *" }),
+			"Ada",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Last name *" }),
+			"Okafor",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Email address *" }),
+			"ada.okafor@gmail.com",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Phone number *" }),
+			"08031234567",
+		)
+	}
+
+	test("client names are title-cased and a same-day return uses the same-day price", async () => {
+		const araIye = await openBooking(
+			chauffeurClientFactory.build({
+				name: "ara iye",
+				meetupPoint: {
+					name: "ara iye reception",
+					address: "owode ogun state",
+					nearestLandmark: null,
+				},
+			}),
+		)
+		const sameDayPrice = formatNightlyPrice(
+			Number(araIye.vehicles[0].sameDayPrice),
+			"NGN",
+		)
 
 		await waitFor(() => {
 			expect(document.title).toBe("Fahari - Ara Iye")
 		})
 		expect(
-			screen.getByText("Private ride to Ara Iye and back"),
+			screen.getByText("Private ride to Ara Iye Reception and back"),
 		).toBeInTheDocument()
-		expect(screen.getByText("Destination: Ara Iye")).toBeInTheDocument()
+		expect(screen.getByText("Going")).toBeInTheDocument()
+		expect(screen.getByText("Leaving")).toBeInTheDocument()
+		expect(
+			screen.getByText("Destination: Ara Iye Reception"),
+		).toBeInTheDocument()
 		expect(screen.getByText("Pickup: Ara Iye Reception")).toBeInTheDocument()
+		expect(screen.getByLabelText("Pickup time")).toHaveValue("15:00")
+		expect(screen.getByLabelText("Departure time")).toHaveValue("18:00")
+		expect(
+			screen.getByText(
+				"Your car includes pickup to the resort and the return ride. The total covers both journeys",
+			),
+		).toBeInTheDocument()
+		expect(screen.getAllByText(sameDayPrice).length).toBeGreaterThan(0)
+		const schedule = initialBookingSchedule(araIye)
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.RIDE_FARE,
+			{
+				params: {
+					clientCode: araIye.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
+				},
+			},
+		)
+		expect(
+			screen.queryByText("Departure must be after pickup."),
+		).not.toBeInTheDocument()
+	})
+
+	test("a return on a later day uses the multi-day price", async () => {
+		const araIye = chauffeurClientFactory.build({
+			bookingPolicy: {
+				maxDaysAfterPickup: 2,
+				minDaysBeforeTrip: 5,
+				maxDaysBeforeTrip: 40,
+			},
+		})
+		const schedule = initialBookingSchedule(araIye)
+		await openBooking(araIye, araIye.vehicles[0].multiDayPrice)
+
+		expect(
+			screen.getAllByText(
+				formatNightlyPrice(Number(araIye.vehicles[0].multiDayPrice), "NGN"),
+			).length,
+		).toBeGreaterThan(0)
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.RIDE_FARE,
+			{
+				params: {
+					clientCode: araIye.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
+				},
+			},
+		)
+		expect(
+			screen.queryByText("Departure must be after pickup."),
+		).not.toBeInTheDocument()
+	})
+
+	test("a drop-off shows only the going leg", async () => {
+		const softDays = chauffeurClientFactory.build({
+			name: "soft days by Ade x Ede",
+			code: "softdays",
+			tagLine: "Slow travel for creatives in africa",
+			tripType: {
+				code: "outbound_only",
+				description: "take from home to meetup location",
+			},
+			fareNote: null,
+			meetupPoint: {
+				name: "seme border",
+				address: "lagos badagry express way",
+				nearestLandmark: null,
+			},
+			vehicles: [
+				{
+					operator: "fahari",
+					name: "Toyota Camry",
+					maximumPassengers: 3,
+					sameDayPrice: "75000.00",
+					multiDayPrice: "150000.00",
+				},
+			],
+		})
+		await openBooking(softDays)
+
+		await waitFor(() => {
+			expect(document.title).toBe("Fahari - Soft Days By Ade X Ede")
+		})
+		expect(screen.getByText("Private ride to Seme Border")).toBeInTheDocument()
+		expect(screen.getByText("Going")).toBeInTheDocument()
+		expect(screen.queryByText("Leaving")).not.toBeInTheDocument()
+		expect(screen.getByText("Destination: Seme Border")).toBeInTheDocument()
+		expect(
+			screen.queryByText(/Your car includes pickup/),
+		).not.toBeInTheDocument()
+		expect(
+			screen.getAllByText(formatNightlyPrice(75_000, "NGN")).length,
+		).toBeGreaterThan(0)
+		const schedule = initialBookingSchedule(softDays)
+		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
+			FahariApiPaths.RIDE_FARE,
+			{
+				params: {
+					clientCode: softDays.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
+				},
+			},
+		)
 	})
 
 	test("user cannot add more passengers than the car capacity", async () => {
-		await openAraIyeBooking()
+		await openBooking()
 
 		const addAdult = screen.getByRole("button", { name: "Add adult" })
 		expect(addAdult).toBeEnabled()
 		expect(screen.getByText("1 adult")).toBeInTheDocument()
 
 		await user.click(addAdult)
-
 		expect(screen.getByText("2 adults")).toBeInTheDocument()
+		expect(addAdult).toBeEnabled()
+
+		await user.click(addAdult)
+		expect(screen.getByText("3 adults")).toBeInTheDocument()
 		expect(addAdult).toBeDisabled()
 
 		await user.click(addAdult)
-
-		expect(screen.getByText("2 adults")).toBeInTheDocument()
+		expect(screen.getByText("3 adults")).toBeInTheDocument()
 	})
 
 	test("user can fill in the pickup address and contact details", async () => {
-		await openAraIyeBooking()
+		await openBooking()
 
 		const pickup = screen.getByRole("textbox", { name: "Pick me up from" })
 		const landmark = screen.getByRole("textbox", { name: "Nearest landmark" })
@@ -98,7 +261,7 @@ describe("Fahari booking", () => {
 	})
 
 	test("request stays disabled until the form is valid", async () => {
-		await openAraIyeBooking()
+		await openBooking()
 
 		const request = screen.getByRole("button", { name: "Request this car" })
 		expect(request).toBeDisabled()
@@ -139,13 +302,14 @@ describe("Fahari booking", () => {
 	})
 
 	test("valid form submits a ride request", async () => {
-		const araIye = listingFactory.build()
-		const { pickupDate, departureDate } = initialRideDates()
+		const araIye = chauffeurClientFactory.build()
+		const { pickupDate, departureDate, departureTime } =
+			initialBookingSchedule(araIye)
 		mockPostUrls(apiClient)
 			.url(FahariApiPaths.RIDE_REQUESTS)
 			.respond({ id: 1 })
 			.apply()
-		await openAraIyeBooking()
+		await openBooking(araIye)
 
 		await user.type(
 			screen.getByRole("textbox", { name: "Pick me up from" }),
@@ -155,22 +319,7 @@ describe("Fahari booking", () => {
 			screen.getByRole("textbox", { name: "Nearest landmark" }),
 			"Opposite Shoprite",
 		)
-		await user.type(
-			screen.getByRole("textbox", { name: "First name *" }),
-			"Ada",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Last name *" }),
-			"Okafor",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Email address *" }),
-			"ada.okafor@gmail.com",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Phone number *" }),
-			"08031234567",
-		)
+		await fillContact()
 
 		await user.click(screen.getByRole("button", { name: "Request this car" }))
 
@@ -182,14 +331,8 @@ describe("Fahari booking", () => {
 					numberOfPassengers: 1,
 					pickupLocation: "12 Admiralty Way, Lekki",
 					nearestLandmark: "Opposite Shoprite",
-					pickupDateTime: formatRideDateTime(
-						pickupDate,
-						araIye.schedule.startTime,
-					),
-					departureDateTime: formatRideDateTime(
-						departureDate,
-						araIye.schedule.endTime,
-					),
+					pickupDateTime: formatRideDateTime(pickupDate, "15:00"),
+					departureDateTime: formatRideDateTime(departureDate, departureTime),
 					firstName: "Ada",
 					lastName: "Okafor",
 					email: "ada.okafor@gmail.com",
@@ -221,7 +364,7 @@ describe("Fahari booking", () => {
 			.url(FahariApiPaths.RIDE_REQUESTS)
 			.fail(HttpStatusCode.BadRequest)
 			.apply()
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("textbox", { name: "Pick me up from" }),
@@ -231,22 +374,7 @@ describe("Fahari booking", () => {
 			screen.getByRole("textbox", { name: "Nearest landmark" }),
 			"Opposite Shoprite",
 		)
-		await user.type(
-			screen.getByRole("textbox", { name: "First name *" }),
-			"Ada",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Last name *" }),
-			"Okafor",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Email address *" }),
-			"ada.okafor@gmail.com",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Phone number *" }),
-			"08031234567",
-		)
+		await fillContact()
 
 		await user.click(screen.getByRole("button", { name: "Request this car" }))
 
@@ -258,5 +386,23 @@ describe("Fahari booking", () => {
 		expect(email.closest("[data-sileo-description]")).toHaveTextContent(
 			"Please reach out to us at humans@fahari.io",
 		)
+	})
+
+	test("an unknown code shows the not-found message", async () => {
+		await act(async () => {
+			mockGetUrls()
+				.url(FahariApiPaths.CHAUFFEUR_CLIENT)
+				.fail(HttpStatusCode.NotFound)
+				.apply()
+			await navigateToTestPage({
+				to: "/booking",
+				search: { code: "missing" },
+				product: "fahari",
+			})
+		})
+
+		expect(
+			await screen.findByText("No stay matches this code."),
+		).toBeInTheDocument()
 	})
 })
