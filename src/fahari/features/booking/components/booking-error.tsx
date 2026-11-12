@@ -4,8 +4,7 @@ import { HttpStatusCode, isAxiosError } from "axios"
 
 export function BookingError({ error }: ErrorComponentProps) {
 	const notFound =
-		error.name === "BookingNotFoundError" ||
-		(isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound)
+		isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound
 
 	return (
 		<StatusMessage>

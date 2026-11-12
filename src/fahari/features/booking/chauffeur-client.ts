@@ -7,13 +7,6 @@ export const GOING_PICKUP_TIME = "15:00"
 export const LEAVING_TIME = "11:00"
 export const SAME_DAY_LEAVING_TIME = "18:00"
 
-export class BookingNotFoundError extends Error {
-	constructor() {
-		super("No stay matches this code.")
-		this.name = "BookingNotFoundError"
-	}
-}
-
 export type TripTypeCode = "inbound_only" | "outbound_only" | "round_trip"
 
 export type TripType = {

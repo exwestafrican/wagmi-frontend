@@ -20,15 +20,9 @@ describe("Fahari booking", () => {
 		user = userEvent.setup()
 	})
 
-	async function openBooking(
-		client = chauffeurClientFactory.build(),
-		clients = [client],
-	) {
+	async function openBooking(client = chauffeurClientFactory.build()) {
 		await act(async () => {
-			mockGetUrls()
-				.url(FahariApiPaths.CHAUFFEUR_CLIENTS)
-				.respond(clients)
-				.apply()
+			mockGetUrls().url(FahariApiPaths.CHAUFFEUR_CLIENT).respond(client).apply()
 			await navigateToTestPage({
 				to: "/booking",
 				search: { code: client.code },
@@ -350,7 +344,10 @@ describe("Fahari booking", () => {
 
 	test("an unknown code shows the not-found message", async () => {
 		await act(async () => {
-			mockGetUrls().url(FahariApiPaths.CHAUFFEUR_CLIENTS).respond([]).apply()
+			mockGetUrls()
+				.url(FahariApiPaths.CHAUFFEUR_CLIENT)
+				.fail(HttpStatusCode.NotFound)
+				.apply()
 			await navigateToTestPage({
 				to: "/booking",
 				search: { code: "missing" },

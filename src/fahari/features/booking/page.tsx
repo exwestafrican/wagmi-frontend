@@ -1,4 +1,4 @@
-import { useChauffeurClient } from "@fahari/features/booking/api/list-chauffeur-clients.ts"
+import { useChauffeurClient } from "@fahari/features/booking/api/get-chauffeur-client.ts"
 import { RideOnlyPanel } from "@fahari/features/booking/components/ride-only-panel.tsx"
 import { useSearch } from "@tanstack/react-router"
 import { Toaster } from "sileo"
