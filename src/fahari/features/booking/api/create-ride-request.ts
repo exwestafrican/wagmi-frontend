@@ -34,12 +34,12 @@ function toPhoneNumber(phone: string) {
 
 export function toCreateRideRequest(
 	booking: Booking,
-	experienceCode: string,
+	code: string,
 	numberOfPassengers: number,
 ): CreateRideRequest {
 	const nearestLandmark = booking.nearestLandmark?.trim()
 	return {
-		experienceCode,
+		experienceCode: code,
 		numberOfPassengers,
 		pickupLocation: booking.pickupAddress.trim(),
 		...(nearestLandmark ? { nearestLandmark } : {}),

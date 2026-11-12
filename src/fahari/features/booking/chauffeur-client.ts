@@ -97,36 +97,40 @@ export function initialBookingSchedule(
 	today = startOfDay(new Date()),
 ) {
 	const tripDate = addDays(today, client.bookingPolicy.minDaysBeforeTrip)
-	if (client.tripType.code === "outbound_only") {
-		const departure = shiftDateTime(tripDate, GOING_PICKUP_TIME, 1)
-		return {
-			pickupAddress: "",
-			nearestLandmark: "",
-			pickupDate: tripDate,
-			pickupTime: GOING_PICKUP_TIME,
-			departureDate: departure.date,
-			departureTime: departure.time,
+	switch (client.tripType.code) {
+		case "outbound_only": {
+			const departure = shiftDateTime(tripDate, GOING_PICKUP_TIME, 1)
+			return {
+				pickupAddress: "",
+				nearestLandmark: "",
+				pickupDate: tripDate,
+				pickupTime: GOING_PICKUP_TIME,
+				departureDate: departure.date,
+				departureTime: departure.time,
+			}
 		}
-	}
-	if (client.tripType.code === "inbound_only") {
-		const pickup = shiftDateTime(tripDate, LEAVING_TIME, -1)
-		return {
-			pickupAddress: client.meetupPoint.address || client.meetupPoint.name,
-			nearestLandmark: "",
-			pickupDate: pickup.date,
-			pickupTime: pickup.time,
-			departureDate: tripDate,
-			departureTime: LEAVING_TIME,
+		case "inbound_only": {
+			const pickup = shiftDateTime(tripDate, LEAVING_TIME, -1)
+			return {
+				pickupAddress: client.meetupPoint.address || client.meetupPoint.name,
+				nearestLandmark: "",
+				pickupDate: pickup.date,
+				pickupTime: pickup.time,
+				departureDate: tripDate,
+				departureTime: LEAVING_TIME,
+			}
 		}
-	}
-	const sameDay = client.bookingPolicy.maxDaysAfterPickup === 0
-	return {
-		pickupAddress: "",
-		nearestLandmark: "",
-		pickupDate: tripDate,
-		pickupTime: GOING_PICKUP_TIME,
-		departureDate: sameDay ? tripDate : addDays(tripDate, 1),
-		departureTime: sameDay ? SAME_DAY_LEAVING_TIME : LEAVING_TIME,
+		case "round_trip": {
+			const sameDay = client.bookingPolicy.maxDaysAfterPickup === 0
+			return {
+				pickupAddress: "",
+				nearestLandmark: "",
+				pickupDate: tripDate,
+				pickupTime: GOING_PICKUP_TIME,
+				departureDate: sameDay ? tripDate : addDays(tripDate, 1),
+				departureTime: sameDay ? SAME_DAY_LEAVING_TIME : LEAVING_TIME,
+			}
+		}
 	}
 }
 
@@ -160,28 +164,31 @@ export function rideRequestValues(
 	booking: Booking,
 	client: ChauffeurClient,
 ): Booking {
-	if (client.tripType.code === "outbound_only") {
-		const departure = shiftDateTime(booking.pickupDate, booking.pickupTime, 1)
-		return {
-			...booking,
-			departureDate: departure.date,
-			departureTime: departure.time,
+	switch (client.tripType.code) {
+		case "outbound_only": {
+			const departure = shiftDateTime(booking.pickupDate, booking.pickupTime, 1)
+			return {
+				...booking,
+				departureDate: departure.date,
+				departureTime: departure.time,
+			}
 		}
-	}
-	if (client.tripType.code === "inbound_only") {
-		const pickup = shiftDateTime(
-			booking.departureDate,
-			booking.departureTime,
-			-1,
-		)
-		return {
-			...booking,
-			pickupDate: pickup.date,
-			pickupTime: pickup.time,
-			pickupAddress: client.meetupPoint.name,
+		case "inbound_only": {
+			const pickup = shiftDateTime(
+				booking.departureDate,
+				booking.departureTime,
+				-1,
+			)
+			return {
+				...booking,
+				pickupDate: pickup.date,
+				pickupTime: pickup.time,
+				pickupAddress: client.meetupPoint.name,
+			}
 		}
+		case "round_trip":
+			return booking
 	}
-	return booking
 }
 
 export function ridePrice(
