@@ -24,14 +24,16 @@ import {
 	GuestPicker,
 } from "@fahari/features/booking/components/guest-picker.tsx"
 import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
-import { formatNightlyPrice } from "@fahari/features/booking/format.ts"
+import {
+	formatNightlyPrice,
+	formatRideDateTime,
+} from "@fahari/features/booking/format.ts"
 import {
 	type Booking,
 	bookingSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
-import { differenceInCalendarDays } from "date-fns"
 import { ArrowRight, Car } from "lucide-react"
 import { useState } from "react"
 import { useForm, useFormState } from "react-hook-form"
@@ -62,11 +64,12 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 	} = useCreateRideRequest()
 	const values = form.watch()
 	const scheduled = rideRequestValues(values, client)
-	const nights = differenceInCalendarDays(
-		scheduled.departureDate,
-		scheduled.pickupDate,
+	const ride = useBilling(
+		client.code,
+		formatRideDateTime(scheduled.pickupDate, scheduled.pickupTime),
+		formatRideDateTime(scheduled.departureDate, scheduled.departureTime),
+		true,
 	)
-	const ride = useBilling(client.code, nights, "ride", passengers, true)
 	const price =
 		ride.data === undefined
 			? undefined

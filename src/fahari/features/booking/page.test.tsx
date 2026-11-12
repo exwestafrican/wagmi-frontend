@@ -28,7 +28,7 @@ describe("Fahari booking", () => {
 			mockGetUrls()
 				.url(FahariApiPaths.CHAUFFEUR_CLIENT)
 				.respond(client)
-				.url(FahariApiPaths.CALCULATE)
+				.url(FahariApiPaths.RIDE_FARE)
 				.respond({ amount })
 				.apply()
 			await navigateToTestPage({
@@ -98,14 +98,20 @@ describe("Fahari booking", () => {
 			),
 		).toBeInTheDocument()
 		expect(screen.getAllByText(sameDayPrice).length).toBeGreaterThan(0)
+		const schedule = initialBookingSchedule(araIye)
 		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
-			FahariApiPaths.CALCULATE,
+			FahariApiPaths.RIDE_FARE,
 			{
 				params: {
-					resortCode: araIye.code,
-					numberOfNights: 0,
-					lineItem: "ride",
-					numberOfGuests: 1,
+					clientCode: araIye.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
 				},
 			},
 		)
@@ -122,6 +128,7 @@ describe("Fahari booking", () => {
 				maxDaysBeforeTrip: 40,
 			},
 		})
+		const schedule = initialBookingSchedule(araIye)
 		await openBooking(araIye, araIye.vehicles[0].multiDayPrice)
 
 		expect(
@@ -130,13 +137,18 @@ describe("Fahari booking", () => {
 			).length,
 		).toBeGreaterThan(0)
 		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
-			FahariApiPaths.CALCULATE,
+			FahariApiPaths.RIDE_FARE,
 			{
 				params: {
-					resortCode: araIye.code,
-					numberOfNights: 1,
-					lineItem: "ride",
-					numberOfGuests: 1,
+					clientCode: araIye.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
 				},
 			},
 		)
@@ -185,14 +197,20 @@ describe("Fahari booking", () => {
 		expect(
 			screen.getAllByText(formatNightlyPrice(75_000, "NGN")).length,
 		).toBeGreaterThan(0)
+		const schedule = initialBookingSchedule(softDays)
 		expect(vi.mocked(apiClient.get)).toHaveBeenCalledWith(
-			FahariApiPaths.CALCULATE,
+			FahariApiPaths.RIDE_FARE,
 			{
 				params: {
-					resortCode: softDays.code,
-					numberOfNights: 0,
-					lineItem: "ride",
-					numberOfGuests: 1,
+					clientCode: softDays.code,
+					pickupDateTime: formatRideDateTime(
+						schedule.pickupDate,
+						schedule.pickupTime,
+					),
+					returnDateTime: formatRideDateTime(
+						schedule.departureDate,
+						schedule.departureTime,
+					),
 				},
 			},
 		)
