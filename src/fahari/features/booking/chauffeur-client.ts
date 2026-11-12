@@ -55,13 +55,14 @@ export function showsLeaving(client: ChauffeurClient) {
 
 export function rideIntro(client: ChauffeurClient) {
 	const meetup = titleCase(client.meetupPoint.name)
-	if (client.tripType.code === "inbound_only") {
-		return `Private ride from ${meetup}`
+	switch (client.tripType.code) {
+		case "inbound_only":
+			return `Private ride from ${meetup}`
+		case "outbound_only":
+			return `Private ride to ${meetup}`
+		case "round_trip":
+			return `Private ride to ${meetup} and back`
 	}
-	if (client.tripType.code === "outbound_only") {
-		return `Private ride to ${meetup}`
-	}
-	return `Private ride to ${meetup} and back`
 }
 
 export function tripWindow(
@@ -111,8 +112,7 @@ export function initialBookingSchedule(
 		const pickup = shiftDateTime(tripDate, LEAVING_TIME, -1)
 		return {
 			pickupAddress: client.meetupPoint.address || client.meetupPoint.name,
-			nearestLandmark:
-				client.meetupPoint.nearestLandmark || client.meetupPoint.name,
+			nearestLandmark: "",
 			pickupDate: pickup.date,
 			pickupTime: pickup.time,
 			departureDate: tripDate,
@@ -178,9 +178,7 @@ export function rideRequestValues(
 			...booking,
 			pickupDate: pickup.date,
 			pickupTime: pickup.time,
-			pickupAddress: client.meetupPoint.address || client.meetupPoint.name,
-			nearestLandmark:
-				client.meetupPoint.nearestLandmark || client.meetupPoint.name,
+			pickupAddress: client.meetupPoint.name,
 		}
 	}
 	return booking

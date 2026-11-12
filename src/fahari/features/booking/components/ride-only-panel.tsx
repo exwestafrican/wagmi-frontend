@@ -30,7 +30,7 @@ import {
 import { RideBooking } from "@fahari/features/booking/components/ride-booking-card.tsx"
 import {
 	type Booking,
-	bookingSchema,
+	bookingFormSchema,
 } from "@fahari/features/booking/schema/booking.schema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useNavigate } from "@tanstack/react-router"
@@ -47,8 +47,9 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 	const dates = tripWindow(client.bookingPolicy)
 	const intro = rideIntro(client)
 	const roundTrip = client.tripType.code === "round_trip"
+	const guestFillsLandmark = showsGoing(client)
 	const form = useForm<Booking>({
-		resolver: zodResolver(bookingSchema),
+		resolver: zodResolver(bookingFormSchema(guestFillsLandmark)),
 		mode: "onChange",
 		defaultValues: {
 			...initialBookingSchedule(client),
