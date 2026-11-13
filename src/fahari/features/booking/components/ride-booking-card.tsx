@@ -23,7 +23,6 @@ import { titleCase } from "@common/utils/sentence-case.ts"
 import {
 	type ChauffeurClient,
 	departureIsAfterPickup,
-	showsGoing,
 	showsLeaving,
 	tripWindow,
 } from "@fahari/features/booking/chauffeur-client.ts"
@@ -107,7 +106,6 @@ function RideDateField({
 export function RideBookingCard({
 	goingLabel,
 	leavingLabel,
-	showGoing,
 	showLeaving,
 	destinationName,
 	meetingPointName,
@@ -117,7 +115,6 @@ export function RideBookingCard({
 }: {
 	goingLabel: string
 	leavingLabel: string
-	showGoing: boolean
 	showLeaving: boolean
 	destinationName: string
 	meetingPointName: string
@@ -130,14 +127,11 @@ export function RideBookingCard({
 	const departureDate = form.watch("departureDate")
 	const pickupTime = form.watch("pickupTime")
 	const departureTime = form.watch("departureTime")
-	const leavingEarliest = showGoing ? pickupDate : pickupEarliest
-	const leavingLatest = showGoing
-		? returnWithinDays === undefined
+	const leavingLatest =
+		returnWithinDays === undefined
 			? undefined
 			: addDays(startOfDay(pickupDate), returnWithinDays)
-		: pickupLatest
 	const departureBeforePickup =
-		showGoing &&
 		showLeaving &&
 		!departureIsAfterPickup({
 			pickupDate,
@@ -149,131 +143,117 @@ export function RideBookingCard({
 	return (
 		<Card className="gap-3 border-[#89C9CA] py-3 shadow-none">
 			<CardContent className="flex flex-col gap-3 px-3">
-				{showGoing && (
-					<>
-						<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
-							<ArrowUpRight className="size-4" aria-hidden />
-							{goingLabel}
-						</p>
-						<FormField
-							control={form.control}
-							name="pickupAddress"
-							render={({ field }) => (
-								<FormItem className="gap-1.5">
-									<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
-										<InputGroupAddon
-											align="block-start"
-											className="px-2 pt-2 pb-0"
-										>
-											<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
-												Pick me up from
-											</FormLabel>
-										</InputGroupAddon>
-										<div className="flex w-full items-center gap-2 px-2 pb-2">
-											<FormControl>
-												<InputGroupInput
-													autoComplete="street-address"
-													placeholder="Add pickup"
-													className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
-													{...field}
-												/>
-											</FormControl>
-											<InputGroupAddon align="inline-end" className="p-0">
-												<MapPin
-													className="size-4 shrink-0 text-[#10241c]"
-													aria-hidden
-												/>
-											</InputGroupAddon>
-										</div>
-									</InputGroup>
-									<FormMessage className="text-[11px]" />
-								</FormItem>
-							)}
-						/>
-						<p className="text-xs text-slate-500">
-							Your home, hotel or airport
-						</p>
-						<FormField
-							control={form.control}
-							name="nearestLandmark"
-							render={({ field }) => (
-								<FormItem className="gap-1.5">
-									<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
-										<InputGroupAddon
-											align="block-start"
-											className="px-2 pt-2 pb-0"
-										>
-											<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
-												Nearest landmark
-											</FormLabel>
-										</InputGroupAddon>
-										<div className="flex w-full items-center gap-2 px-2 pb-2">
-											<FormControl>
-												<InputGroupInput
-													placeholder="e.g. Opposite Shoprite"
-													className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
-													{...field}
-												/>
-											</FormControl>
-										</div>
-									</InputGroup>
-									<FormMessage className="text-[11px]" />
-								</FormItem>
-							)}
-						/>
-						<div className="flex items-start gap-1.5">
-							<FormField
-								control={form.control}
-								name="pickupDate"
-								render={() => (
-									<RideDateField
-										label="Pickup date"
-										value={pickupDate}
-										earliest={pickupEarliest}
-										latest={pickupLatest}
-										onChange={(date) => {
-											form.setValue("pickupDate", date, {
-												shouldValidate: true,
-											})
-											if (!showLeaving) return
-											form.setValue(
-												"departureDate",
-												clampReturn(date, departureDate, returnWithinDays),
-												{ shouldValidate: true },
-											)
-										}}
-									/>
-								)}
+				<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
+					<ArrowUpRight className="size-4" aria-hidden />
+					{goingLabel}
+				</p>
+				<FormField
+					control={form.control}
+					name="pickupAddress"
+					render={({ field }) => (
+						<FormItem className="gap-1.5">
+							<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+								<InputGroupAddon align="block-start" className="px-2 pt-2 pb-0">
+									<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
+										Pick me up from
+									</FormLabel>
+								</InputGroupAddon>
+								<div className="flex w-full items-center gap-2 px-2 pb-2">
+									<FormControl>
+										<InputGroupInput
+											autoComplete="street-address"
+											placeholder="Add pickup"
+											className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
+											{...field}
+										/>
+									</FormControl>
+									<InputGroupAddon align="inline-end" className="p-0">
+										<MapPin
+											className="size-4 shrink-0 text-[#10241c]"
+											aria-hidden
+										/>
+									</InputGroupAddon>
+								</div>
+							</InputGroup>
+							<FormMessage className="text-[11px]" />
+						</FormItem>
+					)}
+				/>
+				<p className="text-xs text-slate-500">Your home, hotel or airport</p>
+				<FormField
+					control={form.control}
+					name="nearestLandmark"
+					render={({ field }) => (
+						<FormItem className="gap-1.5">
+							<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+								<InputGroupAddon align="block-start" className="px-2 pt-2 pb-0">
+									<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
+										Nearest landmark
+									</FormLabel>
+								</InputGroupAddon>
+								<div className="flex w-full items-center gap-2 px-2 pb-2">
+									<FormControl>
+										<InputGroupInput
+											placeholder="e.g. Opposite Shoprite"
+											className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
+											{...field}
+										/>
+									</FormControl>
+								</div>
+							</InputGroup>
+							<FormMessage className="text-[11px]" />
+						</FormItem>
+					)}
+				/>
+				<div className="flex items-start gap-1.5">
+					<FormField
+						control={form.control}
+						name="pickupDate"
+						render={() => (
+							<RideDateField
+								label="Pickup date"
+								value={pickupDate}
+								earliest={pickupEarliest}
+								latest={pickupLatest}
+								onChange={(date) => {
+									form.setValue("pickupDate", date, {
+										shouldValidate: true,
+									})
+									if (!showLeaving) return
+									form.setValue(
+										"departureDate",
+										clampReturn(date, departureDate, returnWithinDays),
+										{ shouldValidate: true },
+									)
+								}}
 							/>
-							<FormField
-								control={form.control}
-								name="pickupTime"
-								render={({ field }) => (
-									<FormItem className="min-w-0 flex-1 gap-1.5">
-										<FormLabel className="text-[11px] font-semibold text-[#012420]">
-											Pickup time
-										</FormLabel>
-										<InputGroup className="h-9 rounded-md border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
-											<FormControl>
-												<InputGroupInput
-													type="time"
-													placeholder="Add time"
-													className="h-9 px-2 text-sm font-normal text-[#012420] md:text-sm"
-													{...field}
-												/>
-											</FormControl>
-										</InputGroup>
-										<FormMessage className="text-[11px]" />
-									</FormItem>
-								)}
-							/>
-						</div>
-						<p className="text-xs text-slate-600">
-							Destination: {destinationName}
-						</p>
-					</>
-				)}
-				{showGoing && showLeaving && <Separator />}
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="pickupTime"
+						render={({ field }) => (
+							<FormItem className="min-w-0 flex-1 gap-1.5">
+								<FormLabel className="text-[11px] font-semibold text-[#012420]">
+									Pickup time
+								</FormLabel>
+								<InputGroup className="h-9 rounded-md border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
+									<FormControl>
+										<InputGroupInput
+											type="time"
+											placeholder="Add time"
+											className="h-9 px-2 text-sm font-normal text-[#012420] md:text-sm"
+											{...field}
+										/>
+									</FormControl>
+								</InputGroup>
+								<FormMessage className="text-[11px]" />
+							</FormItem>
+						)}
+					/>
+				</div>
+				<p className="text-xs text-slate-600">Destination: {destinationName}</p>
+				{showLeaving && <Separator />}
 				{showLeaving && (
 					<>
 						<p className="flex items-center gap-1.5 text-sm font-semibold text-[#012420]">
@@ -289,7 +269,7 @@ export function RideBookingCard({
 									<RideDateField
 										label="Departure date"
 										value={departureDate}
-										earliest={leavingEarliest}
+										earliest={pickupDate}
 										latest={leavingLatest}
 										onChange={(date) => {
 											form.setValue("departureDate", date, {
@@ -344,7 +324,6 @@ export function RideBooking({ client }: { client: ChauffeurClient }) {
 		<RideBookingCard
 			goingLabel="Going"
 			leavingLabel="Leaving"
-			showGoing={showsGoing(client)}
 			showLeaving={showsLeaving(client)}
 			destinationName={meetup}
 			meetingPointName={meetup}

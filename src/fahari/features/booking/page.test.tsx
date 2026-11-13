@@ -157,13 +157,13 @@ describe("Fahari booking", () => {
 		).not.toBeInTheDocument()
 	})
 
-	test("a drop-off shows only the going leg", async () => {
+	test("a one-way ride shows only the going leg", async () => {
 		const softDays = chauffeurClientFactory.build({
 			name: "soft days by Ade x Ede",
 			code: "softdays",
 			tagLine: "Slow travel for creatives in africa",
 			tripType: {
-				code: "outbound_only",
+				code: "one_way",
 				description: "take from home to meetup location",
 			},
 			fareNote: null,
@@ -289,13 +289,6 @@ describe("Fahari booking", () => {
 		await user.type(
 			screen.getByRole("textbox", { name: "Phone number *" }),
 			"08031234567",
-		)
-
-		expect(request).toBeDisabled()
-
-		await user.type(
-			screen.getByRole("textbox", { name: "Nearest landmark" }),
-			"Opposite Shoprite",
 		)
 
 		expect(request).toBeEnabled()
