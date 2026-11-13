@@ -40,25 +40,24 @@ export function toCreateRideRequest(
 	tripType: TripTypeCode,
 ): CreateRideRequest {
 	const nearestLandmark = booking.nearestLandmark?.trim()
-	return {
+	const request: CreateRideRequest = {
 		experienceCode: code,
 		numberOfPassengers,
 		pickupLocation: booking.pickupAddress.trim(),
-		...(nearestLandmark ? { nearestLandmark } : {}),
 		pickupDateTime: formatRideDateTime(booking.pickupDate, booking.pickupTime),
-		...(tripType === "round_trip"
-			? {
-					departureDateTime: formatRideDateTime(
-						booking.departureDate,
-						booking.departureTime,
-					),
-				}
-			: {}),
 		firstName: booking.firstName.trim(),
 		lastName: booking.lastName.trim(),
 		email: booking.email.trim(),
 		phoneNumber: toPhoneNumber(booking.phone),
 	}
+	if (nearestLandmark) request.nearestLandmark = nearestLandmark
+	if (tripType === "round_trip") {
+		request.departureDateTime = formatRideDateTime(
+			booking.departureDate,
+			booking.departureTime,
+		)
+	}
+	return request
 }
 
 export function useCreateRideRequest() {
