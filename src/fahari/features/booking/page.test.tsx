@@ -157,13 +157,13 @@ describe("Fahari booking", () => {
 		).not.toBeInTheDocument()
 	})
 
-	test("a drop-off shows only the going leg", async () => {
+	test("a one-way ride shows only the going leg", async () => {
 		const softDays = chauffeurClientFactory.build({
 			name: "soft days by Ade x Ede",
 			code: "softdays",
 			tagLine: "Slow travel for creatives in africa",
 			tripType: {
-				code: "dropoff",
+				code: "one_way",
 				description: "take from home to meetup location",
 			},
 			fareNote: null,
