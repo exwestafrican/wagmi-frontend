@@ -304,7 +304,7 @@ describe("Fahari booking", () => {
 			"Admiralty Road, Lekki Phase 1, Nigeria",
 		])
 		googleMaps.places = places
-		await openAraIyeBooking()
+		await openBooking()
 
 		const pickup = screen.getByRole("combobox", { name: "Pick me up from" })
 		await user.type(pickup, "Admiralty")
@@ -335,7 +335,7 @@ describe("Fahari booking", () => {
 			.respond({ id: 1 })
 			.apply()
 		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("combobox", { name: "Pick me up from" }),
@@ -347,26 +347,7 @@ describe("Fahari booking", () => {
 			}),
 		)
 		await screen.findByRole("region", { name: "Pickup on the map" })
-		await user.type(
-			screen.getByRole("textbox", { name: "Nearest landmark" }),
-			"Opposite Shoprite",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "First name *" }),
-			"Ada",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Last name *" }),
-			"Okafor",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Email address *" }),
-			"ada.okafor@gmail.com",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Phone number *" }),
-			"08031234567",
-		)
+		await fillLandmarkAndContactDetails()
 
 		await user.click(screen.getByRole("button", { name: "Request this car" }))
 
@@ -385,7 +366,7 @@ describe("Fahari booking", () => {
 			"Admiralty Way, Lekki, Nigeria",
 			"Admiralty Road, Lekki Phase 1, Nigeria",
 		])
-		await openAraIyeBooking()
+		await openBooking()
 
 		const pickup = screen.getByRole("combobox", { name: "Pick me up from" })
 		await user.type(pickup, "Admiralty")
@@ -404,7 +385,7 @@ describe("Fahari booking", () => {
 			new Error("Places API has been disabled"),
 		)
 		googleMaps.places = places
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("combobox", { name: "Pick me up from" }),
@@ -421,7 +402,7 @@ describe("Fahari booking", () => {
 	test("pickup is a plain field without a map when Google is switched off", async () => {
 		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
 		googleMaps.status = "AUTH_FAILURE"
-		await openAraIyeBooking()
+		await openBooking()
 
 		const pickup = screen.getByRole("textbox", { name: "Pick me up from" })
 		await user.type(pickup, "12 Admiralty Way, Lekki")
@@ -438,22 +419,7 @@ describe("Fahari booking", () => {
 			screen.getByRole("textbox", { name: "Nearest landmark" }),
 			"Opposite Shoprite",
 		)
-		await user.type(
-			screen.getByRole("textbox", { name: "First name *" }),
-			"Ada",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Last name *" }),
-			"Okafor",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Email address *" }),
-			"ada.okafor@gmail.com",
-		)
-		await user.type(
-			screen.getByRole("textbox", { name: "Phone number *" }),
-			"08031234567",
-		)
+		await fillContact()
 	}
 
 	async function expectRideRequestFrom(pickupLocation: string) {
@@ -473,7 +439,7 @@ describe("Fahari booking", () => {
 			.apply()
 		googleMaps.places = fakePlaces(["Admiralty Way, Lekki, Nigeria"])
 		googleMaps.status = "AUTH_FAILURE"
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("textbox", { name: "Pick me up from" }),
@@ -494,7 +460,7 @@ describe("Fahari booking", () => {
 			new Error("Places API has been disabled"),
 		)
 		googleMaps.places = places
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("combobox", { name: "Pick me up from" }),
@@ -530,7 +496,7 @@ describe("Fahari booking", () => {
 			},
 		)
 		googleMaps.places = places
-		await openAraIyeBooking()
+		await openBooking()
 
 		await user.type(
 			screen.getByRole("combobox", { name: "Pick me up from" }),
