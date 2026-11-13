@@ -26,10 +26,11 @@ import {
 	showsLeaving,
 	tripWindow,
 } from "@fahari/features/booking/chauffeur-client.ts"
+import { PickupAddressField } from "@fahari/features/booking/components/pickup-address-field.tsx"
 import { formatStayDate } from "@fahari/features/booking/format.ts"
 import type { RideFormValues } from "@fahari/features/booking/schema/trip.schema.ts"
 import { addDays, isAfter, isBefore, startOfDay } from "date-fns"
-import { ArrowDownLeft, ArrowUpRight, CalendarIcon, MapPin } from "lucide-react"
+import { ArrowDownLeft, ArrowUpRight, CalendarIcon } from "lucide-react"
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 
@@ -147,38 +148,7 @@ export function RideBookingCard({
 					<ArrowUpRight className="size-4" aria-hidden />
 					{goingLabel}
 				</p>
-				<FormField
-					control={form.control}
-					name="pickupAddress"
-					render={({ field }) => (
-						<FormItem className="gap-1.5">
-							<InputGroup className="h-auto items-stretch rounded-xl border-[#d7e1e8] bg-white shadow-none has-[[aria-invalid=true]]:border-red-400 has-[[aria-invalid=true]]:ring-0">
-								<InputGroupAddon align="block-start" className="px-2 pt-2 pb-0">
-									<FormLabel className="text-[9px] leading-none font-semibold uppercase tracking-[0.08em] text-slate-500">
-										Pick me up from
-									</FormLabel>
-								</InputGroupAddon>
-								<div className="flex w-full items-center gap-2 px-2 pb-2">
-									<FormControl>
-										<InputGroupInput
-											autoComplete="street-address"
-											placeholder="Add pickup"
-											className="h-auto px-0 text-xs font-medium text-[#012420] md:text-xs"
-											{...field}
-										/>
-									</FormControl>
-									<InputGroupAddon align="inline-end" className="p-0">
-										<MapPin
-											className="size-4 shrink-0 text-[#10241c]"
-											aria-hidden
-										/>
-									</InputGroupAddon>
-								</div>
-							</InputGroup>
-							<FormMessage className="text-[11px]" />
-						</FormItem>
-					)}
-				/>
+				<PickupAddressField />
 				<p className="text-xs text-slate-500">Your home, hotel or airport</p>
 				<FormField
 					control={form.control}
