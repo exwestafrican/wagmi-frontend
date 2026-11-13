@@ -207,10 +207,6 @@ describe("Fahari booking", () => {
 						schedule.pickupDate,
 						schedule.pickupTime,
 					),
-					returnDateTime: formatRideDateTime(
-						schedule.departureDate,
-						schedule.departureTime,
-					),
 				},
 			},
 		)
@@ -292,6 +288,61 @@ describe("Fahari booking", () => {
 		)
 
 		expect(request).toBeEnabled()
+	})
+
+	test("a one-way ride request sends pickup only", async () => {
+		const softDays = chauffeurClientFactory.build({
+			name: "soft days by Ade x Ede",
+			code: "softdays",
+			tripType: {
+				code: "one_way",
+				description: "take from home to meetup location",
+			},
+			fareNote: null,
+			meetupPoint: {
+				name: "seme border",
+				address: "lagos badagry express way",
+				nearestLandmark: null,
+			},
+		})
+		const { pickupDate } = initialBookingSchedule(softDays)
+		mockPostUrls(apiClient)
+			.url(FahariApiPaths.RIDE_REQUESTS)
+			.respond({ id: 1 })
+			.apply()
+		await openBooking(softDays)
+
+		await user.type(
+			screen.getByRole("textbox", { name: "Pick me up from" }),
+			"12 Admiralty Way, Lekki",
+		)
+		await user.type(
+			screen.getByRole("textbox", { name: "Nearest landmark" }),
+			"Opposite Shoprite",
+		)
+		await fillContact()
+
+		await user.click(screen.getByRole("button", { name: "Request this car" }))
+
+		await waitFor(() => {
+			expect(vi.mocked(apiClient.post)).toHaveBeenCalledWith(
+				FahariApiPaths.RIDE_REQUESTS,
+				{
+					experienceCode: softDays.code,
+					numberOfPassengers: 1,
+					pickupLocation: "12 Admiralty Way, Lekki",
+					nearestLandmark: "Opposite Shoprite",
+					pickupDateTime: formatRideDateTime(pickupDate, "15:00"),
+					firstName: "Ada",
+					lastName: "Okafor",
+					email: "ada.okafor@gmail.com",
+					phoneNumber: {
+						countryCallingCode: "+234",
+						nationalNumber: "8031234567",
+					},
+				},
+			)
+		})
 	})
 
 	test("valid form submits a ride request", async () => {

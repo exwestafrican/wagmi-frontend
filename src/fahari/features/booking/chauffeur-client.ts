@@ -1,5 +1,4 @@
 import { titleCase } from "@common/utils/sentence-case.ts"
-import type { Booking } from "@fahari/features/booking/schema/booking.schema.ts"
 import { addDays, format, startOfDay } from "date-fns"
 
 export const GOING_PICKUP_TIME = "15:00"
@@ -140,24 +139,6 @@ export function departureIsAfterPickup(booking: {
 	const departure = atTime(booking.departureDate, booking.departureTime)
 	if (!pickup || !departure) return false
 	return departure.getTime() > pickup.getTime()
-}
-
-export function rideRequestValues(
-	booking: Booking,
-	client: ChauffeurClient,
-): Booking {
-	switch (client.tripType.code) {
-		case "one_way": {
-			const departure = shiftDateTime(booking.pickupDate, booking.pickupTime, 1)
-			return {
-				...booking,
-				departureDate: departure.date,
-				departureTime: departure.time,
-			}
-		}
-		case "round_trip":
-			return booking
-	}
 }
 
 export function passengerCapacity(client: ChauffeurClient) {
