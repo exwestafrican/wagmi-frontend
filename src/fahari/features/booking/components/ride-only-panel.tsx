@@ -16,7 +16,7 @@ import {
 	initialBookingSchedule,
 	passengerCapacity,
 	rideIntro,
-	rideRequestValues,
+	showsLeaving,
 } from "@fahari/features/booking/chauffeur-client.ts"
 import { ContactDetails } from "@fahari/features/booking/components/contact-fields.tsx"
 import {
@@ -63,27 +63,30 @@ export function RideOnlyPanel({ client }: { client: ChauffeurClient }) {
 		isSuccess,
 	} = useCreateRideRequest()
 	const values = form.watch()
-	const scheduled = rideRequestValues(values, client)
+	const leaving = showsLeaving(client)
 	const ride = useBilling(
 		client.code,
-		formatRideDateTime(scheduled.pickupDate, scheduled.pickupTime),
-		formatRideDateTime(scheduled.departureDate, scheduled.departureTime),
+		formatRideDateTime(values.pickupDate, values.pickupTime),
+		leaving
+			? formatRideDateTime(values.departureDate, values.departureTime)
+			: undefined,
 		true,
 	)
 	const price =
 		ride.data === undefined
 			? undefined
 			: formatNightlyPrice(Number(ride.data.amount), "NGN")
-	const timesOk = departureIsAfterPickup(scheduled)
+	const timesOk = !leaving || departureIsAfterPickup(values)
 
 	function onSubmit(booking: Booking) {
 		void sileo
 			.promise(
 				createRideRequest(
 					toCreateRideRequest(
-						rideRequestValues(booking, client),
+						booking,
 						client.code,
 						passengers,
+						client.tripType.code,
 					),
 				),
 				{

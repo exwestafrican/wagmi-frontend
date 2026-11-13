@@ -11,16 +11,21 @@ type BillingAmount = {
 export function billingQueryOptions(
 	clientCode: string,
 	pickupDateTime: string,
-	returnDateTime: string,
+	returnDateTime?: string,
 ) {
 	return queryOptions({
-		queryKey: [FAHARI_BILLING, clientCode, pickupDateTime, returnDateTime],
+		queryKey: [
+			FAHARI_BILLING,
+			clientCode,
+			pickupDateTime,
+			...(returnDateTime ? [returnDateTime] : []),
+		],
 		queryFn: async () => {
 			const res = await apiClient.get<BillingAmount>(FahariApiPaths.RIDE_FARE, {
 				params: {
 					clientCode,
 					pickupDateTime,
-					returnDateTime,
+					...(returnDateTime ? { returnDateTime } : {}),
 				},
 			})
 			return res.data
@@ -31,7 +36,7 @@ export function billingQueryOptions(
 export function useBilling(
 	clientCode: string,
 	pickupDateTime: string,
-	returnDateTime: string,
+	returnDateTime: string | undefined,
 	enabled: boolean,
 ) {
 	return useQuery({
