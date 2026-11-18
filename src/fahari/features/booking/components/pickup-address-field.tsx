@@ -12,6 +12,12 @@ import {
 } from "@common/components/ui/input-group.tsx"
 import { cn } from "@common/lib/utils"
 import { GOOGLE_MAPS_MAP_ID } from "@fahari/constants.ts"
+import {
+	type AddressSuggestion,
+	type PlaceLocation,
+	fetchAddressSuggestions,
+	fetchPlaceLocation,
+} from "@fahari/features/booking/api/address-suggestions.ts"
 import type { RideFormValues } from "@fahari/features/booking/schema/trip.schema.ts"
 import {
 	APILoadingStatus,
@@ -19,7 +25,6 @@ import {
 	AdvancedMarker,
 	Map as GoogleMap,
 	useApiLoadingStatus,
-	useMapsLibrary,
 } from "@vis.gl/react-google-maps"
 import { MapPin } from "lucide-react"
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react"
@@ -27,87 +32,53 @@ import { useFormContext } from "react-hook-form"
 
 const MIN_SEARCH_LENGTH = 3
 const SEARCH_DELAY_MS = 300
-// Most pickups are in Lagos, so suggestions lean there without excluding the rest of Nigeria.
-const LAGOS_BIAS = { center: { lat: 6.5244, lng: 3.3792 }, radius: 50_000 }
 
-type Suggestion = {
-	id: string
-	text: string
-	prediction: google.maps.places.PlacePrediction
-}
-
-// Google can be switched off on purpose (to cap spend) or fail to load. Either way the
-// field falls back to plain typing, so guests can always submit a pickup address.
+// Suggestions come from our backend, which holds the Places key. The map is drawn in the
+// browser with a separate map-only key. If either is switched off (to cap spend) or fails,
+// the field still works as plain typing, so guests can always submit a pickup address.
 export function PickupAddressField() {
 	const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 	if (!apiKey) {
-		return <PickupAddressInput places={null} showMap={false} />
+		return <PickupAddressInput showMap={false} />
 	}
 	return (
 		<APIProvider apiKey={apiKey} region="NG" language="en">
-			<GooglePickupAddress />
+			<PickupAddressWithMap />
 		</APIProvider>
 	)
 }
 
-function GooglePickupAddress() {
-	const places = useMapsLibrary("places")
+function PickupAddressWithMap() {
 	const loaded = useApiLoadingStatus() === APILoadingStatus.LOADED
-	return <PickupAddressInput places={loaded ? places : null} showMap={loaded} />
+	return <PickupAddressInput showMap={loaded} />
 }
 
-function PickupAddressInput({
-	places,
-	showMap,
-}: {
-	places: google.maps.PlacesLibrary | null
-	showMap: boolean
-}) {
+function PickupAddressInput({ showMap }: { showMap: boolean }) {
 	const form = useFormContext<RideFormValues>()
 	const listId = useId()
-	const sessionToken = useRef<
-		google.maps.places.AutocompleteSessionToken | undefined
-	>(undefined)
+	const sessionToken = useRef<string | undefined>(undefined)
 	const [query, setQuery] = useState("")
-	const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+	const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
 	const [open, setOpen] = useState(false)
 	const [activeIndex, setActiveIndex] = useState(-1)
 	const [searchFailed, setSearchFailed] = useState(false)
 	const pickupPlace = form.watch("pickupPlace")
-	const searchable = places !== null && !searchFailed
+	const searchable = !searchFailed
 	const showSuggestions = searchable && open && suggestions.length > 0
 
 	useEffect(() => {
 		const input = query.trim()
-		if (!places || searchFailed || input.length < MIN_SEARCH_LENGTH) {
+		if (searchFailed || input.length < MIN_SEARCH_LENGTH) {
 			setSuggestions([])
 			return
 		}
 		let cancelled = false
 		const timer = setTimeout(async () => {
 			try {
-				sessionToken.current ??= new places.AutocompleteSessionToken()
-				const response =
-					await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-						input,
-						sessionToken: sessionToken.current,
-						includedRegionCodes: ["ng"],
-						locationBias: LAGOS_BIAS,
-					})
+				sessionToken.current ??= crypto.randomUUID()
+				const found = await fetchAddressSuggestions(input, sessionToken.current)
 				if (cancelled) return
-				setSuggestions(
-					response.suggestions.flatMap(({ placePrediction }) =>
-						placePrediction
-							? [
-									{
-										id: placePrediction.placeId,
-										text: placePrediction.text.text,
-										prediction: placePrediction,
-									},
-								]
-							: [],
-					),
-				)
+				setSuggestions(found)
 				setActiveIndex(-1)
 			} catch {
 				if (!cancelled) setSearchFailed(true)
@@ -117,30 +88,26 @@ function PickupAddressInput({
 			cancelled = true
 			clearTimeout(timer)
 		}
-	}, [places, query, searchFailed])
+	}, [query, searchFailed])
 
-	async function choose(suggestion: Suggestion) {
+	async function choose(suggestion: AddressSuggestion) {
 		form.setValue("pickupAddress", suggestion.text, {
 			shouldValidate: true,
 			shouldDirty: true,
 		})
 		setOpen(false)
 		setSuggestions([])
-		const place = suggestion.prediction.toPlace()
-		// Fetching the place ends Google's billing session, so the next search starts a new one.
+		// Locating the pick ends Google's billing session, so the next search starts a new one.
+		const token = sessionToken.current ?? crypto.randomUUID()
 		sessionToken.current = undefined
+		let place: PlaceLocation
 		try {
-			await place.fetchFields({ fields: ["location"] })
+			place = await fetchPlaceLocation(suggestion.placeId, token)
 		} catch {
 			return
 		}
-		const stillChosen = form.getValues("pickupAddress") === suggestion.text
-		if (place.location && stillChosen) {
-			form.setValue("pickupPlace", {
-				placeId: place.id,
-				latitude: place.location.lat(),
-				longitude: place.location.lng(),
-			})
+		if (form.getValues("pickupAddress") === suggestion.text) {
+			form.setValue("pickupPlace", place)
 		}
 	}
 
@@ -220,7 +187,7 @@ function PickupAddressInput({
 										// biome-ignore lint/a11y/useFocusableInteractive lint/a11y/useSemanticElements lint/a11y/useKeyWithClickEvents: options are chosen with the input's arrow keys and Enter
 										<div
 											role="option"
-											key={suggestion.id}
+											key={suggestion.placeId}
 											id={`${listId}-${index}`}
 											aria-selected={index === activeIndex}
 											onMouseDown={(event) => event.preventDefault()}
