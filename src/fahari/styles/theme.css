@@ -30,6 +30,7 @@
 	--color-fh-line-strong: var(--fh-line-strong);
 	--color-fh-ink: var(--fh-ink);
 	--color-fh-ink-muted: var(--fh-ink-muted);
+	--color-fh-ink-faint: var(--fh-ink-faint);
 	--color-fh-accent: var(--fh-accent);
 	--color-fh-accent-hover: var(--fh-accent-hover);
 	--color-fh-accent-pressed: var(--fh-accent-pressed);
@@ -57,6 +58,7 @@
 	--shadow-fh-glow: 0 0 32px #aae1f066;
 	--shadow-fh-float: 0 2px 10px #12121233;
 	--shadow-fh-toast: 0 8px 24px #00000040;
+	--shadow-fh-picker: 0 12px 32px #0000004d;
 	--shadow-fh-modal: 0 16px 48px #00000066;
 
 	--text-fh-display: 3.5rem;
@@ -88,6 +90,7 @@
 	--fh-line-strong: #d4d4d0;
 	--fh-ink: #121212;
 	--fh-ink-muted: #6b6b6b;
+	--fh-ink-faint: #9a9a9a;
 	--fh-accent: #aae1f0;
 	--fh-accent-hover: #96d6e8;
 	--fh-accent-pressed: #7fc9de;
@@ -137,6 +140,7 @@
 	--fh-line-strong: #3a3a3a;
 	--fh-ink: #f7f7f4;
 	--fh-ink-muted: #a3a3a3;
+	--fh-ink-faint: #a3a3a3;
 	--fh-accent-ink: #aae1f0;
 	--fh-inverse: #f7f7f4;
 	--fh-inverse-hover: #e4e4e0;

@@ -1,6 +1,6 @@
 import { Progress } from "@common/components/ui/progress.tsx"
 import { cn } from "@common/lib/utils.ts"
-import { IconButton } from "@fahari/components/ui/button.tsx"
+import { IconButton, InterestedButton } from "@fahari/components/ui/button.tsx"
 import {
 	CountdownSticker,
 	Pill,
@@ -12,7 +12,6 @@ import {
 	ChevronRight,
 	MapPin,
 	Share2,
-	Star,
 } from "lucide-react"
 import type { ComponentProps, ReactNode } from "react"
 
@@ -66,15 +65,12 @@ function QuickActionButtons({
 	return (
 		<div className={cn("flex gap-2", className)}>
 			{onStar ? (
-				<IconButton
-					variant={variant}
+				<InterestedButton
+					interested={Boolean(starred)}
+					variant={variant ?? "surface"}
 					size={size}
-					aria-label={starred ? "Remove from interested" : "I'm interested"}
-					aria-pressed={starred}
 					onClick={onStar}
-				>
-					<Star aria-hidden className={cn(starred && "fill-current")} />
-				</IconButton>
+				/>
 			) : null}
 			{onShare ? (
 				<IconButton
@@ -129,6 +125,9 @@ function PriceLine({
 const cardShell =
 	"rounded-fh-lg border border-fh-line bg-fh-surface shadow-fh-card"
 
+// Ticket cards use the stronger line so the outline reads around the notches.
+const ticketShell = cn(cardShell, "border-fh-line-strong")
+
 const dashColor = "var(--fh-line-strong)"
 
 // The big event card, styled like a ticket: photo on top, a perforated tear
@@ -160,7 +159,7 @@ export function EventCard({
 	className?: string
 }) {
 	return (
-		<article className={cn(cardShell, "relative flex flex-col", className)}>
+		<article className={cn(ticketShell, "relative flex flex-col", className)}>
 			<div className="p-2 pb-0">
 				<EventImage src={imageSrc} className="h-[220px] rounded-2xl">
 					<QuickActionButtons
@@ -173,7 +172,7 @@ export function EventCard({
 			</div>
 			<div aria-hidden className="-mx-px flex h-6 items-center">
 				<span className="relative h-6 w-3 overflow-hidden">
-					<span className="absolute top-0 -left-3 size-6 rounded-full border border-fh-line bg-fh-page" />
+					<span className="absolute top-0 -left-3 size-6 rounded-full border border-fh-line-strong bg-fh-page" />
 				</span>
 				<span
 					className="mx-2.5 h-0.5 flex-1"
@@ -182,7 +181,7 @@ export function EventCard({
 					}}
 				/>
 				<span className="relative h-6 w-3 overflow-hidden">
-					<span className="absolute top-0 left-0 size-6 rounded-full border border-fh-line bg-fh-page" />
+					<span className="absolute top-0 left-0 size-6 rounded-full border border-fh-line-strong bg-fh-page" />
 				</span>
 			</div>
 			<div className="flex flex-col gap-1.5 px-5 pt-1 pb-[18px]">
@@ -241,7 +240,7 @@ export function EventRowCard({
 	return (
 		<article
 			className={cn(
-				cardShell,
+				ticketShell,
 				"flex h-[150px] overflow-hidden pr-3",
 				className,
 			)}
@@ -249,7 +248,7 @@ export function EventRowCard({
 			<EventImage src={imageSrc} className="w-28" />
 			<div aria-hidden className="-my-px flex w-3.5 flex-col items-center">
 				<span className="relative h-[7px] w-3.5 overflow-hidden">
-					<span className="absolute -top-[7px] left-0 size-3.5 rounded-full border border-fh-line bg-fh-page" />
+					<span className="absolute -top-[7px] left-0 size-3.5 rounded-full border border-fh-line-strong bg-fh-page" />
 				</span>
 				<span
 					className="my-1.5 w-0.5 flex-1"
@@ -258,7 +257,7 @@ export function EventRowCard({
 					}}
 				/>
 				<span className="relative h-[7px] w-3.5 overflow-hidden">
-					<span className="absolute top-0 left-0 size-3.5 rounded-full border border-fh-line bg-fh-page" />
+					<span className="absolute top-0 left-0 size-3.5 rounded-full border border-fh-line-strong bg-fh-page" />
 				</span>
 			</div>
 			<div className="flex min-w-0 flex-1 flex-col justify-center gap-[5px] py-3 pl-2">

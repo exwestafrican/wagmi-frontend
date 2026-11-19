@@ -3,7 +3,7 @@ import { cn } from "@common/lib/utils.ts"
 import { Spinner } from "@fahari/components/ui/spinner.tsx"
 import { useFahariThemeStore } from "@fahari/theme/theme.store.ts"
 import { type VariantProps, cva } from "class-variance-authority"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Star, Sun } from "lucide-react"
 import type { ComponentProps } from "react"
 
 const buttonVariants = cva(
@@ -154,6 +154,34 @@ export function IconButton({
 		>
 			{loading ? <Spinner /> : children}
 		</ShadcnButton>
+	)
+}
+
+// The star that marks an event as "interested". When on, the whole button
+// turns accent and the star becomes solid.
+export function InterestedButton({
+	interested,
+	variant = "onPhoto",
+	className,
+	...props
+}: Omit<IconButtonProps, "children" | "aria-label" | "aria-pressed"> & {
+	interested: boolean
+	"aria-label"?: string
+}) {
+	return (
+		<IconButton
+			variant={variant}
+			aria-label={interested ? "Remove from interested" : "I'm interested"}
+			aria-pressed={interested}
+			className={cn(
+				interested &&
+					"bg-fh-accent text-fh-on-accent hover:bg-fh-accent-hover active:bg-fh-accent-pressed",
+				className,
+			)}
+			{...props}
+		>
+			<Star aria-hidden className={cn(interested && "fill-current")} />
+		</IconButton>
 	)
 }
 

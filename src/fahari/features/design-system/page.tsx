@@ -9,6 +9,7 @@ import { Avatar, AvatarGroup } from "@fahari/components/ui/avatar.tsx"
 import {
 	Button,
 	IconButton,
+	InterestedButton,
 	SplitPill,
 	SplitPillButton,
 	ThemeToggle,
@@ -135,6 +136,9 @@ export function DesignSystemPage() {
 	const [date, setDate] = useState<Date>()
 	const [notify, setNotify] = useState(true)
 	const [starred, setStarred] = useState(false)
+	const [time, setTime] = useState<string>()
+	const [cover, setCover] = useState<File>()
+	const [interestedA, setInterestedA] = useState(true)
 
 	return (
 		<FahariTheme>
@@ -228,6 +232,18 @@ export function DesignSystemPage() {
 								<Share2 aria-hidden />
 							</IconButton>
 						</Row>
+						<Row label="Interested">
+							<InterestedButton
+								interested={interestedA}
+								onClick={() => setInterestedA((current) => !current)}
+							/>
+							<InterestedButton
+								variant="outline"
+								size="xs"
+								interested={interestedA}
+								onClick={() => setInterestedA((current) => !current)}
+							/>
+						</Row>
 						<Row label="Split pill">
 							<SplitPill className="w-[360px]">
 								<SplitPillButton>🎟️ RSVP</SplitPillButton>
@@ -298,11 +314,18 @@ export function DesignSystemPage() {
 								label="Start date"
 								value={date}
 								onChange={setDate}
+								disabledDays={{ before: new Date() }}
+								pickerNote="Past days cannot be picked."
 								helper="Rides can be booked 5 to 40 days ahead."
 							/>
 							<TimeField
 								className="w-[260px]"
 								label="Start time"
+								value={time}
+								onChange={setTime}
+								isTimeDisabled={(option) =>
+									option < "08:00" || option > "22:00"
+								}
 								helper="Local time (WAT)."
 							/>
 							<PhoneField
@@ -375,7 +398,10 @@ export function DesignSystemPage() {
 							<UploadBox
 								className="w-[300px]"
 								hint="JPG, PNG or MP4, up to 20MB"
-								onFiles={noop}
+								accept="image/*,video/mp4"
+								value={cover}
+								onFiles={(files) => setCover(files[0])}
+								onRemove={() => setCover(undefined)}
 							/>
 							<UploadBox
 								className="w-[300px]"

@@ -1,6 +1,14 @@
-import { Button, ThemeToggle } from "@fahari/components/ui/button.tsx"
-import { Segmented, Stepper } from "@fahari/components/ui/controls.tsx"
-import { TextField } from "@fahari/components/ui/field.tsx"
+import {
+	Button,
+	InterestedButton,
+	ThemeToggle,
+} from "@fahari/components/ui/button.tsx"
+import {
+	Segmented,
+	Stepper,
+	UploadBox,
+} from "@fahari/components/ui/controls.tsx"
+import { TextField, TimeField } from "@fahari/components/ui/field.tsx"
 import { FahariTheme } from "@fahari/theme/fahari-theme.tsx"
 import { useFahariThemeStore } from "@fahari/theme/theme.store.ts"
 import { render, screen } from "@testing-library/react"
@@ -101,5 +109,76 @@ describe("Fahari design system", () => {
 		unmount()
 		expect(root).not.toHaveClass("fahari")
 		expect(root).not.toHaveClass("dark")
+	})
+
+	it("picks a time from the list and skips times that are switched off", async () => {
+		function Harness() {
+			const [time, setTime] = useState<string>()
+			return (
+				<TimeField
+					label="Start time"
+					value={time}
+					onChange={setTime}
+					isTimeDisabled={(option) => option < "08:00"}
+				/>
+			)
+		}
+		render(<Harness />)
+
+		const field = screen.getByRole("button", { name: /start time/i })
+		expect(field).toHaveTextContent("Select time")
+
+		await userEvent.click(field)
+		expect(screen.getByRole("button", { name: "7:45 AM" })).toBeDisabled()
+		await userEvent.click(screen.getByRole("button", { name: "2:30 PM" }))
+
+		expect(field).toHaveTextContent("2:30 PM")
+		expect(
+			screen.queryByRole("button", { name: "2:45 PM" }),
+		).not.toBeInTheDocument()
+	})
+
+	it("previews the chosen image and lets it be removed", async () => {
+		URL.createObjectURL = vi.fn(() => "blob:cover")
+		URL.revokeObjectURL = vi.fn()
+		const cover = new File(["x"], "cover.png", { type: "image/png" })
+
+		function Harness() {
+			const [file, setFile] = useState<File>()
+			return (
+				<UploadBox
+					accept="image/*"
+					value={file}
+					onFiles={(files) => setFile(files[0])}
+					onRemove={() => setFile(undefined)}
+				/>
+			)
+		}
+		const { container } = render(<Harness />)
+
+		const input = container.querySelector<HTMLInputElement>("input[type=file]")
+		if (!input) throw new Error("file input not found")
+		await userEvent.upload(input, cover)
+
+		expect(
+			await screen.findByRole("img", { name: "Chosen file" }),
+		).toHaveAttribute("src", "blob:cover")
+
+		await userEvent.click(screen.getByRole("button", { name: "Remove file" }))
+
+		expect(screen.queryByRole("img")).not.toBeInTheDocument()
+		expect(screen.getByText("Upload cover image")).toBeInTheDocument()
+	})
+
+	it("tells assistive tech whether the interested star is on", () => {
+		const { rerender } = render(<InterestedButton interested={false} />)
+		expect(
+			screen.getByRole("button", { name: "I'm interested" }),
+		).toHaveAttribute("aria-pressed", "false")
+
+		rerender(<InterestedButton interested />)
+		expect(
+			screen.getByRole("button", { name: "Remove from interested" }),
+		).toHaveAttribute("aria-pressed", "true")
 	})
 })

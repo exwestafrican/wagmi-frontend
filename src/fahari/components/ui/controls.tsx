@@ -6,11 +6,12 @@ import {
 } from "@common/components/ui/toggle-group.tsx"
 import { cn } from "@common/lib/utils.ts"
 import { IconButton } from "@fahari/components/ui/button.tsx"
-import { CloudUpload, Minus, Plus } from "lucide-react"
+import { CloudUpload, FileIcon, Minus, Plus, X } from "lucide-react"
 import {
 	type ComponentProps,
 	type DragEvent,
 	type ReactNode,
+	useEffect,
 	useId,
 	useState,
 } from "react"
@@ -182,7 +183,40 @@ export function Segmented<Value extends string>({
 	)
 }
 
-// Click or drop to choose files. Shows the error in place of the hint.
+// Whether a file fits an `accept` list such as "image/*,.pdf".
+function matchesAccept(file: File, accept?: string) {
+	if (!accept) return true
+	return accept
+		.split(",")
+		.map((rule) => rule.trim().toLowerCase())
+		.filter(Boolean)
+		.some((rule) => {
+			if (rule.startsWith(".")) return file.name.toLowerCase().endsWith(rule)
+			if (rule.endsWith("/*")) return file.type.startsWith(rule.slice(0, -1))
+			return file.type === rule
+		})
+}
+
+// A temporary address the browser can show a just-picked file from.
+function useFilePreviewUrl(file: File | undefined) {
+	const [url, setUrl] = useState<string>()
+
+	useEffect(() => {
+		if (!file) {
+			setUrl(undefined)
+			return
+		}
+		const objectUrl = URL.createObjectURL(file)
+		setUrl(objectUrl)
+		return () => URL.revokeObjectURL(objectUrl)
+	}, [file])
+
+	return url
+}
+
+// Click or drop to choose files. Shows the error in place of the hint. Pass the
+// chosen file (or the address of an already saved image) as `value` to show it
+// in the box; clicking the box again replaces it.
 export function UploadBox({
 	title = "Upload cover image",
 	hint,
@@ -191,6 +225,10 @@ export function UploadBox({
 	multiple = false,
 	disabled = false,
 	onFiles,
+	value,
+	onRemove,
+	previewAlt = "Chosen file",
+	removeLabel = "Remove file",
 	className,
 }: {
 	title?: ReactNode
@@ -200,58 +238,104 @@ export function UploadBox({
 	multiple?: boolean
 	disabled?: boolean
 	onFiles: (files: File[]) => void
+	value?: File | string | null
+	// Shows a remove button on the preview when given.
+	onRemove?: () => void
+	previewAlt?: string
+	removeLabel?: string
 	className?: string
 }) {
 	const [dragging, setDragging] = useState(false)
+	const file = value instanceof File ? value : undefined
+	const fileUrl = useFilePreviewUrl(
+		file?.type.startsWith("image/") ? file : undefined,
+	)
+	const imageUrl = typeof value === "string" ? value : fileUrl
+	const hasValue = Boolean(value)
 
 	function handleDrop(event: DragEvent<HTMLLabelElement>) {
 		event.preventDefault()
 		setDragging(false)
 		if (disabled) return
-		const files = Array.from(event.dataTransfer.files)
+		const files = Array.from(event.dataTransfer.files).filter((dropped) =>
+			matchesAccept(dropped, accept),
+		)
 		if (files.length) onFiles(multiple ? files : files.slice(0, 1))
 	}
 
 	return (
-		<label
-			onDragOver={(event) => {
-				event.preventDefault()
-				setDragging(true)
-			}}
-			onDragLeave={() => setDragging(false)}
-			onDrop={handleDrop}
-			className={cn(
-				"flex h-[180px] w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-fh-lg border-[1.5px] border-dashed border-fh-line-strong bg-fh-surface px-4 text-center transition-colors",
-				"hover:bg-fh-subtle has-[:focus-visible]:border-fh-accent-ink",
-				dragging && "bg-fh-subtle",
-				error && "border-fh-error",
-				disabled && "pointer-events-none opacity-50",
-				className,
-			)}
-		>
-			<input
-				type="file"
-				accept={accept}
-				multiple={multiple}
-				disabled={disabled}
-				className="sr-only"
-				onChange={(event) => {
-					const files = Array.from(event.target.files ?? [])
-					if (files.length) onFiles(files)
-					event.target.value = ""
+		<div className={cn("relative h-[180px] w-full", className)}>
+			<label
+				onDragOver={(event) => {
+					event.preventDefault()
+					setDragging(true)
 				}}
-			/>
-			<span className="flex size-12 items-center justify-center rounded-full bg-fh-subtle text-fh-accent-ink">
-				<CloudUpload aria-hidden className="size-[22px]" />
-			</span>
-			<span className="text-[15px] font-bold text-fh-ink">{title}</span>
-			{error ? (
-				<span role="alert" className="text-[13px] text-fh-error">
-					{error}
-				</span>
-			) : hint ? (
-				<span className="text-[13px] text-fh-ink-muted">{hint}</span>
+				onDragLeave={() => setDragging(false)}
+				onDrop={handleDrop}
+				className={cn(
+					"flex size-full cursor-pointer flex-col items-center justify-center gap-2.5 overflow-hidden rounded-fh-lg border-[1.5px] border-dashed border-fh-line-strong bg-fh-surface px-4 text-center transition-colors",
+					"hover:bg-fh-subtle has-[:focus-visible]:border-fh-accent-ink",
+					dragging && "bg-fh-subtle",
+					hasValue && "border-solid border-fh-line",
+					imageUrl && "p-0",
+					error && "border-fh-error",
+					disabled && "pointer-events-none opacity-50",
+				)}
+			>
+				<input
+					type="file"
+					accept={accept}
+					multiple={multiple}
+					disabled={disabled}
+					className="sr-only"
+					onChange={(event) => {
+						const files = Array.from(event.target.files ?? [])
+						if (files.length) onFiles(files)
+						event.target.value = ""
+					}}
+				/>
+				{imageUrl ? (
+					<img
+						src={imageUrl}
+						alt={previewAlt}
+						className="size-full object-cover"
+					/>
+				) : file ? (
+					<>
+						<span className="flex size-12 items-center justify-center rounded-full bg-fh-subtle text-fh-accent-ink">
+							<FileIcon aria-hidden className="size-[22px]" />
+						</span>
+						<span className="max-w-full truncate text-[15px] font-bold text-fh-ink">
+							{file.name}
+						</span>
+					</>
+				) : (
+					<>
+						<span className="flex size-12 items-center justify-center rounded-full bg-fh-subtle text-fh-accent-ink">
+							<CloudUpload aria-hidden className="size-[22px]" />
+						</span>
+						<span className="text-[15px] font-bold text-fh-ink">{title}</span>
+						{error ? (
+							<span role="alert" className="text-[13px] text-fh-error">
+								{error}
+							</span>
+						) : hint ? (
+							<span className="text-[13px] text-fh-ink-muted">{hint}</span>
+						) : null}
+					</>
+				)}
+			</label>
+			{hasValue && onRemove && !disabled ? (
+				<IconButton
+					variant="onPhoto"
+					size="xs"
+					aria-label={removeLabel}
+					onClick={onRemove}
+					className="absolute top-2.5 right-2.5"
+				>
+					<X aria-hidden />
+				</IconButton>
 			) : null}
-		</label>
+		</div>
 	)
 }

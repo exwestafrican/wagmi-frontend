@@ -1,4 +1,4 @@
-import { Calendar } from "@common/components/ui/calendar.tsx"
+import { Calendar, CalendarDayButton } from "@common/components/ui/calendar.tsx"
 import {
 	Field,
 	FieldDescription,
@@ -16,10 +16,24 @@ import {
 	PopoverTrigger,
 } from "@common/components/ui/popover.tsx"
 import { Textarea } from "@common/components/ui/textarea.tsx"
+import { useIsMobile } from "@common/hooks/use-mobile.ts"
 import { cn } from "@common/lib/utils.ts"
+import { Button } from "@fahari/components/ui/button.tsx"
+import {
+	BottomSheet,
+	BottomSheetContent,
+	BottomSheetTitle,
+	BottomSheetTrigger,
+} from "@fahari/components/ui/overlay.tsx"
 import { format } from "date-fns"
-import { AlarmClock, CalendarIcon, CircleAlert } from "lucide-react"
-import { type ComponentProps, type ReactNode, useId, useState } from "react"
+import { CalendarIcon, Check, CircleAlert, Clock3 } from "lucide-react"
+import {
+	type ComponentProps,
+	type ReactNode,
+	useCallback,
+	useId,
+	useState,
+} from "react"
 
 interface FieldShellProps {
 	label: ReactNode
@@ -181,30 +195,6 @@ export function PriceField({
 	)
 }
 
-// Uses the device's own time picker; clicking anywhere in the field opens it.
-export function TimeField(
-	props: Omit<TextFieldProps, "prefix" | "icon" | "type">,
-) {
-	return (
-		<TextField
-			type="time"
-			icon={<AlarmClock aria-hidden />}
-			onClick={(event) => {
-				try {
-					event.currentTarget.showPicker?.()
-				} catch {
-					// Some browsers only allow this straight after a tap; typing still works.
-				}
-			}}
-			{...props}
-			className={cn(
-				"[&_input::-webkit-calendar-picker-indicator]:hidden",
-				props.className,
-			)}
-		/>
-	)
-}
-
 type TextareaFieldProps = FieldShellProps & ComponentProps<"textarea">
 
 export function TextareaField({
@@ -244,6 +234,33 @@ export function TextareaField({
 	)
 }
 
+// The box a picker field shows when closed. It looks like a text input but is
+// a button, because the value is chosen from a panel rather than typed.
+const pickerTriggerClasses = cn(
+	"flex h-[52px] items-center gap-2.5 rounded-fh-sm border-[1.5px] border-fh-line bg-fh-surface px-3.5 text-left text-base outline-none transition-colors",
+	"hover:border-fh-line-strong focus-visible:border-fh-accent-ink data-[state=open]:border-fh-accent-ink aria-invalid:border-fh-error",
+)
+
+const pickerPanelClasses =
+	"rounded-fh-md border-fh-line bg-fh-surface p-0 shadow-fh-picker"
+
+function PickerDayButton({
+	className,
+	...props
+}: ComponentProps<typeof CalendarDayButton>) {
+	return (
+		<CalendarDayButton
+			className={cn(
+				"aspect-auto h-9 min-w-0 rounded-fh-sm text-sm font-medium text-fh-ink hover:bg-fh-subtle hover:text-fh-ink dark:hover:text-fh-ink",
+				"group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-2 group-data-[focused=true]/day:ring-fh-accent-ink",
+				"data-[selected-single=true]:bg-fh-accent data-[selected-single=true]:font-bold data-[selected-single=true]:text-fh-on-accent data-[selected-single=true]:hover:bg-fh-accent-hover",
+				className,
+			)}
+			{...props}
+		/>
+	)
+}
+
 type DateFieldProps = FieldShellProps & {
 	value?: Date
 	onChange: (date: Date) => void
@@ -252,6 +269,8 @@ type DateFieldProps = FieldShellProps & {
 	dateFormat?: string
 	// Days that cannot be picked, in the calendar's own format.
 	disabledDays?: ComponentProps<typeof Calendar>["disabled"]
+	// A line under the calendar, e.g. to explain why some days are greyed out.
+	pickerNote?: ReactNode
 	disabled?: boolean
 	id?: string
 	className?: string
@@ -266,6 +285,7 @@ export function DateField({
 	placeholder = "Select date",
 	dateFormat = "EEE d MMM yyyy",
 	disabledDays,
+	pickerNote,
 	disabled,
 	id,
 	className,
@@ -293,8 +313,7 @@ export function DateField({
 						aria-invalid={error ? true : undefined}
 						aria-describedby={hasMessage ? `${fieldId}-message` : undefined}
 						className={cn(
-							"flex h-[52px] items-center gap-2.5 rounded-fh-sm border-[1.5px] border-fh-line bg-fh-surface px-3.5 text-left text-base outline-none transition-colors",
-							"hover:border-fh-line-strong focus-visible:border-fh-accent-ink data-[state=open]:border-fh-accent-ink aria-invalid:border-fh-error",
+							pickerTriggerClasses,
 							value ? "text-fh-ink" : "text-fh-ink-muted",
 						)}
 					>
@@ -309,10 +328,11 @@ export function DateField({
 				</PopoverTrigger>
 				<PopoverContent
 					align="start"
-					className="w-auto rounded-fh-md border-fh-line p-0"
+					className={cn(pickerPanelClasses, "w-[300px]")}
 				>
 					<Calendar
 						mode="single"
+						weekStartsOn={1}
 						selected={value}
 						defaultMonth={value}
 						disabled={disabledDays}
@@ -321,9 +341,244 @@ export function DateField({
 							onChange(date)
 							setOpen(false)
 						}}
+						className="w-full bg-transparent p-3.5"
+						classNames={{
+							root: "w-full",
+							months: "relative flex flex-col",
+							month: "flex w-full flex-col gap-2.5",
+							nav: "absolute inset-x-0 top-0 flex items-center justify-between",
+							button_previous:
+								"flex size-8 items-center justify-center rounded-fh-sm text-fh-ink outline-none hover:bg-fh-subtle focus-visible:ring-2 focus-visible:ring-fh-accent-ink aria-disabled:opacity-35 [&>svg]:size-[18px]",
+							button_next:
+								"flex size-8 items-center justify-center rounded-fh-sm text-fh-ink outline-none hover:bg-fh-subtle focus-visible:ring-2 focus-visible:ring-fh-accent-ink aria-disabled:opacity-35 [&>svg]:size-[18px]",
+							month_caption: "flex h-8 items-center justify-center",
+							caption_label: "text-[15px] font-bold text-fh-ink select-none",
+							weekdays: "flex",
+							weekday:
+								"flex h-6 flex-1 items-center justify-center text-xs font-semibold text-fh-ink-muted select-none",
+							week: "mt-0.5 flex w-full gap-0.5",
+							day: "group/day relative h-9 flex-1 p-0 text-center select-none",
+							today: "",
+							outside: "[&>button]:text-fh-ink-faint",
+							disabled: "opacity-35 [&>button]:text-fh-ink-faint",
+						}}
+						components={{ DayButton: PickerDayButton }}
+						formatters={{
+							formatWeekdayName: (day) => format(day, "EEEEE"),
+						}}
 					/>
+					{pickerNote ? (
+						<p className="px-3.5 pb-3.5 text-xs text-fh-ink-muted">
+							{pickerNote}
+						</p>
+					) : null}
 				</PopoverContent>
 			</Popover>
+		</FieldShell>
+	)
+}
+
+// Every time of day at the given spacing, as 24-hour "HH:mm" strings.
+function timesOfDay(minuteStep: number) {
+	const times: string[] = []
+	for (let minutes = 0; minutes < 24 * 60; minutes += minuteStep) {
+		const hours = Math.floor(minutes / 60)
+		times.push(
+			`${String(hours).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`,
+		)
+	}
+	return times
+}
+
+// "14:30" -> "2:30 PM"
+function formatTime(value: string) {
+	const [hours, minutes] = value.split(":").map(Number)
+	const suffix = hours < 12 ? "AM" : "PM"
+	return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${suffix}`
+}
+
+function TimeList({
+	times,
+	selected,
+	isTimeDisabled,
+	onSelect,
+	className,
+}: {
+	times: string[]
+	selected?: string
+	isTimeDisabled?: (time: string) => boolean
+	onSelect: (time: string) => void
+	className?: string
+}) {
+	// Start the list at the picked time, or the first time that can be picked.
+	const anchor = selected ?? times.find((time) => !isTimeDisabled?.(time))
+	const scrollToAnchor = useCallback((list: HTMLUListElement | null) => {
+		list
+			?.querySelector<HTMLElement>("[data-anchor=true]")
+			?.scrollIntoView?.({ block: "center" })
+	}, [])
+
+	return (
+		<ul
+			ref={scrollToAnchor}
+			className={cn(
+				"flex h-[280px] flex-col gap-0.5 overflow-y-auto p-1.5",
+				className,
+			)}
+		>
+			{times.map((time) => {
+				const isSelected = time === selected
+				return (
+					<li key={time}>
+						<button
+							type="button"
+							disabled={isTimeDisabled?.(time)}
+							aria-pressed={isSelected}
+							data-anchor={time === anchor}
+							onClick={() => onSelect(time)}
+							className={cn(
+								"flex h-10 w-full items-center justify-between rounded-fh-sm px-3 text-sm font-medium text-fh-ink outline-none transition-colors",
+								"hover:bg-fh-subtle focus-visible:ring-2 focus-visible:ring-fh-accent-ink focus-visible:ring-inset disabled:pointer-events-none disabled:text-fh-ink-faint",
+								isSelected &&
+									"bg-fh-accent font-bold text-fh-on-accent hover:bg-fh-accent-hover",
+							)}
+						>
+							{formatTime(time)}
+							{isSelected ? <Check aria-hidden className="size-4" /> : null}
+						</button>
+					</li>
+				)
+			})}
+		</ul>
+	)
+}
+
+type TimeFieldProps = FieldShellProps & {
+	// 24-hour "HH:mm", e.g. "14:30". Shown to the person as "2:30 PM".
+	value?: string
+	onChange: (value: string) => void
+	placeholder?: string
+	// Minutes between the times on offer.
+	minuteStep?: number
+	// Return true for times that cannot be picked.
+	isTimeDisabled?: (time: string) => boolean
+	// Title of the sheet on phones.
+	sheetTitle?: ReactNode
+	doneLabel?: ReactNode
+	disabled?: boolean
+	id?: string
+	className?: string
+}
+
+// A list of times to pick from: a dropdown under the field on larger screens,
+// a bottom sheet with a Done button on phones.
+export function TimeField({
+	label,
+	helper,
+	error,
+	value,
+	onChange,
+	placeholder = "Select time",
+	minuteStep = 15,
+	isTimeDisabled,
+	sheetTitle = "Pick a time",
+	doneLabel = "Done",
+	disabled,
+	id,
+	className,
+}: TimeFieldProps) {
+	const generatedId = useId()
+	const fieldId = id ?? generatedId
+	const hasMessage = Boolean(error || helper)
+	const isMobile = useIsMobile()
+	const [open, setOpen] = useState(false)
+	// On phones the choice only counts once Done is pressed.
+	const [pending, setPending] = useState(value)
+	const times = timesOfDay(minuteStep)
+
+	function handleOpenChange(next: boolean) {
+		if (next) setPending(value)
+		setOpen(next)
+	}
+
+	const trigger = (
+		<button
+			type="button"
+			id={fieldId}
+			disabled={disabled}
+			aria-invalid={error ? true : undefined}
+			aria-describedby={hasMessage ? `${fieldId}-message` : undefined}
+			className={cn(
+				pickerTriggerClasses,
+				value ? "text-fh-ink" : "text-fh-ink-muted",
+			)}
+		>
+			<Clock3 aria-hidden className="size-[18px] shrink-0 text-fh-accent-ink" />
+			<span className="truncate">
+				{value ? formatTime(value) : placeholder}
+			</span>
+		</button>
+	)
+
+	return (
+		<FieldShell
+			id={fieldId}
+			label={label}
+			helper={helper}
+			error={error}
+			disabled={disabled}
+			className={className}
+		>
+			{isMobile ? (
+				<BottomSheet open={open} onOpenChange={handleOpenChange}>
+					<BottomSheetTrigger asChild>{trigger}</BottomSheetTrigger>
+					<BottomSheetContent
+						aria-describedby={undefined}
+						className="px-4 pb-6"
+					>
+						<BottomSheetTitle>{sheetTitle}</BottomSheetTitle>
+						<TimeList
+							times={times}
+							selected={pending}
+							isTimeDisabled={isTimeDisabled}
+							onSelect={setPending}
+							className="p-0"
+						/>
+						<Button
+							className="w-full"
+							disabled={!pending}
+							onClick={() => {
+								if (pending) onChange(pending)
+								setOpen(false)
+							}}
+						>
+							{doneLabel}
+						</Button>
+					</BottomSheetContent>
+				</BottomSheet>
+			) : (
+				<Popover open={open} onOpenChange={handleOpenChange}>
+					<PopoverTrigger asChild>{trigger}</PopoverTrigger>
+					<PopoverContent
+						align="start"
+						sideOffset={8}
+						className={cn(
+							pickerPanelClasses,
+							"w-(--radix-popover-trigger-width) min-w-[200px] overflow-hidden",
+						)}
+					>
+						<TimeList
+							times={times}
+							selected={value}
+							isTimeDisabled={isTimeDisabled}
+							onSelect={(time) => {
+								onChange(time)
+								setOpen(false)
+							}}
+						/>
+					</PopoverContent>
+				</Popover>
+			)}
 		</FieldShell>
 	)
 }
