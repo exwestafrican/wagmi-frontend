@@ -1,0 +1,226 @@
+/*
+ * Fahari design system tokens, from the "Fahari Design System" frame in fahari.pen.
+ *
+ * Everything is scoped to the `.fahari` class, which <FahariTheme> puts on <html>
+ * while a Fahari page is mounted. Pages that do not opt in keep the shared look.
+ *
+ * Design variable -> token
+ *   bg/page, bg/surface, bg/subtle         -> fh-page, fh-surface, fh-subtle
+ *   border/default, border/strong          -> fh-line, fh-line-strong
+ *   text/primary, text/secondary           -> fh-ink, fh-ink-muted
+ *   accent/fill (+hover, +pressed)         -> fh-accent, fh-accent-hover, fh-accent-pressed
+ *   accent/text, accent/on                 -> fh-accent-ink, fh-on-accent
+ *   bg/inverse (+hover, +pressed)          -> fh-inverse, fh-inverse-hover, fh-inverse-pressed
+ *   text/inverse                           -> fh-on-inverse
+ *   status/error, status/success           -> fh-error, fh-success
+ *   image/placeholder, overlay/dim         -> fh-placeholder, fh-overlay
+ *   brand/primary (Dark Blue), midnight    -> fh-primary, fh-primary-dark
+ *   brand/sky blue, aqua, ivory            -> fh-secondary, fh-tertiary, fh-neutral
+ *   guest initials                         -> fh-avatar-1 ... fh-avatar-8
+ *   fixed white / black (same in both modes) -> fh-white, fh-black
+ *   radius/sm, md, lg                      -> rounded-fh-sm, rounded-fh-md, rounded-fh-lg
+ */
+
+/* The brand script. It has a single weight, so the range stops the browser
+   from faking a bold version of it. */
+@font-face {
+	font-family: "Casey";
+	src: url("../assets/fonts/Casey-Classic.ttf") format("truetype");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme inline {
+	--font-fahari: "DM Sans", sans-serif;
+	/* For 1 to 3 accent words per page, never full sentences. */
+	--font-fahari-accent: "Casey", cursive;
+
+	--color-fh-page: var(--fh-page);
+	--color-fh-surface: var(--fh-surface);
+	--color-fh-subtle: var(--fh-subtle);
+	--color-fh-line: var(--fh-line);
+	--color-fh-line-strong: var(--fh-line-strong);
+	--color-fh-ink: var(--fh-ink);
+	--color-fh-ink-muted: var(--fh-ink-muted);
+	--color-fh-ink-faint: var(--fh-ink-faint);
+	--color-fh-accent: var(--fh-accent);
+	--color-fh-accent-hover: var(--fh-accent-hover);
+	--color-fh-accent-pressed: var(--fh-accent-pressed);
+	--color-fh-accent-ink: var(--fh-accent-ink);
+	--color-fh-on-accent: var(--fh-on-accent);
+	--color-fh-inverse: var(--fh-inverse);
+	--color-fh-inverse-hover: var(--fh-inverse-hover);
+	--color-fh-inverse-pressed: var(--fh-inverse-pressed);
+	--color-fh-on-inverse: var(--fh-on-inverse);
+	--color-fh-error: var(--fh-error);
+	--color-fh-success: var(--fh-success);
+	--color-fh-placeholder: var(--fh-placeholder);
+	--color-fh-overlay: var(--fh-overlay);
+
+	/* Brand colours, the same in light and dark. */
+	--color-fh-primary: var(--fh-primary);
+	--color-fh-primary-dark: var(--fh-primary-dark);
+	--color-fh-secondary: var(--fh-secondary);
+	--color-fh-tertiary: var(--fh-tertiary);
+	--color-fh-neutral: var(--fh-neutral);
+
+	/* Fixed colours for things that sit on photos, the same in light and dark. */
+	--color-fh-white: #ffffff;
+	--color-fh-black: #121212;
+
+	/* Guest initials, the same in light and dark. */
+	--color-fh-avatar-1: #f4c7b8;
+	--color-fh-avatar-2: #bfe3d0;
+	--color-fh-avatar-3: #f6e3a1;
+	--color-fh-avatar-4: #c9d7f2;
+	--color-fh-avatar-5: #e8c6e8;
+	--color-fh-avatar-6: #fad4a8;
+	--color-fh-avatar-7: #b8e0e6;
+	--color-fh-avatar-8: #d8d3f0;
+
+	--radius-fh-sm: 8px;
+	--radius-fh-md: 12px;
+	--radius-fh-lg: 20px;
+
+	--shadow-fh-card: 0 2px 8px var(--fh-shadow-card);
+	--shadow-fh-glow: 0 0 32px
+		color-mix(in srgb, var(--fh-secondary) 40%, transparent);
+	--shadow-fh-float: 0 2px 10px #12121233;
+	--shadow-fh-toast: 0 8px 24px #00000040;
+	--shadow-fh-popover: var(--fh-shadow-popover);
+	--shadow-fh-modal: 0 16px 48px #00000066;
+
+	--text-fh-display: 3.5rem;
+	--text-fh-display--line-height: 4rem;
+	--text-fh-display--font-weight: 700;
+	--text-fh-h1: 2.5rem;
+	--text-fh-h1--line-height: 3rem;
+	--text-fh-h1--font-weight: 700;
+	--text-fh-h2: 1.75rem;
+	--text-fh-h2--line-height: 2.25rem;
+	--text-fh-h2--font-weight: 700;
+	--text-fh-h3: 1.25rem;
+	--text-fh-h3--line-height: 1.75rem;
+	--text-fh-h3--font-weight: 600;
+	--text-fh-body: 1rem;
+	--text-fh-body--line-height: 1.5rem;
+	--text-fh-small: 0.875rem;
+	--text-fh-small--line-height: 1.25rem;
+	--text-fh-caption: 0.75rem;
+	--text-fh-caption--line-height: 1rem;
+	--text-fh-caption--font-weight: 500;
+}
+
+.fahari {
+	--fh-primary: #204555;
+	--fh-primary-dark: #012420;
+	--fh-secondary: #aae1f0;
+	--fh-tertiary: #89c9ca;
+	--fh-neutral: #f7f9e4;
+
+	--fh-page: #ffffff;
+	--fh-surface: #ffffff;
+	--fh-subtle: #f5f5f2;
+	--fh-line: #e4e4e0;
+	--fh-line-strong: #d4d4d0;
+	--fh-ink: #121212;
+	--fh-ink-muted: #6b6b6b;
+	--fh-ink-faint: #9a9a9a;
+	/* The main button fill follows the brand's Sky Blue. */
+	--fh-accent: var(--fh-secondary);
+	--fh-accent-hover: #96d6e8;
+	--fh-accent-pressed: #7fc9de;
+	--fh-accent-ink: var(--fh-primary);
+	--fh-on-accent: #121212;
+	--fh-inverse: #121212;
+	--fh-inverse-hover: #2a2a2a;
+	--fh-inverse-pressed: #3a3a3a;
+	--fh-on-inverse: #ffffff;
+	--fh-error: #d93036;
+	--fh-success: #1f8f5f;
+	--fh-placeholder: #f0f0ec;
+	--fh-shadow-card: #12121214;
+	--fh-shadow-popover: 0 12px 32px #0000004d;
+	--fh-overlay: #12121266;
+
+	/* Point the shared shadcn variables at Fahari tokens, so every shadcn
+	   component (calendar, popover, dialog...) picks up the Fahari look. */
+	--radius: 0.75rem;
+	--background: var(--fh-page);
+	--foreground: var(--fh-ink);
+	--card: var(--fh-surface);
+	--card-foreground: var(--fh-ink);
+	--popover: var(--fh-surface);
+	--popover-foreground: var(--fh-ink);
+	--primary: var(--fh-accent);
+	--primary-foreground: var(--fh-on-accent);
+	--secondary: var(--fh-subtle);
+	--secondary-foreground: var(--fh-ink);
+	--muted: var(--fh-subtle);
+	--muted-foreground: var(--fh-ink-muted);
+	--accent: var(--fh-subtle);
+	--accent-foreground: var(--fh-ink);
+	--destructive: var(--fh-error);
+	--border: var(--fh-line);
+	--input: var(--fh-line);
+	--ring: var(--fh-accent-ink);
+
+	color-scheme: light;
+}
+
+.fahari.dark,
+.dark .fahari {
+	--fh-page: #121212;
+	--fh-surface: #1e1e1e;
+	/* A step darker than the border colour, so borders stay visible on it. */
+	--fh-subtle: #252525;
+	--fh-line: #2a2a2a;
+	--fh-line-strong: #3a3a3a;
+	--fh-ink: #f7f7f4;
+	--fh-ink-muted: #a3a3a3;
+	--fh-ink-faint: #5a5a5a;
+	--fh-accent-ink: var(--fh-secondary);
+	--fh-inverse: #f7f7f4;
+	--fh-inverse-hover: #e4e4e0;
+	--fh-inverse-pressed: #d4d4d0;
+	--fh-on-inverse: #121212;
+	--fh-error: #f2555a;
+	--fh-success: #6fd3a0;
+	--fh-placeholder: #2a2a2a;
+	--fh-shadow-card: #00000000;
+	--fh-overlay: #000000b8;
+
+	color-scheme: dark;
+}
+
+.fahari,
+.fahari body {
+	font-family: var(--font-fahari);
+}
+
+/* The shared dialog and sheet draw their own backdrop; tint it with the Fahari overlay. */
+.fahari [data-slot="dialog-overlay"],
+.fahari [data-slot="sheet-overlay"] {
+	background-color: var(--fh-overlay);
+}
+
+/* Every popover (date picker, time picker, dropdowns, menus) shares one shadow. */
+.fahari [data-slot="popover-content"],
+.fahari [data-slot="dropdown-menu-content"],
+.fahari [data-slot="dropdown-menu-sub-content"] {
+	box-shadow: var(--fh-shadow-popover);
+}
+
+/* The shared switch does not expose its thumb, so the Fahari sizes are set here. */
+.fh-switch [data-slot="switch-thumb"] {
+	width: 22px;
+	height: 22px;
+	background-color: var(--fh-ink);
+	translate: 0 0;
+}
+
+.fh-switch [data-slot="switch-thumb"][data-state="checked"] {
+	background-color: var(--fh-on-accent);
+	translate: 20px 0;
+}
