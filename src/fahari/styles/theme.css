@@ -14,14 +14,27 @@
  *   text/inverse                           -> fh-on-inverse
  *   status/error, status/success           -> fh-error, fh-success
  *   image/placeholder, overlay/dim         -> fh-placeholder, fh-overlay
- *   brand/primary, midnight, aqua, ivory   -> fh-brand, fh-midnight, fh-aqua, fh-ivory
+ *   brand/primary (Dark Blue), midnight    -> fh-primary, fh-primary-dark
+ *   brand/sky blue, aqua, ivory            -> fh-secondary, fh-tertiary, fh-neutral
+ *   guest initials                         -> fh-avatar-1 ... fh-avatar-8
+ *   fixed white / black (same in both modes) -> fh-white, fh-black
  *   radius/sm, md, lg                      -> rounded-fh-sm, rounded-fh-md, rounded-fh-lg
  */
 
+/* The brand script. It has a single weight, so the range stops the browser
+   from faking a bold version of it. */
+@font-face {
+	font-family: "Casey";
+	src: url("../assets/fonts/Casey-Classic.ttf") format("truetype");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
 @theme inline {
 	--font-fahari: "DM Sans", sans-serif;
-	/* Casey is the brand script. Caveat stands in until the Casey font files are added. */
-	--font-fahari-accent: "Casey", "Caveat", cursive;
+	/* For 1 to 3 accent words per page, never full sentences. */
+	--font-fahari-accent: "Casey", cursive;
 
 	--color-fh-page: var(--fh-page);
 	--color-fh-surface: var(--fh-surface);
@@ -45,20 +58,37 @@
 	--color-fh-placeholder: var(--fh-placeholder);
 	--color-fh-overlay: var(--fh-overlay);
 
-	--color-fh-brand: #204555;
-	--color-fh-midnight: #012420;
-	--color-fh-aqua: #89c9ca;
-	--color-fh-ivory: #f7f9e4;
+	/* Brand colours, the same in light and dark. */
+	--color-fh-primary: var(--fh-primary);
+	--color-fh-primary-dark: var(--fh-primary-dark);
+	--color-fh-secondary: var(--fh-secondary);
+	--color-fh-tertiary: var(--fh-tertiary);
+	--color-fh-neutral: var(--fh-neutral);
+
+	/* Fixed colours for things that sit on photos, the same in light and dark. */
+	--color-fh-white: #ffffff;
+	--color-fh-black: #121212;
+
+	/* Guest initials, the same in light and dark. */
+	--color-fh-avatar-1: #f4c7b8;
+	--color-fh-avatar-2: #bfe3d0;
+	--color-fh-avatar-3: #f6e3a1;
+	--color-fh-avatar-4: #c9d7f2;
+	--color-fh-avatar-5: #e8c6e8;
+	--color-fh-avatar-6: #fad4a8;
+	--color-fh-avatar-7: #b8e0e6;
+	--color-fh-avatar-8: #d8d3f0;
 
 	--radius-fh-sm: 8px;
 	--radius-fh-md: 12px;
 	--radius-fh-lg: 20px;
 
 	--shadow-fh-card: 0 2px 8px var(--fh-shadow-card);
-	--shadow-fh-glow: 0 0 32px #aae1f066;
+	--shadow-fh-glow: 0 0 32px
+		color-mix(in srgb, var(--fh-secondary) 40%, transparent);
 	--shadow-fh-float: 0 2px 10px #12121233;
 	--shadow-fh-toast: 0 8px 24px #00000040;
-	--shadow-fh-picker: 0 12px 32px #0000004d;
+	--shadow-fh-popover: var(--fh-shadow-popover);
 	--shadow-fh-modal: 0 16px 48px #00000066;
 
 	--text-fh-display: 3.5rem;
@@ -83,6 +113,12 @@
 }
 
 .fahari {
+	--fh-primary: #204555;
+	--fh-primary-dark: #012420;
+	--fh-secondary: #aae1f0;
+	--fh-tertiary: #89c9ca;
+	--fh-neutral: #f7f9e4;
+
 	--fh-page: #ffffff;
 	--fh-surface: #ffffff;
 	--fh-subtle: #f5f5f2;
@@ -91,10 +127,11 @@
 	--fh-ink: #121212;
 	--fh-ink-muted: #6b6b6b;
 	--fh-ink-faint: #9a9a9a;
-	--fh-accent: #aae1f0;
+	/* The main button fill follows the brand's Sky Blue. */
+	--fh-accent: var(--fh-secondary);
 	--fh-accent-hover: #96d6e8;
 	--fh-accent-pressed: #7fc9de;
-	--fh-accent-ink: #204555;
+	--fh-accent-ink: var(--fh-primary);
 	--fh-on-accent: #121212;
 	--fh-inverse: #121212;
 	--fh-inverse-hover: #2a2a2a;
@@ -104,6 +141,7 @@
 	--fh-success: #1f8f5f;
 	--fh-placeholder: #f0f0ec;
 	--fh-shadow-card: #12121214;
+	--fh-shadow-popover: 0 12px 32px #0000004d;
 	--fh-overlay: #12121266;
 
 	/* Point the shared shadcn variables at Fahari tokens, so every shadcn
@@ -135,13 +173,14 @@
 .dark .fahari {
 	--fh-page: #121212;
 	--fh-surface: #1e1e1e;
-	--fh-subtle: #2a2a2a;
+	/* A step darker than the border colour, so borders stay visible on it. */
+	--fh-subtle: #252525;
 	--fh-line: #2a2a2a;
 	--fh-line-strong: #3a3a3a;
 	--fh-ink: #f7f7f4;
 	--fh-ink-muted: #a3a3a3;
-	--fh-ink-faint: #a3a3a3;
-	--fh-accent-ink: #aae1f0;
+	--fh-ink-faint: #5a5a5a;
+	--fh-accent-ink: var(--fh-secondary);
 	--fh-inverse: #f7f7f4;
 	--fh-inverse-hover: #e4e4e0;
 	--fh-inverse-pressed: #d4d4d0;
@@ -164,6 +203,13 @@
 .fahari [data-slot="dialog-overlay"],
 .fahari [data-slot="sheet-overlay"] {
 	background-color: var(--fh-overlay);
+}
+
+/* Every popover (date picker, time picker, dropdowns, menus) shares one shadow. */
+.fahari [data-slot="popover-content"],
+.fahari [data-slot="dropdown-menu-content"],
+.fahari [data-slot="dropdown-menu-sub-content"] {
+	box-shadow: var(--fh-shadow-popover);
 }
 
 /* The shared switch does not expose its thumb, so the Fahari sizes are set here. */

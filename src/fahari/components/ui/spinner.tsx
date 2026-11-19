@@ -1,7 +1,7 @@
 import { cn } from "@common/lib/utils.ts"
 import type { ComponentProps } from "react"
 
-// 18px ring: a faint full track with a 110 degree arc in the current text colour.
+// 18px ring: a faint full track (25% of the text colour) with a 110 degree arc in the current text colour.
 export function Spinner({ className, ...props }: ComponentProps<"svg">) {
 	return (
 		<svg
@@ -11,7 +11,14 @@ export function Spinner({ className, ...props }: ComponentProps<"svg">) {
 			{...props}
 		>
 			<title>Loading</title>
-			<circle cx="9" cy="9" r="8" stroke="#8080804D" strokeWidth="2" />
+			<circle
+				cx="9"
+				cy="9"
+				r="8"
+				stroke="currentColor"
+				strokeOpacity="0.25"
+				strokeWidth="2"
+			/>
 			<circle
 				cx="9"
 				cy="9"

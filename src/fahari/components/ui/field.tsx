@@ -242,7 +242,7 @@ const pickerTriggerClasses = cn(
 )
 
 const pickerPanelClasses =
-	"rounded-fh-md border-fh-line bg-fh-surface p-0 shadow-fh-picker"
+	"rounded-fh-md border-fh-line bg-fh-surface p-0 shadow-fh-popover"
 
 function PickerDayButton({
 	className,
@@ -252,6 +252,9 @@ function PickerDayButton({
 		<CalendarDayButton
 			className={cn(
 				"aspect-auto h-9 min-w-0 rounded-fh-sm text-sm font-medium text-fh-ink hover:bg-fh-subtle hover:text-fh-ink dark:hover:text-fh-ink",
+				// The shared button halves the opacity of anything disabled; here the
+				// faint text colour alone marks a day that cannot be picked.
+				"disabled:opacity-100",
 				"group-data-[focused=true]/day:border-transparent group-data-[focused=true]/day:ring-2 group-data-[focused=true]/day:ring-fh-accent-ink",
 				"data-[selected-single=true]:bg-fh-accent data-[selected-single=true]:font-bold data-[selected-single=true]:text-fh-on-accent data-[selected-single=true]:hover:bg-fh-accent-hover",
 				className,
@@ -359,8 +362,10 @@ export function DateField({
 							week: "mt-0.5 flex w-full gap-0.5",
 							day: "group/day relative h-9 flex-1 p-0 text-center select-none",
 							today: "",
-							outside: "[&>button]:text-fh-ink-faint",
-							disabled: "opacity-35 [&>button]:text-fh-ink-faint",
+							// Days from the months either side are a step quieter than this
+							// month's, but still clearly darker than days that cannot be picked.
+							outside: "[&>button:not(:disabled)]:text-fh-ink-muted",
+							disabled: "[&>button]:text-fh-ink-faint",
 						}}
 						components={{ DayButton: PickerDayButton }}
 						formatters={{

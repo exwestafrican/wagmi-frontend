@@ -12,7 +12,7 @@ const pillVariants = cva("gap-1.5 px-[9px] py-[3px] text-xs font-bold", {
 			// Neutral pill with a leading dot, e.g. "2 spots left".
 			status: "bg-fh-subtle text-fh-ink",
 			// Sits on a photo, so it keeps the same colours in both modes.
-			ended: "bg-[#121212b3] py-[2px] text-white",
+			ended: "bg-fh-black/60 py-[2px] text-fh-white",
 		},
 	},
 	defaultVariants: {
@@ -49,7 +49,7 @@ export function CountdownSticker({
 	return (
 		<Badge
 			className={cn(
-				"bg-[#121212] px-[11px] py-1 text-xs font-bold text-[#aae1f0]",
+				"bg-fh-black px-[11px] py-1 text-xs font-bold text-fh-secondary",
 				tilted && "-rotate-[4deg]",
 				className,
 			)}
@@ -67,7 +67,7 @@ export function SoldOutBadge({
 	return (
 		<span
 			className={cn(
-				"flex size-24 -rotate-[8deg] items-center justify-center rounded-full bg-[#121212] px-4 text-center text-xl leading-[1.05] font-extrabold text-[#f7f7f4] shadow-[0_4px_12px_#00000066]",
+				"flex size-24 -rotate-[8deg] items-center justify-center rounded-full bg-fh-black px-4 text-center text-xl leading-[1.05] font-extrabold text-[#f7f7f4] shadow-[0_4px_12px_#00000066]",
 				className,
 			)}
 			{...props}
@@ -87,7 +87,7 @@ const sources = {
 		icon: (
 			<span
 				aria-hidden
-				className="flex size-3 items-center justify-center rounded-[3px] bg-[#121212] text-[8px] font-extrabold text-white"
+				className="flex size-3 items-center justify-center rounded-[3px] bg-fh-black text-[8px] font-extrabold text-fh-white"
 			>
 				F
 			</span>
@@ -106,7 +106,7 @@ export function SourcePill({
 	return (
 		<Badge
 			className={cn(
-				"gap-1.5 bg-white px-[11px] py-[5px] text-[13px] font-semibold text-[#121212] shadow-fh-float",
+				"gap-1.5 bg-fh-white px-[11px] py-[5px] text-[13px] font-semibold text-fh-black shadow-fh-float",
 				className,
 			)}
 			{...props}

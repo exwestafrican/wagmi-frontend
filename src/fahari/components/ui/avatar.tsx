@@ -8,13 +8,16 @@ import {
 import { cn } from "@common/lib/utils.ts"
 import type { ComponentProps } from "react"
 
-// The five pastel gradients from the design system.
-const gradients = [
-	"from-[#FFD6A5] to-[#FFADAD]",
-	"from-[#CAFFBF] to-[#9BF6FF]",
-	"from-[#BDB2FF] to-[#FFC6FF]",
-	"from-[#A0C4FF] to-[#BDB2FF]",
-	"from-[#FDFFB6] to-[#CAFFBF]",
+// The eight guest colours from the design system.
+const colours = [
+	"bg-fh-avatar-1",
+	"bg-fh-avatar-2",
+	"bg-fh-avatar-3",
+	"bg-fh-avatar-4",
+	"bg-fh-avatar-5",
+	"bg-fh-avatar-6",
+	"bg-fh-avatar-7",
+	"bg-fh-avatar-8",
 ]
 
 function initialsOf(name: string) {
@@ -26,14 +29,14 @@ function initialsOf(name: string) {
 	return letters.toUpperCase()
 }
 
-// The same name always gets the same gradient.
-function gradientFor(name: string) {
+// The same name always gets the same colour.
+function colourFor(name: string) {
 	let total = 0
 	for (const character of name) total += character.charCodeAt(0)
-	return gradients[total % gradients.length]
+	return colours[total % colours.length]
 }
 
-// A person's photo, or their initials on a pastel gradient when there is none.
+// A person's photo, or their initials on a pastel colour when there is none.
 export function Avatar({
 	name,
 	src,
@@ -49,10 +52,7 @@ export function Avatar({
 				<AvatarImage src={src} alt={name} className="object-cover" />
 			) : null}
 			<AvatarFallback
-				className={cn(
-					"bg-linear-135 text-sm font-bold text-[#121212]",
-					gradientFor(name),
-				)}
+				className={cn("text-sm font-bold text-fh-black", colourFor(name))}
 			>
 				{initialsOf(name)}
 			</AvatarFallback>

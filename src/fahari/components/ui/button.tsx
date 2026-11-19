@@ -104,7 +104,7 @@ const iconButtonVariants = cva(
 					"border border-fh-line-strong bg-transparent text-fh-ink hover:bg-fh-subtle active:bg-fh-line-strong",
 				// Sits on top of a photo, so it stays white in both modes.
 				onPhoto:
-					"bg-white text-[#121212] shadow-fh-float hover:bg-[#f5f5f2] active:bg-[#e4e4e0]",
+					"bg-fh-white text-fh-black shadow-fh-float hover:bg-[#f5f5f2] active:bg-[#e4e4e0]",
 			},
 			size: {
 				md: "size-11 [&_svg:not([class*='size-'])]:size-[18px]",
