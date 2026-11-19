@@ -13,6 +13,7 @@ import { BookingError } from "@fahari/features/booking/components/booking-error.
 import { BookingPending } from "@fahari/features/booking/components/booking-pending.tsx"
 import { BookingPage } from "@fahari/features/booking/page.tsx"
 import { BookingSuccessPage } from "@fahari/features/booking/success-page.tsx"
+import { DesignSystemPage } from "@fahari/features/design-system/page.tsx"
 import { FahariHomePage } from "@fahari/features/home/page.tsx"
 import { type AnyRoute, createRoute } from "@tanstack/react-router"
 import { z } from "zod"
@@ -98,8 +99,17 @@ export function createFahariRouteTree(parentRoute: AnyRoute) {
 		component: AdminBookingsPage,
 	})
 
+	// Shows every design system component on one page. Development only.
+	const fahariDesignSystemRoute = createRoute({
+		getParentRoute: () => parentRoute,
+		staticData: { product: "fahari" },
+		path: "design-system",
+		component: DesignSystemPage,
+	})
+
 	return [
 		fahariHomeRoute,
+		...(import.meta.env.DEV ? [fahariDesignSystemRoute] : []),
 		fahariBookingSuccessRoute,
 		fahariBookingRoute,
 		fahariAdminLoginRoute,
