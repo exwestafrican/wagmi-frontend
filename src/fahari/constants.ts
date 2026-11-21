@@ -1,5 +1,9 @@
 export const FAHARI_WORKSPACE_CODE = ""
 
+// Map ID from Google Cloud Map Management (same project as the Maps API key); falls back to Google's demo ID locally.
+export const GOOGLE_MAPS_MAP_ID =
+	import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID"
+
 export const FahariPages = {
 	BOOKING: "/booking",
 	BOOKING_SUCCESS: "/booking/success",
@@ -9,6 +13,8 @@ export const FahariApiPaths = {
 	CHAUFFEUR_CLIENT: "booking/chauffeur-client",
 	RIDE_FARE: "booking/calculate/ride-fare",
 	RIDE_REQUESTS: "booking/ride-requests",
+	ADDRESS_SUGGESTIONS: "booking/address-suggestions",
+	PLACES: "booking/places",
 } as const
 
 export const FahariAdminPages = {
