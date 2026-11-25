@@ -56,7 +56,8 @@ function PickupAddressWithMap() {
 function PickupAddressInput({ showMap }: { showMap: boolean }) {
 	const form = useFormContext<RideFormValues>()
 	const listId = useId()
-	const sessionToken = useRef<string | undefined>(undefined)
+	const [firstSessionToken] = useState(() => crypto.randomUUID())
+	const sessionToken = useRef(firstSessionToken)
 	const [query, setQuery] = useState("")
 	const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
 	const [open, setOpen] = useState(false)
@@ -75,7 +76,6 @@ function PickupAddressInput({ showMap }: { showMap: boolean }) {
 		let cancelled = false
 		const timer = setTimeout(async () => {
 			try {
-				sessionToken.current ??= crypto.randomUUID()
 				const found = await fetchAddressSuggestions(input, sessionToken.current)
 				if (cancelled) return
 				setSuggestions(found)
@@ -98,8 +98,8 @@ function PickupAddressInput({ showMap }: { showMap: boolean }) {
 		setOpen(false)
 		setSuggestions([])
 		// Locating the pick ends Google's billing session, so the next search starts a new one.
-		const token = sessionToken.current ?? crypto.randomUUID()
-		sessionToken.current = undefined
+		const token = sessionToken.current
+		sessionToken.current = crypto.randomUUID()
 		let place: PlaceLocation
 		try {
 			place = await fetchPlaceLocation(suggestion.placeId, token)
